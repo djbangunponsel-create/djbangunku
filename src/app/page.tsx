@@ -1,47 +1,54 @@
 "use client";
 
 import Link from "next/link";
-import { Users, Wallet, FileText, BarChart3, CreditCard, PiggyBank, TrendingUp, UserPlus } from "lucide-react";
+import { Users, Wallet, FileText, BarChart3, CreditCard, PiggyBank, TrendingUp, UserPlus, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const menuItems = [
-  {
-    title: "Data Anggota",
-    description: "Kelola data anggota KSP",
-    icon: Users,
-    href: "/anggota",
-    color: "bg-blue-500",
-  },
-  {
-    title: "Simpanan",
-    description: "Kelola simpanan anggota",
-    icon: PiggyBank,
-    href: "/simpanan",
-    color: "bg-green-500",
-  },
-  {
-    title: "Pinjaman",
-    description: "Kelola pinjaman anggota",
-    icon: CreditCard,
-    href: "/pinjaman",
-    color: "bg-orange-500",
-  },
-  {
-    title: "Laporan",
-    description: "Lihat laporan keuangan",
-    icon: FileText,
-    href: "/laporan",
-    color: "bg-purple-500",
-  },
-  {
-    title: "Statistik",
-    description: "Statistik dan grafik",
-    icon: BarChart3,
-    href: "/statistik",
-    color: "bg-indigo-500",
-  },
-];
+    const menuItems = [
+      {
+        title: "Data Anggota",
+        description: "Kelola data anggota KSP",
+        icon: Users,
+        href: "/anggota",
+        color: "bg-blue-500",
+      },
+      {
+        title: "Simpanan",
+        description: "Kelola simpanan anggota",
+        icon: PiggyBank,
+        href: "/simpanan",
+        color: "bg-green-500",
+      },
+      {
+        title: "Pinjaman",
+        description: "Kelola pinjaman anggota",
+        icon: CreditCard,
+        href: "/pinjaman",
+        color: "bg-orange-500",
+      },
+      {
+        title: "Laporan",
+        description: "Lihat laporan keuangan",
+        icon: FileText,
+        href: "/laporan",
+        color: "bg-purple-500",
+      },
+      {
+        title: "Statistik",
+        description: "Statistik dan grafik",
+        icon: BarChart3,
+        href: "/statistik",
+        color: "bg-indigo-500",
+      },
+      {
+        title: "Tambah Anggota",
+        description: "Pendaftaran anggota baru",
+        icon: PlusCircle,
+        href: "/register",
+        color: "bg-emerald-500",
+      },
+    ];
 
 export default function Home() {
   return (
@@ -89,7 +96,7 @@ export default function Home() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {menuItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">

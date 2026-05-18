@@ -53,15 +53,40 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">KSP Mulia Dana Sejahtera</h1>
               <p className="text-sm text-gray-600">Aplikasi Koperasi Simpan Pinjam</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
+            <Button variant="outline" asChild>
+              <Link href="/anggota">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Tambah Anggota Baru
-              </Button>
-            </div>
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
+
+      <nav className="bg-gray-50 border-b">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex space-x-1 overflow-x-auto py-2">
+            <Button variant="ghost" asChild>
+              <Link href="/">Dashboard</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/anggota">Data Anggota</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/simpanan">Simpanan</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/pinjaman">Pinjaman</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/laporan">Laporan</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/statistik">Statistik</Link>
+            </Button>
+          </div>
+        </div>
+      </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PlusCircle, Search, Edit, Trash2, CheckCircle, XCircle } from "lucide-react"
+import { PlusCircle, Search, Edit, Trash2, Home } from "lucide-react"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Pinjaman - KSP Mulia Dana Sejahtera",
@@ -26,13 +27,28 @@ export default function PinjamanPage() {
               <h1 className="text-2xl font-bold text-gray-900">Data Pinjaman</h1>
               <p className="text-sm text-gray-600">Kelola pinjaman anggota KSP</p>
             </div>
-            <Button>
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Tambah Pinjaman
+            <Button asChild>
+              <Link href="/">
+                <Home className="w-4 h-4 mr-2" />
+                Kembali ke Dashboard
+              </Link>
             </Button>
           </div>
         </div>
       </header>
+
+      <nav className="bg-gray-50 border-b">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex space-x-1 overflow-x-auto py-2">
+            <Button variant="ghost" asChild><Link href="/">Dashboard</Link></Button>
+            <Button variant="ghost" asChild><Link href="/anggota">Data Anggota</Link></Button>
+            <Button variant="ghost" asChild><Link href="/simpanan">Simpanan</Link></Button>
+            <Button variant="ghost" asChild><Link href="/pinjaman">Pinjaman</Link></Button>
+            <Button variant="ghost" asChild><Link href="/laporan">Laporan</Link></Button>
+            <Button variant="ghost" asChild><Link href="/statistik">Statistik</Link></Button>
+          </div>
+        </div>
+      </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

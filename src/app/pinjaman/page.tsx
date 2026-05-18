@@ -10,12 +10,7 @@ export const metadata: Metadata = {
   title: "Pinjaman - KSP Mulia Dana Sejahtera",
 }
 
-const pinjamanData = [
-  { id: "PJ001", anggota: "Siti Aisyah", jumlah: 15000000, bunga: 1.5, tenor: 12, angsuran: 1312500, sisa: 8750000, status: "Aktif" },
-  { id: "PJ002", anggota: "Rina Wijaya", jumlah: 22500000, bunga: 1.5, tenor: 24, angsuran: 1015625, sisa: 16300000, status: "Aktif" },
-  { id: "PJ003", anggota: "Budi Santoso", jumlah: 10000000, bunga: 1.5, tenor: 10, angsuran: 850000, sisa: 0, status: "Lunas" },
-  { id: "PJ004", anggota: "Ahmad Sutrisno", jumlah: 5000000, bunga: 1.5, tenor: 6, angsuran: 425000, sisa: 0, status: "Lunas" },
-]
+const pinjamanData = []
 
 export default function PinjamanPage() {
   return (
@@ -43,7 +38,7 @@ export default function PinjamanPage() {
             <Button variant="ghost" asChild><Link href="/">Dashboard</Link></Button>
             <Button variant="ghost" asChild><Link href="/anggota">Data Anggota</Link></Button>
             <Button variant="ghost" asChild><Link href="/simpanan">Simpanan</Link></Button>
-            <Button variant="ghost" asChild><Link href="/pinjaman">Pinjaman</Link></Button>
+            <Button variant="default" asChild><Link href="/pinjaman">Pinjaman</Link></Button>
             <Button variant="ghost" asChild><Link href="/laporan">Laporan</Link></Button>
             <Button variant="ghost" asChild><Link href="/statistik">Statistik</Link></Button>
           </div>
@@ -57,8 +52,8 @@ export default function PinjamanPage() {
               <CardTitle className="text-sm">Total Pinjaman Aktif</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 298 Jt</div>
-              <p className="text-xs text-gray-500">78 pinjaman aktif</p>
+              <div className="text-xl font-bold">Rp 0</div>
+              <p className="text-xs text-gray-500">0 pinjaman aktif</p>
             </CardContent>
           </Card>
           <Card>
@@ -66,8 +61,8 @@ export default function PinjamanPage() {
               <CardTitle className="text-sm">Pinjaman Lunas</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 156 Jt</div>
-              <p className="text-xs text-gray-500">42 pinjaman lunas</p>
+              <div className="text-xl font-bold">Rp 0</div>
+              <p className="text-xs text-gray-500">0 pinjaman lunas</p>
             </CardContent>
           </Card>
           <Card>
@@ -75,7 +70,7 @@ export default function PinjamanPage() {
               <CardTitle className="text-sm">Angsuran/Bulan</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 22 Jt</div>
+              <div className="text-xl font-bold">Rp 0</div>
             </CardContent>
           </Card>
           <Card>
@@ -83,8 +78,8 @@ export default function PinjamanPage() {
               <CardTitle className="text-sm">Pendapatan Bunga</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 4.5 Jt</div>
-              <p className="text-xs text-green-600">Tahun ini</p>
+              <div className="text-xl font-bold">Rp 0</div>
+              <p className="text-xs text-gray-500">Tahun ini</p>
             </CardContent>
           </Card>
         </div>
@@ -92,7 +87,7 @@ export default function PinjamanPage() {
         <Card>
           <CardHeader>
             <CardTitle>Daftar Pinjaman</CardTitle>
-            <CardDescription>Total 120 pinjaman</CardDescription>
+            <CardDescription>Total 0 pinjaman</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4 mb-4">

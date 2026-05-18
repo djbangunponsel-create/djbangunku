@@ -10,12 +10,7 @@ export const metadata: Metadata = {
   title: "Simpanan - KSP Mulia Dana Sejahtera",
 }
 
-const simpananData = [
-  { id: "TS001", anggota: "Ahmad Sutrisno", tipe: "Simpanan Pokok", jumlah: 1000000, tanggal: "2024-01-15", status: "Aktif" },
-  { id: "TS002", anggota: "Siti Aisyah", tipe: "Simpanan Wajib", jumlah: 500000, tanggal: "2024-02-20", status: "Aktif" },
-  { id: "TS003", anggota: "Budi Santoso", tipe: "Simpanan Sukarela", jumlah: 2750000, tanggal: "2024-03-10", status: "Aktif" },
-  { id: "TS004", anggota: "Rina Wijaya", tipe: "Simpanan Wajib", jumlah: 500000, tanggal: "2024-02-28", status: "Aktif" },
-]
+const simpananData = []
 
 export default function SimpananPage() {
   return (
@@ -42,7 +37,7 @@ export default function SimpananPage() {
           <div className="flex space-x-1 overflow-x-auto py-2">
             <Button variant="ghost" asChild><Link href="/">Dashboard</Link></Button>
             <Button variant="ghost" asChild><Link href="/anggota">Data Anggota</Link></Button>
-            <Button variant="ghost" asChild><Link href="/simpanan">Simpanan</Link></Button>
+            <Button variant="default" asChild><Link href="/simpanan">Simpanan</Link></Button>
             <Button variant="ghost" asChild><Link href="/pinjaman">Pinjaman</Link></Button>
             <Button variant="ghost" asChild><Link href="/laporan">Laporan</Link></Button>
             <Button variant="ghost" asChild><Link href="/statistik">Statistik</Link></Button>
@@ -57,7 +52,7 @@ export default function SimpananPage() {
               <CardTitle className="text-sm">Total Simpanan Pokok</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 128 Jt</div>
+              <div className="text-xl font-bold">Rp 0</div>
             </CardContent>
           </Card>
           <Card>
@@ -65,7 +60,7 @@ export default function SimpananPage() {
               <CardTitle className="text-sm">Total Simpanan Wajib</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 64 Jt</div>
+              <div className="text-xl font-bold">Rp 0</div>
             </CardContent>
           </Card>
           <Card>
@@ -73,7 +68,7 @@ export default function SimpananPage() {
               <CardTitle className="text-sm">Total Simpanan Sukarela</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 260 Jt</div>
+              <div className="text-xl font-bold">Rp 0</div>
             </CardContent>
           </Card>
           <Card>
@@ -81,7 +76,7 @@ export default function SimpananPage() {
               <CardTitle className="text-sm">Total Semua Simpanan</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp 452 Jt</div>
+              <div className="text-xl font-bold">Rp 0</div>
             </CardContent>
           </Card>
         </div>
@@ -89,7 +84,7 @@ export default function SimpananPage() {
         <Card>
           <CardHeader>
             <CardTitle>Daftar Transaksi Simpanan</CardTitle>
-            <CardDescription>Total 1.245 transaksi simpanan</CardDescription>
+            <CardDescription>Total 0 transaksi simpanan</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4 mb-4">

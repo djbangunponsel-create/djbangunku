@@ -111,7 +111,7 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-gray-600">Total Anggota</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">128</div>
+              <div className="text-2xl font-bold">0</div>
               <p className="text-xs text-gray-500">+5 bulan ini</p>
             </CardContent>
           </Card>

@@ -10,13 +10,7 @@ export const metadata: Metadata = {
   title: "Data Anggota - KSP Mulia Dana Sejahtera",
 }
 
-const anggotaData = [
-  { id: "AG001", nama: "Ahmad Sutrisno", nik: "3201234567890001", telepon: "081234567890", alamat: "Jl. Merdeka No. 12", simpanan: 5500000, pinjaman: 0 },
-  { id: "AG002", nama: "Siti Aisyah", nik: "3201234567890002", telepon: "081234567891", alamat: "Jl. Pemuda No. 45", simpanan: 3200000, pinjaman: 15000000 },
-  { id: "AG003", nama: "Budi Santoso", nik: "3201234567890003", telepon: "081234567892", alamat: "Jl. Diponegoro No. 67", simpanan: 2750000, pinjaman: 0 },
-  { id: "AG004", nama: "Rina Wijaya", nik: "3201234567890004", telepon: "081234567893", alamat: "Jl. Gatot Subroto No. 89", simpanan: 4100000, pinjaman: 22500000 },
-  { id: "AG005", nama: "Dedi Kurniawan", nik: "3201234567890005", telepon: "081234567894", alamat: "Jl. Ahmad Dahlan No. 23", simpanan: 1800000, pinjaman: 0 },
-]
+const anggotaData = []
 
 export default function AnggotaPage() {
   return (
@@ -55,7 +49,7 @@ export default function AnggotaPage() {
         <Card>
           <CardHeader>
             <CardTitle>Daftar Anggota</CardTitle>
-            <CardDescription>Total 128 anggota terdaftar</CardDescription>
+            <CardDescription>Total 0 anggota terdaftar</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4 mb-4">

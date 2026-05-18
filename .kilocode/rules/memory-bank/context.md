@@ -2,14 +2,14 @@
 
 ## Current State
 
-**Project Status**: ✅ Aplikasi KSP selesai dibuat dengan laporan keuangan lengkap
+**Project Status**: ✅ Aplikasi KSP selesai dibuat dengan fitur lengkap
 
-Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan fitur lengkap termasuk laporan keuangan yang diperlukan.
+Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan fitur lengkap termasuk manajemen anggota, simpanan, pinjaman, laporan keuangan, dan statistik.
 
 ## Recently Completed
 
 - [x] Aplikasi KSP Mulia Dana Sejahtera - halaman utama dengan dashboard
-- [x] Halaman Data Anggota - kelola data anggota KSP
+- [x] Halaman Data Anggota - kelola data anggota KSP dengan form pendaftaran anggota baru yang muncul saat menekan tombol "Tambah Anggota"
 - [x] Halaman Simpanan - kelola simpanan (pokok, wajib, sukarela)
 - [x] Halaman Pinjaman - kelola pinjaman dengan bunga dan tenor
 - [x] Halaman Laporan - laporan keuangan lengkap dengan submenu:
@@ -23,14 +23,16 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 - [x] Komponen UI: Card, Button, Input, Table, Sonner (toast)
 - [x] Membersihkan semua data sampel dan mengosongkan array data untuk fresh start
 - [x] Memperbaiki error TypeScript dengan menambahkan tipe interface untuk semua data array
-- [x] Menambahkan menu laporan Catatan Atas Laporan Keuangan (CALK)
+- [x] Mengembalikan tampilan Dashboard utama seperti semula tanpa form input
+- [x] Memindahkan seluruh komponen form pendaftaran anggota baru ke dalam halaman Data Anggota sebagai fitur tambah anggota
+- [x] Memperbarui navigasi dan menu sesuai dengan perubahan
 
 ## Current Structure
 
 | File/Directory | Purpose |
 |----------------|---------|
 | `src/app/page.tsx` | Dashboard utama |
-| `src/app/anggota/page.tsx` | Data anggota |
+| `src/app/anggota/page.tsx` | Data anggota dengan form pendaftaran anggota baru |
 | `src/app/simpanan/page.tsx` | Manajemen simpanan |
 | `src/app/pinjaman/page.tsx` | Manajemen pinjaman |
 | `src/app/laporan/page.tsx` | Halaman induk laporan keuangan |
@@ -42,12 +44,16 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | `src/app/laporan/catatan/page.tsx` | Catatan Atas Laporan Keuangan (CALK) |
 | `src/app/statistik/page.tsx` | Grafik statistik |
 | `src/components/ui/` | Komponen UI |
+| `src/components/RegisterAnggotaForm.tsx` | Komponen form pendaftaran anggota baru |
 
 ## Session History
 
 | Date | Changes |
 |------|---------|
-| 2026-05-18 | Membuat aplikasi KSP Mulia Dana Sejahtera lengkap dengan semua laporan keuangan dan membersihkan data sampel |
-| 2026-05-18 | Memperbaiki error laporan menu dengan membuat halaman laporan dan semua subhalaman yang diperlukan |
+| 2026-05-18 | Membuat aplikasi KSP Mulia Dana Sejahtera lengkap dengan semua fitur |
+| 2026-05-18 | Membersihkan semua data sampel dan mengosongkan array data untuk fresh start |
 | 2026-05-18 | Memperbaiki error TypeScript dengan menambahkan tipe interface untuk semua data array |
-| 2026-05-18 | Menambahkan menu laporan Catatan Atas Laporan Keuangan (CALK) |
+| 2026-05-18 | Membuat halaman laporan lengkap dengan semua sublaporan yang diperlukan |
+| 2026-05-18 | Mengembalikan tampilan Dashboard utama seperti semula tanpa form input |
+| 2026-05-18 | Memindahkan komponen form pendaftaran anggota baru ke halaman Data Anggota |
+| 2026-05-18 | Memperbarui navigasi dan menu sesuai dengan perubahan |

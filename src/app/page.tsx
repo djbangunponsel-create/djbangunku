@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Users, Wallet, FileText, BarChart3, CreditCard, PiggyBank, TrendingUp, UserPlus, PlusCircle } from "lucide-react";
+import { Users, Wallet, FileText, BarChart3, CreditCard, PiggyBank, TrendingUp, UserPlus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -41,13 +41,6 @@ import { Button } from "@/components/ui/button";
         href: "/statistik",
         color: "bg-indigo-500",
       },
-      {
-        title: "Tambah Anggota",
-        description: "Pendaftaran anggota baru",
-        icon: PlusCircle,
-        href: "/register",
-        color: "bg-emerald-500",
-      },
     ];
 
 export default function Home() {
@@ -60,12 +53,6 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">KSP Mulia Dana Sejahtera</h1>
               <p className="text-sm text-gray-600">Aplikasi Koperasi Simpan Pinjam</p>
             </div>
-            <Button variant="outline" asChild>
-              <Link href="/anggota">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Tambah Anggota Baru
-              </Link>
-            </Button>
           </div>
         </div>
       </header>
@@ -96,7 +83,7 @@ export default function Home() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {menuItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">

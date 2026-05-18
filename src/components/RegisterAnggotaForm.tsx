@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-export default function RegisterAnggotaForm() {
+export default function RegisterAnggotaForm({ onComplete }: { onComplete: () => void }) {
   // Auto-generated anggota number (example format: AG + timestamp)
   const autoAnggotaNo = `AG${Date.now().toString().slice(-6)}`
 
@@ -53,8 +53,7 @@ export default function RegisterAnggotaForm() {
               <Input
                 type="text"
                 placeholder="Alamat lengkap sesuai KTP"
-                className="w-full"
-              />
+                className="w-full" />
             </div>
           </div>
         </div>
@@ -216,10 +215,12 @@ export default function RegisterAnggotaForm() {
 
         {/* Tombol Aksi */}
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" asChild>
-            <a href="#">Batal</a>
+          <Button variant="outline" asChild onClick={onComplete}>
+            Batal
           </Button>
-          <Button variant="default">Simpan Data</Button>
+          <Button variant="default" asChild onClick={onComplete}>
+            Simpan Data
+          </Button>
         </div>
       </form>
     </div>

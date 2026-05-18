@@ -56,78 +56,78 @@ export default function PhuPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Pendapatan Bunga Pinjaman</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">45.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Pendapatan Bunga Pinjaman</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Pendapatan Administrasi</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">5.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Pendapatan Administrasi</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Pendapatan Lain-lain</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">2.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Pendapatan Lain-lain</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Pendapatan Operasional
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">52.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm font-medium text-gray-900">
                         BEBAN OPERASIONAL
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-gray-900"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Gaji</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">15.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Gaji</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Sewa</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">6.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Sewa</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Listrik dan Air</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">2.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Listrik dan Air</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Telekomunikasi</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">1.500.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Telekomunikasi</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Perlengkapan Kantor</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">1.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Perlengkapan Kantor</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Penyusutan Aset Tetap</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">8.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Penyusutan Aset Tetap</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Umum dan Administrasi</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">3.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Umum dan Administrasi</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Beban Operasional
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">36.500.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm font-medium text-gray-900">
                         SISA HASIL USAHA SEBELUM PAJAK
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">15.500.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium text-gray-900">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Beban Pajak Penghasilan Badan (22%)</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">3.410.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Beban Pajak Penghasilan Badan (22%)</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-blue-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-lg">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm font-bold text-lg">
                         SISA HASIL USAHA (SHU)
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg">12.090.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-bold text-lg">0</td>
                     </tr>
                   </tbody>
                 </table>

@@ -44,48 +44,42 @@ export default function PromosiEkonomiPage() {
                 
                 <h3 className="mt-4 text-lg font-semibold">1. Penghematan Biaya Pinjaman</h3>
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>Rata-rata bunga pinjaman KSP: 1% per bulan (efektif)</li>
-                  <li>Rata-rata bunga pinjaman di lembaga keuangan lain: 2.5% per bulan</li>
-                  <li>Selisih bunga yang dihemat oleh anggota: 1.5% per bulan</li>
-                  <li>Total pinjaman anggota sepanjang tahun: Rp 350.000.000</li>
-                  <li><strong>Penghematan biaya pinjaman:</strong> Rp 350.000.000 × 1.5% × 12 bulan = Rp 63.000.000</li>
+                  <li>Rata-rata bunga pinjaman KSP: 0% per bulan (belum ada data)</li>
+                  <li>Rata-rata bunga pinjaman di lembaga keuangan lain: 0% per bulan (belum ada perbandingan)</li>
+                  <li>Selisih bunga yang dihemat oleh anggota: 0% per bulan</li>
+                  <li>Total pinjaman anggota sepanjang tahun: Rp 0</li>
+                  <li><strong>Penghematan biaya pinjaman:</strong> Rp 0 × 0% × 12 bulan = Rp 0</li>
                 </ul>
                 
                 <h3 className="mt-4 text-lg font-semibold">2. Bonus Jasa Simpanan</h3>
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>Rata-rata simpanan anggota: Rp 200.000.000</li>
-                  <li>Margin hasil usaha KSP yang dapat dibagikan: 5% per tahun</li>
-                  <li><strong>Bonus jasa simpanan:</strong> Rp 200.000.000 × 5% = Rp 10.000.000</li>
+                  <li>Rata-rata simpanan anggota: Rp 0</li>
+                  <li>Margin hasil usaha KSP yang dapat dibagikan: 0% per tahun</li>
+                  <li><strong>Bonus jasa simpanan:</strong> Rp 0 × 0% = Rp 0</li>
                 </ul>
                 
                 <h3 className="mt-4 text-lg font-semibold">3. Layanan Tambahan yang Diberikan Gratis</h3>
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>Administrasi pengajuan pinjaman: Rp 2.000.000</li>
-                  <li>Konsultasi keuangan anggota: Rp 1.500.000</li>
-                  <li>Pendidikan dan pelatihan keuangan: Rp 3.000.000</li>
-                  <li><strong>Nilai layanan tambahan:</strong> Rp 6.500.000</li>
+                  <li>Administrasi pengajuan pinjaman: Rp 0</li>
+                  <li>Konsultasi keuangan anggota: Rp 0</li>
+                  <li>Pendidikan dan pelatihan keuangan: Rp 0</li>
+                  <li><strong>Nilai layanan tambahan:</strong> Rp 0</li>
                 </ul>
                 
                 <h2 className="mt-6 text-xl font-semibold">TOTAL MANFAAT EKONOMI ANGGOTA</h2>
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-2">
-                  <p className="flex justify-between"><span>Penghematan biaya pinjaman:</span> <span className="font-medium">Rp 63.000.000</span></p>
-                  <p className="flex justify-between"><span>Bonus jasa simpanan:</span> <span className="font-medium">Rp 10.000.000</span></p>
-                  <p className="flex justify-between"><span>Layanan tambahan:</span> <span className="font-medium">Rp 6.500.000</span></p>
+                  <p className="flex justify-between"><span>Penghematan biaya pinjaman:</span> <span className="font-medium">Rp 0</span></p>
+                  <p className="flex justify-between"><span>Bonus jasa simpanan:</span> <span className="font-medium">Rp 0</span></p>
+                  <p className="flex justify-between"><span>Layanan tambahan:</span> <span className="font-medium">Rp 0</span></p>
                   <div className="mt-2 pt-2 border-t">
                     <p className="flex justify-between text-lg font-bold">
-                      <span>Jumlah total manfaat ekonomi anggota:</span> <span className="text-lg font-bold">Rp 79.500.000</span>
+                      <span>Jumlah total manfaat ekonomi anggota:</span> <span className="text-lg font-bold">Rp 0</span>
                     </p>
                   </div>
                 </div>
                 
                 <h2 className="mt-6 text-xl font-semibold">PENJELASAN</h2>
-                <p>Laporan ini menunjukkan bahwa selama satu tahun, anggota KSP XYZ secara koleksi mendapatkan manfaat ekonomi sebesar Rp 79.500.000 dari bertransaksi dengan koperasi, yang terdiri dari:</p>
-                <ol className="list-decimal list-inside mt-2 space-y-2">
-                  <li>Penghematan bunga pinjaman karena koperasi memberikan suku bunga yang lebih rendah dibandingkan pasar</li>
-                  <li>Bonus jasa simpanan berupa bagian dari hasil usaha yang dibagikan kepada anggota</li>
-                  <li>Nilai layanan tambahan yang disediakan koperasi secara gratis atau dengan biaya minimal</li>
-                </ol>
-                <p>Manfaat ini merupakan salah satu landasan koperasi menjalankan prinsip kepentingan anggota sebagai prioritas utama.</p>
+                <p>Laporan ini menunjukkan bahwa selama satu tahun, anggota KSP XYZ secara koleksi mendapatkan manfaat ekonomi sebesar Rp 0 dari bertransaksi dengan koperasi karena belum ada data transaksi yang tercatat. Manfaat ekonomi akan terlihat setelah ada data transaksi anggota.</p>
               </div>
             </div>
           </CardContent>

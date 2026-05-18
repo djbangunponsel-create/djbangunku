@@ -53,123 +53,123 @@ export default function PerubahanEkuitasPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         SALDO EKUITAS AWAL (1 Januari 2025)
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-gray-900"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Simpanan Pokok/Modal Tetap</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">130.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Simpanan Pokok/Modal Tetap</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Simpanan Wajib/Modal Tambahan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">80.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Simpanan Wajib/Modal Tambahan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Cadangan Umum</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">20.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Cadangan Umum</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Cadangan Bakan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">10.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Cadangan Bakan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Hibah</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">5.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Hibah</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Saldo Ekuitas Awal
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">245.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm font-medium text-gray-900">
                         PERUBAHAN SELAMA PERIODE
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-gray-900"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Penambahan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm"></td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Penambahan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Setoran Simpanan Pokok Baru</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">20.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Setoran Simpanan Pokok Baru</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Setoran Simpanan Wajib Baru</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">20.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Setoran Simpanan Wajib Baru</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Cadangan Umum dari SHU Tahun Berjalan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">10.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Cadangan Umum dari SHU Tahun Berjalan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Cadangan Bakan dari SHU Tahun Berjalan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">5.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Cadangan Bakan dari SHU Tahun Berjalan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Hibah Baru</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Hibah Baru</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Penambahan
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">55.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Pengurangan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm"></td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Pengurangan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Penarikan Simpanan Pokok</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Penarikan Simpanan Pokok</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Penarikan Simpanan Wajib</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Penarikan Simpanan Wajib</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Pembagian SHU (Bagi Hasil)</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-10">Pembagian SHU (Bagi Hasil)</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Pengurangan
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-lg">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm font-bold text-lg">
                         SALDO EKUITAS AKHIR (31 Desember 2025)
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg"></td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-bold text-lg"></td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Simpanan Pokok/Modal Tetap</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">150.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Simpanan Pokok/Modal Tetap</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Simpanan Wajib/Modal Tambahan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">100.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Simpanan Wajib/Modal Tambahan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Cadangan Umum</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">30.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Cadangan Umum</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Cadangan Bakan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">15.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Cadangan Bakan</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">Hibah</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">5.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8">Hibah</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-blue-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-bold text-lg">
+                      <td className="px-6 py=4 whitespace-nowrap text-sm pl-8 font-bold text-lg">
                         Jumlah Saldo Ekuitas Akhir
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg">300.000.000</td>
+                      <td className="px-6 py=4 whitespace-nowrap text-sm text-right font-bold text-lg">0</td>
                     </tr>
                   </tbody>
                 </table>

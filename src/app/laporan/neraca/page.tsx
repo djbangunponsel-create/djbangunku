@@ -63,25 +63,25 @@ export default function NeracaPage() {
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Kas</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">50.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Piutang Pinjaman Anggota</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">200.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Piutang Bunga</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">20.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Persediaan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">10.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Aktiva Lancar
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">280.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">
@@ -91,23 +91,23 @@ export default function NeracaPage() {
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Investasi Jangka Panjang</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">100.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Aset Tetap (netto)</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">120.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Aktiva Tidak Lancar
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">220.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-blue-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-lg">
                         JUMLAH AKTIVA
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg">500.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -123,21 +123,21 @@ export default function NeracaPage() {
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Utang Jangka Pendek</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">30.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Utang Bunga</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">10.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Cadangan Korto</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">10.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Kewajiban Jangka Pendek
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">50.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">
@@ -147,17 +147,17 @@ export default function NeracaPage() {
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Utang Jangka Panjang</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">100.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Imbalan Kerja</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">50.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Kewajiban Jangka Panjang
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">150.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8">
@@ -167,35 +167,35 @@ export default function NeracaPage() {
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Simpanan Pokok/Modal Tetap</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">150.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Simpanan Wajib/Modal Tambahan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">100.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Cadangan Umum</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">30.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Cadangan Bakan</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">15.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-10">Hibah</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">5.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm pl-8 font-medium">
                         Jumlah Ekuitas
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">300.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">0</td>
                     </tr>
                     <tr className="bg-blue-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-lg">
                         JUMLAH KEWAJIBAN DAN EKUITAS
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg">500.000.000</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-lg">0</td>
                     </tr>
                   </tbody>
                 </table>

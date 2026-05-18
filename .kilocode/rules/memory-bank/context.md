@@ -18,10 +18,12 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   - [x] Perubahan Ekuitas (Laporan Perubahan Modal)
   - [x] Arus Kas
   - [x] Promosi Ekonomi Anggota
+  - [x] Catatan Atas Laporan Keuangan (CALK)
 - [x] Halaman Statistik - grafik pertumbuhan anggota dan simpanan
 - [x] Komponen UI: Card, Button, Input, Table, Sonner (toast)
 - [x] Membersihkan semua data sampel dan mengosongkan array data untuk fresh start
 - [x] Memperbaiki error TypeScript dengan menambahkan tipe interface untuk semua data array
+- [x] Menambahkan menu laporan Catatan Atas Laporan Keuangan (CALK)
 
 ## Current Structure
 
@@ -37,6 +39,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | `src/app/laporan/perubahan-ekuitas/page.tsx` | Laporan Perubahan Ekuitas (Modal) |
 | `src/app/laporan/arus-kas/page.tsx` | Laporan Arus Kas |
 | `src/app/laporan/promosi-ekonomi/page.tsx` | Laporan Promosi Ekonomi Anggota |
+| `src/app/laporan/catatan/page.tsx` | Catatan Atas Laporan Keuangan (CALK) |
 | `src/app/statistik/page.tsx` | Grafik statistik |
 | `src/components/ui/` | Komponen UI |
 
@@ -47,3 +50,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | 2026-05-18 | Membuat aplikasi KSP Mulia Dana Sejahtera lengkap dengan semua laporan keuangan dan membersihkan data sampel |
 | 2026-05-18 | Memperbaiki error laporan menu dengan membuat halaman laporan dan semua subhalaman yang diperlukan |
 | 2026-05-18 | Memperbaiki error TypeScript dengan menambahkan tipe interface untuk semua data array |
+| 2026-05-18 | Menambahkan menu laporan Catatan Atas Laporan Keuangan (CALK) |

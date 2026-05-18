@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, FileText, BarChart3, TrendingUp, PiggyBank, CreditCard } from "lucide-react"
+import { Users, FileText, BarChart3, TrendingUp, PiggyBank, CreditCard, HelpCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ export default function LaporanPage() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <Link href="/laporan/neraca">
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
@@ -108,6 +108,20 @@ export default function LaporanPage() {
                   </div>
                   <CardTitle>Promosi Ekonomi</CardTitle>
                   <CardDescription>Laporan Manfaat Anggota</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          </Card>
+          
+          <Card>
+            <Link href="/laporan/catatan">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-yellow-500 flex items-center justify-center mb-2">
+                    <HelpCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle>Catatan Laporan</CardTitle>
+                  <CardDescription>Catatan Atas Laporan Keuangan</CardDescription>
                 </CardHeader>
               </Card>
             </Link>

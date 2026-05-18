@@ -112,7 +112,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-gray-500">+5 bulan ini</p>
+              <p className="text-xs text-gray-500">+0 bulan ini</p>
             </CardContent>
           </Card>
           <Card>
@@ -120,8 +120,8 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-gray-600">Total Simpanan</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Rp 452 Jt</div>
-              <p className="text-xs text-green-600">+12% dari bulan lalu</p>
+              <div className="text-2xl font-bold">Rp 0</div>
+              <p className="text-xs text-gray-500">+0% dari bulan lalu</p>
             </CardContent>
           </Card>
           <Card>
@@ -129,8 +129,8 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-gray-600">Total Pinjaman</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Rp 298 Jt</div>
-              <p className="text-xs text-gray-500">78 pinjaman aktif</p>
+              <div className="text-2xl font-bold">Rp 0</div>
+              <p className="text-xs text-gray-500">0 pinjaman aktif</p>
             </CardContent>
           </Card>
         </div>

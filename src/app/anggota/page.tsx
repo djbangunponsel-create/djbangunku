@@ -10,7 +10,17 @@ export const metadata: Metadata = {
   title: "Data Anggota - KSP Mulia Dana Sejahtera",
 }
 
-const anggotaData = []
+interface Anggota {
+  id: string
+  nama: string
+  nik: string
+  telepon: string
+  alamat: string
+  simpanan: number
+  pinjaman: number
+}
+
+const anggotaData: Anggota[] = []
 
 export default function AnggotaPage() {
   return (

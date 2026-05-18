@@ -10,7 +10,16 @@ export const metadata: Metadata = {
   title: "Simpanan - KSP Mulia Dana Sejahtera",
 }
 
-const simpananData = []
+interface Simpanan {
+  id: string
+  anggota: string
+  tipe: string
+  jumlah: number
+  tanggal: string
+  status: string
+}
+
+const simpananData: Simpanan[] = []
 
 export default function SimpananPage() {
   return (

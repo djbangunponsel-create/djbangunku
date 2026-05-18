@@ -10,7 +10,18 @@ export const metadata: Metadata = {
   title: "Pinjaman - KSP Mulia Dana Sejahtera",
 }
 
-const pinjamanData = []
+interface Pinjaman {
+  id: string
+  anggota: string
+  jumlah: number
+  bunga: number
+  tenor: number
+  angsuran: number
+  sisa: number
+  status: string
+}
+
+const pinjamanData: Pinjaman[] = []
 
 export default function PinjamanPage() {
   return (

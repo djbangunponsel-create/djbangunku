@@ -127,49 +127,6 @@ export default function AnggotaClientContent() {
     PENGHASILAN_per_Bulan: 0,
   });
 
-  /* ── Auto-fill Tanggal Masuk & next No. Anggota when form opens ── */
-  function computeNextNo(): string {
-    if (anggotaData.length === 0) return '1';
-    const max = anggotaData.reduce((maxN, a) => {
-      const n = parseInt(a.No_Anggota.replace(/\D/g, ''), 10) || 0;
-      return n > maxN ? n : maxN;
-    }, 0);
-    return String(max + 1);
-  }
-
-  function resetFormData(nextNo: string, today: string) {
-    setFormData({
-      No_Anggota: nextNo,
-      NAMA_ANGGOTA: '',
-      Jenis_Kelamin: 'Laki-laki' as "Laki-laki" | "Perempuan",
-      Agama: '',
-      NIK: '',
-      Tempat_Lahir: '',
-      Tanggal_Lahir: '',
-      TELEPON: '',
-      Alamat: '',
-      Tanggal_Masuk: today,
-      Status_Perkawinan: 'Belum Kawin' as "Belum Kawin" | "Kawin" | "Cerai Hidup" | "Cerai Mati",
-      Nama_Pasangan: '',
-      Jumlah_Anak: 0,
-      Nama_Ibu_Kandung: '',
-      Nama_Saudara: '',
-      No_HP_Saudara: '',
-      Hubungan_Saudara: '',
-      Pekerjaan: '',
-      PENGHASILAN_per_Bulan: 0,
-    });
-  }
-
-  const handleTambahClick = () => {
-    try {
-      resetFormData(computeNextNo(), new Date().toISOString().slice(0, 10));
-      setShowForm(true);
-    } catch (err) {
-      console.error('Tambah button error:', err);
-    }
-  };
-
   const filteredData = anggotaData.filter((a) =>
     a.NAMA_ANGGOTA.toLowerCase().includes(search.toLowerCase()) ||
     a.NIK.includes(search) ||

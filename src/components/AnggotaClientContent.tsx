@@ -16,8 +16,6 @@ interface Anggota {
   alamat: string;
   tanggalMasuk: string; // DD-MM-YYYY
   status: 'Aktif' | 'Pasif';
-  simpanan: number;
-  pinjaman: number;
 }
 
 export default function AnggotaClientContent() {
@@ -35,8 +33,6 @@ export default function AnggotaClientContent() {
     jenisKelamin: 'L' as 'L' | 'P',
     agama: '',
     status: 'Aktif' as 'Aktif' | 'Pasif',
-    simpanan: 0,
-    pinjaman: 0,
   });
 
   const nextId = anggotaData.length > 0 ? Math.max(...anggotaData.map(a => a.id)) + 1 : 1;
@@ -54,8 +50,6 @@ export default function AnggotaClientContent() {
       alamat: formData.alamat,
       tanggalMasuk: new Date().toLocaleDateString('id-ID'),
       status: formData.status,
-      simpanan: formData.simpanan,
-      pinjaman: formData.pinjaman,
     };
     setAnggotaData([...anggotaData, newAnggota]);
     setShowForm(false);
@@ -69,8 +63,6 @@ export default function AnggotaClientContent() {
       jenisKelamin: 'L',
       agama: '',
       status: 'Aktif',
-      simpanan: 0,
-      pinjaman: 0,
     });
   };
 
@@ -107,22 +99,20 @@ export default function AnggotaClientContent() {
               </Button>
               <Button
                 variant="default"
-                onClick={(e) => {
-                  setFormData({
-                    id: nextId,
-                    nama: '',
-                    nik: '',
-                    telepon: '',
-                    alamat: '',
-                    tanggalLahir: '',
-                    jenisKelamin: 'L',
-                    agama: '',
-                    status: 'Aktif',
-                    simpanan: 0,
-                    pinjaman: 0,
-                  });
-                  setShowForm(true);
-                }}
+onClick={(e) => {
+                   setFormData({
+                     id: nextId,
+                     nama: '',
+                     nik: '',
+                     telepon: '',
+                     alamat: '',
+                     tanggalLahir: '',
+                     jenisKelamin: 'L',
+                     agama: '',
+                     status: 'Aktif',
+                   });
+                   setShowForm(true);
+                 }}
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Tambah Anggota Baru
@@ -408,46 +398,8 @@ export default function AnggotaClientContent() {
                   />
                   Pasif
                 </label>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Simpanan (Rp)
-                  </label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="0"
-                    value={formData.simpanan}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        simpanan: e.target.value ? parseInt(e.target.value) : 0,
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Pinjaman (Rp)
-                  </label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="0"
-                    value={formData.pinjaman}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pinjaman: e.target.value ? parseInt(e.target.value) : 0,
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3 pt-4">
+</div>
+               <div className="flex justify-end space-x-3 pt-4">
                 <Button variant="outline" onClick={() => setShowForm(false)}>
                   Batal
                 </Button>

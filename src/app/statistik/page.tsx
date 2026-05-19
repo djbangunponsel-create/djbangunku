@@ -43,68 +43,38 @@ export default function StatistikPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
+<Card>
             <CardHeader>
               <CardTitle>Grafik Pertumbuhan Anggota</CardTitle>
               <CardDescription>Grafik pertumbuhan 12 bulan terakhir</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-48 flex items-end justify-between gap-1">
-                {[65, 78, 85, 92, 88, 95, 102, 108, 115, 120, 125, 128].map((value, i) => (
-                  <div key={i} className="flex-1 bg-blue-500 rounded-t" style={{ height: `${(value/130)*100}%` }}></div>
-                ))}
+              <div className="h-48 flex items-center justify-center text-gray-400">
+                <p>Belum ada data anggota</p>
               </div>
             </CardContent>
           </Card>
-
+          
           <Card>
             <CardHeader>
               <CardTitle>Grafik Simpanan per Bulan</CardTitle>
               <CardDescription>Riwayat simpanan 6 bulan terakhir</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-48 flex items-end justify-between gap-1">
-                {[380, 410, 395, 425, 440, 452].map((value, i) => (
-                  <div key={i} className="flex-1 bg-green-500 rounded-t" style={{ height: `${(value/460)*100}%` }}></div>
-                ))}
+              <div className="h-48 flex items-center justify-center text-gray-400">
+                <p>Belum ada data simpanan</p>
               </div>
             </CardContent>
           </Card>
-
+          
           <Card>
             <CardHeader>
               <CardTitle>Komposisi Simpanan</CardTitle>
               <CardDescription>Persentase tipe simpanan</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-sm">
-                    <span>Simpanan Pokok</span>
-                    <span>28%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{ width: "28%" }}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm">
-                    <span>Simpanan Wajib</span>
-                    <span>14%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{ width: "14%" }}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm">
-                    <span>Simpanan Sukarela</span>
-                    <span>58%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: "58%" }}></div>
-                  </div>
-                </div>
+              <div className="h-48 flex items-center justify-center text-gray-400">
+                <p>Belum ada data simpanan</p>
               </div>
             </CardContent>
           </Card>

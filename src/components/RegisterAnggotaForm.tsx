@@ -215,10 +215,10 @@ export default function RegisterAnggotaForm({ onComplete }: { onComplete: () => 
 
         {/* Tombol Aksi */}
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" asChild onClick={onComplete}>
+          <Button variant="outline" onClick={onComplete}>
             Batal
           </Button>
-          <Button variant="default" asChild onClick={onComplete}>
+          <Button variant="default" onClick={onComplete}>
             Simpan Data
           </Button>
         </div>

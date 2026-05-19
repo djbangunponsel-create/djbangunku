@@ -1,9 +1,10 @@
+import { useId } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export default function RegisterAnggotaForm({ onComplete }: { onComplete: () => void }) {
-  // Auto-generated anggota number (example format: AG + timestamp)
-  const autoAnggotaNo = `AG${Date.now().toString().slice(-6)}`
+  // Auto-generated anggota number (example format: AG + id suffix)
+  const autoAnggotaNo = "AG" + useId().replace(/:/g, "").slice(-6)
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

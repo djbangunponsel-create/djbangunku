@@ -8,6 +8,49 @@ import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Search, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil } from 'lucide-react';
 import Link from 'next/link';
 
+// ── Date helpers ─────────────────────────────────────────────────
+// Excel stores dates as serial numbers (days since 1899-12-30).
+// convertExcelDate turns those numbers into "YYYY-MM-DD" strings.
+const EXCEL_EPOCH_OFFSET = 25569; // days between 1899-12-30 and 1970-01-01
+
+function isExcelSerial(v: unknown): v is number {
+  return typeof v === 'number' && v > 40000 && v < 60000;
+}
+
+function convertExcelDate(v: unknown): string {
+  if (isExcelSerial(v)) {
+    const ms = Math.round((v - EXCEL_EPOCH_OFFSET) * 86400_000);
+    const d = new Date(ms);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().slice(0, 10); // YYYY-MM-DD
+    }
+  }
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  const s = String(v ?? '');
+  // e.g. "2003-05-15T00:00:00.000Z" or "15-05-2003"
+  const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+  const dmyMatch = s.match(/^(\d{2})-(\d{2})-(\d{4})/);
+  if (dmyMatch) return `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+  return s;
+}
+
+function formatDateDDMMYYYY(v: unknown): string {
+  const iso = convertExcelDate(v);
+  const [y, m, d] = iso.split('-').map(Number);
+  if (!y || !m || !d) return String(v ?? '');
+  return `${String(d).padStart(2, '0')}-${String(m).padStart(2, '0')}-${y}`;
+}
+
+/** Normalise a raw row read from XLSX/CSV/localStorage */
+function normaliseRow(row: Record<string, unknown>): Record<string, unknown> {
+  const r = { ...row };
+  r.Tanggal_Lahir  = convertExcelDate(r.Tanggal_Lahir);
+  r.Tanggal_Masuk  = convertExcelDate(r.Tanggal_Masuk);
+  return r;
+}
+// ───────────────────────────────────────────────────────────────────
+
 interface Anggota {
   No_Anggota: string
   NAMA_ANGGOTA: string
@@ -35,7 +78,7 @@ export default function AnggotaClientContent() {
   const [showForm, setShowForm] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
-  const [importPreview, setImportPreview] = useState<Anggota[]>([]);
+  const [importPreview, setImportPreview] = useState<Record<string, unknown>[]>([]);
   const [importError, setImportError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState('');
@@ -51,7 +94,9 @@ export default function AnggotaClientContent() {
     const saved = window.localStorage.getItem('ksp_anggota_data');
     if (saved) {
       try {
-        setAnggotaData(JSON.parse(saved));
+        const parsed = JSON.parse(saved) as Record<string, unknown>[];
+        const normalised = parsed.map(normaliseRow) as unknown as Anggota[];
+        setAnggotaData(normalised);
       } catch { /* ignore corrupt data */ }
     }
   }, []);
@@ -139,7 +184,7 @@ export default function AnggotaClientContent() {
           const workbook = XLSX.read(text, { type: 'string' });
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-          setImportPreview(rows);
+          setImportPreview(rows.map(normaliseRow));
         } catch (err) {
           setImportError('Gagal membaca file CSV. Pastikan format file valid.');
           setImportPreview([]);
@@ -169,10 +214,8 @@ export default function AnggotaClientContent() {
 
   const handleImportConfirm = () => {
     if (importPreview.length === 0) return;
-    const validCount = importPreview.filter((r) => 
-      r.NAMA_ANGGOTA && r.NAMA_ANGGOTA.trim() !== ''
-    ).length;
-    setAnggotaData((prev) => [...prev, ...importPreview]);
+    const newRows = importPreview.map((r) => r as unknown as Anggota);
+    setAnggotaData((prev) => [...prev, ...newRows]);
     setShowImport(false);
     setImportFile(null);
     setImportPreview([]);
@@ -543,26 +586,28 @@ export default function AnggotaClientContent() {
                     </span>
                   </div>
                   <div className="overflow-x-auto max-h-48">
-                    <table className="min-w-full text-sm">
-                      <thead className="bg-green-100 sticky top-0">
-                        <tr>
-                          <th className="px-2 py-1 text-left">No. Anggota</th>
-                          <th className="px-2 py-1 text-left">Nama</th>
-                          <th className="px-2 py-1 text-left">NIK</th>
-                          <th className="px-2 py-1 text-left">Telepon</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-green-100">
-                        {importPreview.slice(0, 20).map((row, idx) => (
-                          <tr key={idx}>
-                            <td className="px-2 py-1">{row.No_Anggota || '-'}</td>
-                            <td className="px-2 py-1">{row.NAMA_ANGGOTA || '-'}</td>
-                            <td className="px-2 py-1">{row.NIK || '-'}</td>
-                            <td className="px-2 py-1">{row.TELEPON || '-'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+    <table className="min-w-full text-sm">
+    <thead className="bg-green-100 sticky top-0">
+      <tr>
+        <th className="px-2 py-1 text-left">No. Anggota</th>
+        <th className="px-2 py-1 text-left">Nama</th>
+        <th className="px-2 py-1 text-left">NIK</th>
+        <th className="px-2 py-1 text-left">Telepon</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-green-100">
+      {importPreview.slice(0, 20).map((row, idx) => {
+        const r = row as any;
+        return (
+        <tr key={idx}>
+          <td className="px-2 py-1">{r.No_Anggota || '-'}</td>
+          <td className="px-2 py-1">{r.NAMA_ANGGOTA || '-'}</td>
+          <td className="px-2 py-1">{r.NIK || '-'}</td>
+          <td className="px-2 py-1">{r.TELEPON || '-'}</td>
+        </tr>
+      )})}
+    </tbody>
+  </table>
                     {importPreview.length > 20 && (
                       <p className="text-xs text-gray-500 mt-1">
                         ... dan {importPreview.length - 20} baris lainnya
@@ -631,7 +676,7 @@ export default function AnggotaClientContent() {
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Tanggal Lahir</p>
-                <p className="text-sm text-gray-900">{selectedAnggota.Tanggal_Lahir}</p>
+                <p className="text-sm text-gray-900">{formatDateDDMMYYYY(selectedAnggota.Tanggal_Lahir)}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Telepon</p>
@@ -643,7 +688,7 @@ export default function AnggotaClientContent() {
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Tanggal Masuk</p>
-                <p className="text-sm text-gray-900">{selectedAnggota.Tanggal_Masuk}</p>
+                <p className="text-sm text-gray-900">{formatDateDDMMYYYY(selectedAnggota.Tanggal_Masuk)}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Status Perkawinan</p>

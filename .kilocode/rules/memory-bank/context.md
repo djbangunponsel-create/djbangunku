@@ -30,6 +30,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 - [x] Mengembalikan tampilan Dashboard utama seperti semula tanpa form input
 - [x] Memindahkan seluruh komponen form pendaftaran anggota baru ke dalam halaman Data Anggota sebagai fitur tambah anggota
 - [x] Memperbarui navigasi dan menu sesuai dengan perubahan
+- [x] Menambahkan fitur Import Excel untuk data anggota dengan modal dialog dan parsing file .xlsx menggunakan library xlsx (xlsx@0.18.5)
 
 ## Current Structure
 
@@ -61,3 +62,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | 2026-05-19 | Membuat skema database Master_Anggota_KSP dengan 19 kolom |
 | 2026-05-19 | Membuat form pendaftaran anggota lengkap dengan 19 kolom |
 | 2026-05-19 | Membuat halaman summary tabel untuk melihat semua data anggota
+| 2026-05-19 | Menambahkan fitur Import Excel untuk data anggota (modal dialog + xlsx parsing)

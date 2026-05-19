@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Search, Upload } from 'lucide-react';
+import { PlusCircle, Search, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import Link from 'next/link';
 
 interface Anggota {
@@ -34,6 +35,10 @@ export default function AnggotaClientContent() {
   const [anggotaData, setAnggotaData] = useState<Anggota[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<Anggota[]>([]);
+  const [importError, setImportError] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState('');
   
   const [formData, setFormData] = useState({
@@ -95,6 +100,49 @@ export default function AnggotaClientContent() {
       Pekerjaan: '',
       PENGHASILAN_per_Bulan: 0,
     });
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportFile(file);
+    setImportError('');
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const rows = XLSX.utils.sheet_to_json<Anggota>(worksheet, { defval: '' });
+        setImportPreview(rows);
+      } catch (err) {
+        setImportError('Gagal membaca file Excel. Pastikan file .xlsx yang valid.');
+        setImportPreview([]);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleImportConfirm = () => {
+    if (importPreview.length === 0) return;
+    const validCount = importPreview.filter((r) => 
+      r.NAMA_ANGGOTA && r.NAMA_ANGGOTA.trim() !== ''
+    ).length;
+    setAnggotaData((prev) => [...prev, ...importPreview]);
+    setShowImport(false);
+    setImportFile(null);
+    setImportPreview([]);
+    setImportError('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleImportCancel = () => {
+    setShowImport(false);
+    setImportFile(null);
+    setImportPreview([]);
+    setImportError('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
@@ -332,6 +380,111 @@ export default function AnggotaClientContent() {
                 <Button variant="default" type="submit">Simpan</Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Import Excel Modal */}
+      {showImport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Import Data Anggota dari Excel
+              </h2>
+              <Button variant="ghost" size="sm" onClick={handleImportCancel}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                <p className="text-sm text-gray-600 mb-2">
+                  Pilih file Excel (.xlsx) yang berisi data anggota
+                </p>
+                <p className="text-xs text-gray-400 mb-4">
+                  Kolom yang dibutuhkan: No_Anggota, NAMA_ANGGOTA, Jenis_Kelamin, Agama, NIK, Tempat_Lahir, Tanggal_Lahir, TELEPON, Alamat, Tanggal_Masuk, Status_Perkawinan, Nama_Pasangan, Jumlah_Anak, Nama_Ibu_Kandung, Nama_Saudara, No_HP_Saudara, Hubungan_Saudara, Pekerjaan, PENGHASILAN_per_Bulan
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="import-file-input"
+                />
+                <label htmlFor="import-file-input" className="cursor-pointer inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Pilih File Excel
+                </label>
+                {importFile && (
+                  <p className="text-sm text-green-600 mt-2">
+                    File terpilih: <strong>{importFile.name}</strong>
+                  </p>
+                )}
+              </div>
+
+              {importError && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                  <p className="text-sm">{importError}</p>
+                </div>
+              )}
+
+              {importPreview.length > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                  <div className="flex items-center gap-2 text-green-700 mb-2">
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-medium">
+                      {importPreview.length} baris data berhasil dibaca
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto max-h-48">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-green-100 sticky top-0">
+                        <tr>
+                          <th className="px-2 py-1 text-left">No. Anggota</th>
+                          <th className="px-2 py-1 text-left">Nama</th>
+                          <th className="px-2 py-1 text-left">NIK</th>
+                          <th className="px-2 py-1 text-left">Telepon</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-green-100">
+                        {importPreview.slice(0, 20).map((row, idx) => (
+                          <tr key={idx}>
+                            <td className="px-2 py-1">{row.No_Anggota || '-'}</td>
+                            <td className="px-2 py-1">{row.NAMA_ANGGOTA || '-'}</td>
+                            <td className="px-2 py-1">{row.NIK || '-'}</td>
+                            <td className="px-2 py-1">{row.TELEPON || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {importPreview.length > 20 && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        ... dan {importPreview.length - 20} baris lainnya
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4 mt-4 border-t">
+              <Button variant="outline" type="button" onClick={handleImportCancel}>
+                Batal
+              </Button>
+              <Button
+                variant="default"
+                type="button"
+                onClick={handleImportConfirm}
+                disabled={importPreview.length === 0}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Import {importPreview.length > 0 ? `${importPreview.length} Anggota` : ''}
+              </Button>
+            </div>
           </div>
         </div>
       )}

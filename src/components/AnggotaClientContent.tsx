@@ -16,6 +16,8 @@ interface Anggota {
   alamat: string;
   tanggalMasuk: string; // DD-MM-YYYY
   status: 'Aktif' | 'Pasif';
+  simpanan: number;
+  pinjaman: number;
 }
 
 export default function AnggotaClientContent() {
@@ -33,6 +35,8 @@ export default function AnggotaClientContent() {
     jenisKelamin: 'L' as 'L' | 'P',
     agama: '',
     status: 'Aktif' as 'Aktif' | 'Pasif',
+    simpanan: 0,
+    pinjaman: 0,
   });
 
   const nextId = anggotaData.length > 0 ? Math.max(...anggotaData.map(a => a.id)) + 1 : 1;
@@ -50,6 +54,8 @@ export default function AnggotaClientContent() {
       alamat: formData.alamat,
       tanggalMasuk: new Date().toLocaleDateString('id-ID'),
       status: formData.status,
+      simpanan: formData.simpanan,
+      pinjaman: formData.pinjaman,
     };
     setAnggotaData([...anggotaData, newAnggota]);
     setShowForm(false);
@@ -63,6 +69,8 @@ export default function AnggotaClientContent() {
       jenisKelamin: 'L',
       agama: '',
       status: 'Aktif',
+      simpanan: 0,
+      pinjaman: 0,
     });
   };
 
@@ -97,23 +105,25 @@ export default function AnggotaClientContent() {
                 <Upload className="mr-2 h-4 w-4" />
                 Import Excel
               </Button>
-              <Button
-                variant="default"
-onClick={(e) => {
-                   setFormData({
-                     id: nextId,
-                     nama: '',
-                     nik: '',
-                     telepon: '',
-                     alamat: '',
-                     tanggalLahir: '',
-                     jenisKelamin: 'L',
-                     agama: '',
-                     status: 'Aktif',
-                   });
-                   setShowForm(true);
-                 }}
-              >
+<Button
+                 variant="default"
+ onClick={(e) => {
+                    setFormData({
+                      id: nextId,
+                      nama: '',
+                      nik: '',
+                      telepon: '',
+                      alamat: '',
+                      tanggalLahir: '',
+                      jenisKelamin: 'L',
+                      agama: '',
+                      status: 'Aktif',
+                      simpanan: 0,
+                      pinjaman: 0,
+                    });
+                    setShowForm(true);
+                  }}
+               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Tambah Anggota Baru
               </Button>
@@ -143,90 +153,78 @@ onClick={(e) => {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ID Anggota
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nama
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      NIK
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Telepon
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tanggal Masuk
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Simpanan
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Pinjaman
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Aksi
-                    </th>
-                  </tr>
-                </thead>
+<thead className="bg-gray-50">
+                   <tr>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       ID Anggota
+                     </th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Nama
+                     </th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       NIK
+                     </th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Telepon
+                     </th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Tanggal Masuk
+                     </th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Status
+                     </th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Aksi
+                     </th>
+                   </tr>
+                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredData.length === 0 ? (
-                    <tr>
-                      <td className="px-6 py-4 text-center text-gray-500" colSpan={9}>
-                        Tidak ada data anggota
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredData.map((anggota) => (
-                      <tr key={anggota.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          {anggota.id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {anggota.nama}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {anggota.nik}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {anggota.telepon}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {anggota.tanggalMasuk}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            anggota.status === 'Aktif'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {anggota.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                          Rp {anggota.simpanan.toLocaleString('id-ID')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                          Rp {anggota.pinjaman.toLocaleString('id-ID')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
+{filteredData.length === 0 ? (
+                     <tr>
+                       <td className="px-6 py-4 text-center text-gray-500" colSpan={7}>
+                         Tidak ada data anggota
+                       </td>
+                     </tr>
+                   ) : (
+                     filteredData.map((anggota) => (
+                       <tr key={anggota.id}>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                           {anggota.id}
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm">
+                           {anggota.nama}
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm">
+                           {anggota.nik}
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm">
+                           {anggota.telepon}
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm">
+                           {anggota.tanggalMasuk}
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap">
+                           <span className={`px-2 py-1 rounded-full text-xs ${
+                             anggota.status === 'Aktif'
+                               ? 'bg-green-100 text-green-800'
+                               : 'bg-yellow-100 text-yellow-800'
+                           }`}>
+                             {anggota.status}
+                           </span>
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm">
+                           <div className="flex gap-2">
+                             <Button variant="ghost" size="sm">
+                               <Edit className="w-4 h-4" />
+                             </Button>
+                             <Button variant="ghost" size="sm">
+                               <Trash2 className="w-4 h-4" />
+                             </Button>
+                           </div>
+                         </td>
+                       </tr>
+                     ))
+                   )}
                 </tbody>
               </table>
             </div>
@@ -382,23 +380,49 @@ onClick={(e) => {
                   />
                   Aktif
                 </label>
-                <label className="flex items-center">
-                  <Input
-                    type="radio"
-                    name="status"
-                    value="Pasif"
-                    checked={formData.status === 'Pasif'}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        status: e.target.value as 'Aktif' | 'Pasif',
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  Pasif
-                </label>
-</div>
+<label className="flex items-center">
+                   <Input
+                     type="radio"
+                     name="status"
+                     value="Pasif"
+                     checked={formData.status === 'Pasif'}
+                     onChange={(e) =>
+                       setFormData({
+                         ...formData,
+                         status: e.target.value as 'Aktif' | 'Pasif',
+                       })
+                     }
+                     className="mr-2"
+                   />
+                   Pasif
+                 </label>
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                   Simpanan (Rp)
+                 </label>
+                 <Input
+                   type="number"
+                   min="0"
+                   placeholder="0"
+                   value={formData.simpanan}
+                   onChange={(e) => setFormData({ ...formData, simpanan: Number(e.target.value) })}
+                   className="w-full"
+                 />
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                   Pinjaman (Rp)
+                 </label>
+                 <Input
+                   type="number"
+                   min="0"
+                   placeholder="0"
+                   value={formData.pinjaman}
+                   onChange={(e) => setFormData({ ...formData, pinjaman: Number(e.target.value) })}
+                   className="w-full"
+                 />
+               </div>
                <div className="flex justify-end space-x-3 pt-4">
                 <Button variant="outline" onClick={() => setShowForm(false)}>
                   Batal

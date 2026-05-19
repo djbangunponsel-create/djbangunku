@@ -159,7 +159,44 @@ export default function RegisterAnggotaForm({ onComplete }: { onComplete: () => 
           </div>
         </div>
 
-        {/* Section 4: Penjamin / Kontak Darurat */}
+        {/* Section 4: Simpanan & Pinjaman */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Simpanan & Pinjaman
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Total Simpanan (Rp)
+              </label>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-gray-500">Rp</span>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  className="w-full text-right"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Total Pinjaman (Rp)
+              </label>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-gray-500">Rp</span>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  className="w-full text-right"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 5: Penjamin / Kontak Darurat */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">
             Penjamin / Kontak Darurat

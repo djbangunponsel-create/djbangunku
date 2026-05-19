@@ -36,19 +36,15 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | File/Directory | Purpose |
 |----------------|---------|
 | `src/app/page.tsx` | Dashboard utama |
-| `src/app/anggota/page.tsx` | Data anggota dengan form pendaftaran anggota baru |
+| `src/app/anggota/page.tsx` | Data anggota dengan form 19 kolom |
+| `src/app/anggota/summary/page.tsx` | Tabel summary semua anggota (19 kolom) |
+| `src/app/anggota/register/page.tsx` | Halaman registrasi (menggunakan RegisterAnggotaForm) |
 | `src/app/simpanan/page.tsx` | Manajemen simpanan |
 | `src/app/pinjaman/page.tsx` | Manajemen pinjaman |
-| `src/app/laporan/page.tsx` | Halaman induk laporan keuangan |
-| `src/app/laporan/neraca/page.tsx` | Laporan Posisi Keuangan (Neraca) |
-| `src/app/laporan/phu/page.tsx` | Laporan Perhitungan Hasil Usaha (PHU) |
-| `src/app/laporan/perubahan-ekuitas/page.tsx` | Laporan Perubahan Ekuitas (Modal) |
-| `src/app/laporan/arus-kas/page.tsx` | Laporan Arus Kas |
-| `src/app/laporan/promosi-ekonomi/page.tsx` | Laporan Promosi Ekonomi Anggota |
-| `src/app/laporan/catatan/page.tsx` | Catatan Atas Laporan Keuangan (CALK) |
-| `src/app/statistik/page.tsx` | Grafik statistik |
-| `src/components/ui/` | Komponen UI |
-| `src/components/RegisterAnggotaForm.tsx` | Komponen form pendaftaran anggota baru |
+| `src/lib/database/schema.sql` | Skema database Master_Anggota_KSP (19 kolom) |
+| `src/components/ui/textarea.tsx` | Komponen Textarea baru |
+| `src/components/AnggotaClientContent.tsx` | Komponen utama data anggota |
+| `src/components/RegisterAnggotaForm.tsx` | Form pendaftaran anggota baru |
 
 ## Session History
 

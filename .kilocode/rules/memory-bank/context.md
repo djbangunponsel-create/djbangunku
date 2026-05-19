@@ -70,3 +70,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   | 2026-05-19 | Tambah ikon Pencil (Edit) di kolom Aksi; modal edit dengan form 19 kolom pre-fill + Simpan Perubahan
   | 2026-05-19 | Fix tanggal kosong: normalisasi serial Excel Tanggal_Lahir/Tanggal_Masuk jadi YYYY-MM-DD saat import dan saat load dari localStorage; Detail modal tampil DD-MM-YYYY
   | 2026-05-19 | Form Tambah Anggota: Tanggal_Masuk auto-fill hari ini; No_Anggota auto-increment next number readOnly
+  | 2026-05-19 | Fix Tambah modal tidak bisa dibuka: ganti useCallback dengan inline handler; hapus dead code computeNextNo/resetFormData/handleTambahClick; z-index z-[200]

@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Search, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import Link from 'next/link';
 
 interface Anggota {
@@ -102,19 +101,21 @@ export default function AnggotaClientContent() {
     });
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setImportFile(file);
     setImportError('');
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
+        const XLSX = (await import('xlsx')).default;
         const data = new Uint8Array(ev.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const rows = XLSX.utils.sheet_to_json<Anggota>(worksheet, { defval: '' });
+        const utils = (XLSX as any).utils;
+        const rows = utils.sheet_to_json(worksheet, { defval: '' });
         setImportPreview(rows);
       } catch (err) {
         setImportError('Gagal membaca file Excel. Pastikan file .xlsx yang valid.');
@@ -122,7 +123,7 @@ export default function AnggotaClientContent() {
       }
     };
     reader.readAsArrayBuffer(file);
-  };
+  }, []);
 
   const handleImportConfirm = () => {
     if (importPreview.length === 0) return;

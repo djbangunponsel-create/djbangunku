@@ -102,13 +102,12 @@ export default function AnggotaClientContent() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-[200px] md:w-[250px]"
               />
-              <Button variant="outline" asChild>
+              <Button variant="outline" onClick={() => setShowImport(true)}>
                 <Upload className="mr-2 h-4 w-4" />
                 Import Excel
               </Button>
               <Button
                 variant="default"
-                asChild
                 onClick={(e) => {
                   setFormData({
                     id: nextId,
@@ -450,7 +449,7 @@ export default function AnggotaClientContent() {
                 </div>
               </div>
               <div className="flex justify-end space-x-3 pt-4">
-                <Button variant="outline" asChild onClick={() => setShowForm(false)}>
+                <Button variant="outline" onClick={() => setShowForm(false)}>
                   Batal
                 </Button>
                 <Button variant="default" type="submit">
@@ -497,9 +496,9 @@ export default function AnggotaClientContent() {
               </p>
             </div>
             <div className="flex justify-end space-x-3 pt-4">
-              <Button variant="outline" asChild onClick={() => setShowImport(false)}>
-                Batal
-              </Button>
+<Button variant="outline" onClick={() => setShowImport(false)}>
+                  Batal
+                </Button>
               <Button variant="default" onClick={() => setShowImport(false)}>
                 Impor
               </Button>

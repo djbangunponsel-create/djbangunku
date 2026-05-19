@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Search, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { PlusCircle, Search, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil } from 'lucide-react';
 import Link from 'next/link';
 
 interface Anggota {
@@ -39,6 +39,11 @@ export default function AnggotaClientContent() {
   const [importError, setImportError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedAnggota, setSelectedAnggota] = useState<Anggota | null>(null);
   
   useEffect(() => {
     const saved = window.localStorage.getItem('ksp_anggota_data');
@@ -81,6 +86,9 @@ export default function AnggotaClientContent() {
     a.TELEPON.includes(search) ||
     a.No_Anggota.includes(search)
   );
+
+  // Reset to page 1 when search or data changes
+  useEffect(() => { setCurrentPage(1); }, [search]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,6 +186,24 @@ export default function AnggotaClientContent() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const openDetail = (anggota: Anggota) => {
+    setSelectedAnggota(anggota);
+    setShowDetail(true);
+  };
+
+  const closeDetail = () => {
+    setShowDetail(false);
+    setSelectedAnggota(null);
+  };
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const startIdx = (currentPage - 1) * rowsPerPage;
+  const endIdx = startIdx + rowsPerPage;
+  const paginatedData = filteredData.slice(startIdx, endIdx);
+
+  const goPrev = () => { setCurrentPage((p) => Math.max(1, p - 1)); };
+  const goNext = () => { setCurrentPage((p) => Math.min(totalPages, p + 1)); };
+
   return (
     <div className="min-h-screen">
       <header className="bg-white shadow-sm border-b">
@@ -236,62 +262,76 @@ export default function AnggotaClientContent() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. Anggota</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">JK</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Agama</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tmp Lahir</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tgl Lahir</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telepon</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alamat</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tgl Masuk</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Nikah</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pasangan</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Anak</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ibu</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Saudara</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">HP Saudara</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hubungan</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kerja</th>
-                    <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gaji</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. Anggota</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">JK</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telepon</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pekerjaan</th>
+                    <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredData.length === 0 ? (
+                  {paginatedData.length === 0 ? (
                     <tr>
-                      <td colSpan={19} className="px-6 py-4 text-center text-gray-500">
+                      <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                         Tidak ada data anggota
                       </td>
                     </tr>
                   ) : (
-                    filteredData.map((anggota) => (
-                      <tr key={anggota.No_Anggota}>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm font-medium">{anggota.No_Anggota}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.NAMA_ANGGOTA}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Jenis_Kelamin === "Laki-laki" ? "L" : "P"}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Agama}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.NIK}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Tempat_Lahir}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Tanggal_Lahir}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.TELEPON}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm max-w-xs truncate">{anggota.Alamat}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Tanggal_Masuk}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Status_Perkawinan}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Nama_Pasangan || "-"}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-center">{anggota.Jumlah_Anak}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Nama_Ibu_Kandung}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Nama_Saudara}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.No_HP_Saudara}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Hubungan_Saudara}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm">{anggota.Pekerjaan || "-"}</td>
-                        <td className="px-2 py-3 whitespace-nowrap text-sm text-right">Rp {anggota.PENGHASILAN_per_Bulan.toLocaleString('id-ID')}</td>
+                    paginatedData.map((anggota) => (
+                      <tr key={anggota.No_Anggota} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">{anggota.No_Anggota}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.NAMA_ANGGOTA}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.Jenis_Kelamin === "Laki-laki" ? "L" : "P"}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.NIK}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.TELEPON}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.Pekerjaan || "-"}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm text-center">
+                          <button
+                            onClick={() => openDetail(anggota)}
+                            className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50 transition-colors"
+                            title="Lihat Detail"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t">
+                <p className="text-sm text-gray-500">
+                  Menampilkan {startIdx + 1}–{Math.min(endIdx, filteredData.length)} dari {filteredData.length} anggota
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goPrev}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm text-gray-600">
+                    Halaman {currentPage} dari {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goNext}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>
@@ -516,6 +556,107 @@ export default function AnggotaClientContent() {
               >
                 <Upload className="mr-2 h-4 w-4" />
                 Import {importPreview.length > 0 ? `${importPreview.length} Anggota` : ''}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Anggota Modal */}
+      {showDetail && selectedAnggota && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Detail Anggota
+              </h2>
+              <Button variant="ghost" size="sm" onClick={closeDetail}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">No. Anggota</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.No_Anggota}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Nama Lengkap</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.NAMA_ANGGOTA}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Jenis Kelamin</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Jenis_Kelamin}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Agama</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Agama}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">NIK</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.NIK}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Tempat Lahir</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Tempat_Lahir}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Tanggal Lahir</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Tanggal_Lahir}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Telepon</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.TELEPON}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-xs font-medium text-gray-400 uppercase">Alamat</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Alamat}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Tanggal Masuk</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Tanggal_Masuk}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Status Perkawinan</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Status_Perkawinan}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Nama Pasangan</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Nama_Pasangan || '-'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Jumlah Anak</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Jumlah_Anak}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Nama Ibu Kandung</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Nama_Ibu_Kandung}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Nama Saudara</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Nama_Saudara}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">No. HP Saudara</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.No_HP_Saudara}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Hubungan Saudara</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Hubungan_Saudara}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Pekerjaan</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.Pekerjaan || '-'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase">Penghasilan per Bulan</p>
+                <p className="text-sm text-gray-900">Rp {selectedAnggota.PENGHASILAN_per_Bulan.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4 mt-4 border-t">
+              <Button variant="outline" onClick={closeDetail}>
+                Tutup
               </Button>
             </div>
           </div>

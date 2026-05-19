@@ -1,49 +1,73 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Users, Wallet, FileText, BarChart3, CreditCard, PiggyBank, TrendingUp, UserPlus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-    const menuItems = [
-      {
-        title: "Data Anggota",
-        description: "Kelola data anggota KSP",
-        icon: Users,
-        href: "/anggota",
-        color: "bg-blue-500",
-      },
-      {
-        title: "Simpanan",
-        description: "Kelola simpanan anggota",
-        icon: PiggyBank,
-        href: "/simpanan",
-        color: "bg-green-500",
-      },
-      {
-        title: "Pinjaman",
-        description: "Kelola pinjaman anggota",
-        icon: CreditCard,
-        href: "/pinjaman",
-        color: "bg-orange-500",
-      },
-      {
-        title: "Laporan",
-        description: "Lihat laporan keuangan",
-        icon: FileText,
-        href: "/laporan",
-        color: "bg-purple-500",
-      },
-      {
-        title: "Statistik",
-        description: "Statistik dan grafik",
-        icon: BarChart3,
-        href: "/statistik",
-        color: "bg-indigo-500",
-      },
-    ];
+const menuItems = [
+  {
+    title: "Data Anggota",
+    description: "Kelola data anggota KSP",
+    icon: Users,
+    href: "/anggota",
+    color: "bg-blue-500",
+  },
+  {
+    title: "Simpanan",
+    description: "Kelola simpanan anggota",
+    icon: PiggyBank,
+    href: "/simpanan",
+    color: "bg-green-500",
+  },
+  {
+    title: "Pinjaman",
+    description: "Kelola pinjaman anggota",
+    icon: CreditCard,
+    href: "/pinjaman",
+    color: "bg-orange-500",
+  },
+  {
+    title: "Laporan",
+    description: "Lihat laporan keuangan",
+    icon: FileText,
+    href: "/laporan",
+    color: "bg-purple-500",
+  },
+  {
+    title: "Statistik",
+    description: "Statistik dan grafik",
+    icon: BarChart3,
+    href: "/statistik",
+    color: "bg-indigo-500",
+  },
+];
 
 export default function Home() {
+  const readAnggotaCount = (): number => {
+    if (typeof window === "undefined") return 0;
+    const saved = window.localStorage.getItem("ksp_anggota_data");
+    if (!saved) return 0;
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed.length : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const [totalAnggota, setTotalAnggota] = useState(readAnggotaCount);
+
+  // Recalculate total whenever localStorage changes in another tab (real-time)
+  useEffect(() => {
+    const handler = () => {
+      setTotalAnggota(readAnggotaCount());
+    };
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <header className="bg-white shadow-sm border-b">
@@ -105,7 +129,7 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-gray-600">Total Anggota</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{totalAnggota}</div>
               <p className="text-xs text-gray-500">+0 bulan ini</p>
             </CardContent>
           </Card>

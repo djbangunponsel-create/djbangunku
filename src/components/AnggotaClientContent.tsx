@@ -255,6 +255,40 @@ export default function AnggotaClientContent() {
   const goPrev = () => { setCurrentPage((p) => Math.max(1, p - 1)); };
   const goNext = () => { setCurrentPage((p) => Math.min(totalPages, p + 1)); };
 
+  const openAddForm = () => {
+    const nextNo = (() => {
+      if (anggotaData.length === 0) return "1";
+      const maxN = anggotaData.reduce((maxVal, a) => {
+        const nVal = parseInt((a.No_Anggota || "").replace(/\D/g, ""), 10) || 0;
+        return nVal > maxVal ? nVal : maxVal;
+      }, 0);
+      return String(maxN + 1);
+    })();
+    const todayStr = new Date().toISOString().slice(0, 10);
+    setFormData({
+      No_Anggota: nextNo,
+      NAMA_ANGGOTA: "",
+      Jenis_Kelamin: "Laki-laki",
+      Agama: "",
+      NIK: "",
+      Tempat_Lahir: "",
+      Tanggal_Lahir: "",
+      TELEPON: "",
+      Alamat: "",
+      Tanggal_Masuk: todayStr,
+      Status_Perkawinan: "Belum Kawin",
+      Nama_Pasangan: "",
+      Jumlah_Anak: 0,
+      Nama_Ibu_Kandung: "",
+      Nama_Saudara: "",
+      No_HP_Saudara: "",
+      Hubungan_Saudara: "",
+      Pekerjaan: "",
+      PENGHASILAN_per_Bulan: 0,
+    });
+    setShowForm(true);
+  };
+
   return (
     <div className="min-h-screen">
       <header className="bg-white shadow-sm border-b">
@@ -280,39 +314,7 @@ export default function AnggotaClientContent() {
                 <Upload className="mr-2 h-4 w-4" />
                 Import Excel
               </Button>
-              <Button variant="default" onClick={() => {
-                const nextNo = (() => {
-                  if (anggotaData.length === 0) return '1';
-                  const maxN = anggotaData.reduce((maxVal, a) => {
-                    const nVal = parseInt((a.No_Anggota || '').replace(/\D/g, ''), 10) || 0;
-                    return nVal > maxVal ? nVal : maxVal;
-                  }, 0);
-                  return String(maxN + 1);
-                })();
-                const todayStr = new Date().toISOString().slice(0, 10);
-                setFormData({
-                  No_Anggota: nextNo,
-                  NAMA_ANGGOTA: '',
-                  Jenis_Kelamin: 'Laki-laki' as "Laki-laki" | "Perempuan",
-                  Agama: '',
-                  NIK: '',
-                  Tempat_Lahir: '',
-                  Tanggal_Lahir: '',
-                  TELEPON: '',
-                  Alamat: '',
-                  Tanggal_Masuk: todayStr,
-                  Status_Perkawinan: 'Belum Kawin' as "Belum Kawin" | "Kawin" | "Cerai Hidup" | "Cerai Mati",
-                  Nama_Pasangan: '',
-                  Jumlah_Anak: 0,
-                  Nama_Ibu_Kandung: '',
-                  Nama_Saudara: '',
-                  No_HP_Saudara: '',
-                  Hubungan_Saudara: '',
-                  Pekerjaan: '',
-                  PENGHASILAN_per_Bulan: 0,
-                });
-                setShowForm(true);
-              }}>
+              <Button variant="default" onClick={openAddForm}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Tambah Anggota Baru
               </Button>

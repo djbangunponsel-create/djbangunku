@@ -44,6 +44,8 @@ export default function AnggotaClientContent() {
 
   const [showDetail, setShowDetail] = useState(false);
   const [selectedAnggota, setSelectedAnggota] = useState<Anggota | null>(null);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editData, setEditData] = useState<Anggota | null>(null);
   
   useEffect(() => {
     const saved = window.localStorage.getItem('ksp_anggota_data');
@@ -196,6 +198,26 @@ export default function AnggotaClientContent() {
     setSelectedAnggota(null);
   };
 
+  const openEdit = (anggota: Anggota) => {
+    setEditData({ ...anggota });
+    setShowEdit(true);
+  };
+
+  const closeEdit = () => {
+    setShowEdit(false);
+    setEditData(null);
+  };
+
+  const handleEditSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editData) return;
+    setAnggotaData((prev) =>
+      prev.map((a) => (a.No_Anggota === editData.No_Anggota ? editData : a))
+    );
+    setShowEdit(false);
+    setEditData(null);
+  };
+
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIdx = (currentPage - 1) * rowsPerPage;
   const endIdx = startIdx + rowsPerPage;
@@ -294,6 +316,13 @@ export default function AnggotaClientContent() {
                             title="Lihat Detail"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => openEdit(anggota)}
+                            className="text-amber-600 hover:text-amber-800 p-1 rounded hover:bg-amber-50 transition-colors"
+                            title="Edit Data"
+                          >
+                            <Pencil className="h-4 w-4" />
                           </button>
                         </td>
                       </tr>
@@ -659,6 +688,133 @@ export default function AnggotaClientContent() {
                 Tutup
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Anggota Modal */}
+      {showEdit && editData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Edit Data Anggota
+              </h2>
+              <Button variant="ghost" size="sm" onClick={closeEdit}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleEditSave} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">No. Anggota *</label>
+                  <Input type="text" value={editData.No_Anggota} onChange={(e) => setEditData({...editData, No_Anggota: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Masuk *</label>
+                  <Input type="date" value={editData.Tanggal_Masuk} onChange={(e) => setEditData({...editData, Tanggal_Masuk: e.target.value})} required />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota *</label>
+                  <Input type="text" value={editData.NAMA_ANGGOTA} onChange={(e) => setEditData({...editData, NAMA_ANGGOTA: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">NIK (16 digit) *</label>
+                  <Input type="text" maxLength={16} value={editData.NIK} onChange={(e) => setEditData({...editData, NIK: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin *</label>
+                  <select value={editData.Jenis_Kelamin} onChange={(e) => setEditData({...editData, Jenis_Kelamin: e.target.value as any})} className="w-full px-3 py-2 border" required>
+                    <option value="Laki-laki">Laki-laki</option>
+                    <option value="Perempuan">Perempuan</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Agama *</label>
+                  <select value={editData.Agama} onChange={(e) => setEditData({...editData, Agama: e.target.value})} className="w-full px-3 py-2 border" required>
+                    <option value="">-- Pilih Agama --</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Kristen">Kristen</option>
+                    <option value="Katolik">Katolik</option>
+                    <option value="Hindu">Hindu</option>
+                    <option value="Buddha">Buddha</option>
+                    <option value="Khonghucu">Khonghucu</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tempat Lahir *</label>
+                  <Input type="text" value={editData.Tempat_Lahir} onChange={(e) => setEditData({...editData, Tempat_Lahir: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir *</label>
+                  <Input type="date" value={editData.Tanggal_Lahir} onChange={(e) => setEditData({...editData, Tanggal_Lahir: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Telepon *</label>
+                  <Input type="tel" value={editData.TELEPON} onChange={(e) => setEditData({...editData, TELEPON: e.target.value})} required />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Alamat *</label>
+                  <Textarea value={editData.Alamat} onChange={(e) => setEditData({...editData, Alamat: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status Perkawinan *</label>
+                  <select value={editData.Status_Perkawinan} onChange={(e) => setEditData({...editData, Status_Perkawinan: e.target.value as any})} className="w-full px-3 py-2 border" required>
+                    <option value="Belum Kawin">Belum Kawin</option>
+                    <option value="Kawin">Kawin</option>
+                    <option value="Cerai Hidup">Cerai Hidup</option>
+                    <option value="Cerai Mati">Cerai Mati</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pasangan</label>
+                  <Input type="text" value={editData.Nama_Pasangan || ''} onChange={(e) => setEditData({...editData, Nama_Pasangan: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Anak *</label>
+                  <Input type="number" min="0" value={editData.Jumlah_Anak} onChange={(e) => setEditData({...editData, Jumlah_Anak: Number(e.target.value)})} required />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Ibu Kandung *</label>
+                  <Input type="text" value={editData.Nama_Ibu_Kandung} onChange={(e) => setEditData({...editData, Nama_Ibu_Kandung: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Saudara *</label>
+                  <Input type="text" value={editData.Nama_Saudara} onChange={(e) => setEditData({...editData, Nama_Saudara: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">No. HP Saudara *</label>
+                  <Input type="tel" value={editData.No_HP_Saudara} onChange={(e) => setEditData({...editData, No_HP_Saudara: e.target.value})} required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hubungan *</label>
+                  <select value={editData.Hubungan_Saudara} onChange={(e) => setEditData({...editData, Hubungan_Saudara: e.target.value})} className="w-full px-3 py-2 border" required>
+                    <option value="">-- Pilih Hubungan --</option>
+                    <option value="Kakak">Kakak</option>
+                    <option value="Adik">Adik</option>
+                    <option value="Orang Tua">Orang Tua</option>
+                    <option value="Saudara Kandung">Saudara Kandung</option>
+                    <option value="Saudara Ipuk">Saudara Ipuk</option>
+                    <option value="Famili">Famili</option>
+                    <option value="Teman">Teman</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Pekerjaan</label>
+                  <Input type="text" value={editData.Pekerjaan || ''} onChange={(e) => setEditData({...editData, Pekerjaan: e.target.value})} />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Penghasilan/Bulan (Rp) *</label>
+                  <Input type="number" min="0" value={editData.PENGHASILAN_per_Bulan} onChange={(e) => setEditData({...editData, PENGHASILAN_per_Bulan: Number(e.target.value)})} required />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button variant="outline" type="button" onClick={closeEdit}>Batal</Button>
+                <Button variant="default" type="submit">Simpan Perubahan</Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

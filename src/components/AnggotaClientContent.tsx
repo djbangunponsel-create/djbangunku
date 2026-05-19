@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +39,19 @@ export default function AnggotaClientContent() {
   const [importError, setImportError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState('');
+  
+  useEffect(() => {
+    const saved = window.localStorage.getItem('ksp_anggota_data');
+    if (saved) {
+      try {
+        setAnggotaData(JSON.parse(saved));
+      } catch { /* ignore corrupt data */ }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('ksp_anggota_data', JSON.stringify(anggotaData));
+  }, [anggotaData]);
   
   const [formData, setFormData] = useState({
     No_Anggota: '',

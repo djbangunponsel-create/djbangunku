@@ -18,12 +18,12 @@ export default function NeracaPage() {
               <h1 className="text-2xl font-bold text-gray-900">Neraca</h1>
               <p className="text-sm text-gray-600">Laporan Posisi Keuangan KSP Mulia Dana Sejahtera</p>
             </div>
-            <Button asChild>
-              <Link href="/laporan">
+            <Link href="/laporan">
+              <Button variant="ghost">
                 <FileText className="mr-2 h-4 w-4" />
                 Kembali ke Laporan
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>

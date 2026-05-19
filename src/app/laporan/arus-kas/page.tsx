@@ -18,12 +18,12 @@ export default function ArusKasPage() {
               <h1 className="text-2xl font-bold text-gray-900">Laporan Arus Kas</h1>
               <p className="text-sm text-gray-600">KSP Mulia Dana Sejahtera - Periode 1 Januari - 31 Desember 2025</p>
             </div>
-            <Button asChild>
-              <Link href="/laporan">
+            <Link href="/laporan">
+              <Button variant="ghost">
                 <FileText className="mr-2 h-4 w-4" />
                 Kembali ke Laporan
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>

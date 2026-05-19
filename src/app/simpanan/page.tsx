@@ -31,12 +31,12 @@ export default function SimpananPage() {
               <h1 className="text-2xl font-bold text-gray-900">Data Simpanan</h1>
               <p className="text-sm text-gray-600">Kelola simpanan anggota KSP</p>
             </div>
-            <Button asChild>
-              <Link href="/">
+            <Link href="/">
+              <Button variant="ghost">
                 <Home className="w-4 h-4 mr-2" />
                 Kembali ke Dashboard
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>

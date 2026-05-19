@@ -106,6 +106,25 @@ export default function AnggotaClientContent() {
     if (!file) return;
     setImportFile(file);
     setImportError('');
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (ext === 'csv') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const XLSX = require('xlsx');
+          const text = reader.result as string;
+          const workbook = XLSX.read(text, { type: 'string' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+          setImportPreview(rows);
+        } catch (err) {
+          setImportError('Gagal membaca file CSV. Pastikan format file valid.');
+          setImportPreview([]);
+        }
+      };
+      reader.readAsText(file);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
@@ -402,7 +421,7 @@ export default function AnggotaClientContent() {
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                 <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-400 mb-3" />
                 <p className="text-sm text-gray-600 mb-2">
-                  Pilih file Excel (.xlsx) yang berisi data anggota
+                  Pilih file Excel (.xlsx, .xls, .csv) yang berisi data anggota
                 </p>
                 <p className="text-xs text-gray-400 mb-4">
                   Kolom yang dibutuhkan: No_Anggota, NAMA_ANGGOTA, Jenis_Kelamin, Agama, NIK, Tempat_Lahir, Tanggal_Lahir, TELEPON, Alamat, Tanggal_Masuk, Status_Perkawinan, Nama_Pasangan, Jumlah_Anak, Nama_Ibu_Kandung, Nama_Saudara, No_HP_Saudara, Hubungan_Saudara, Pekerjaan, PENGHASILAN_per_Bulan
@@ -410,7 +429,7 @@ export default function AnggotaClientContent() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".xlsx,.xls"
+                  accept=".xlsx,.xls,.csv"
                   onChange={handleFileSelect}
                   className="hidden"
                   id="import-file-input"

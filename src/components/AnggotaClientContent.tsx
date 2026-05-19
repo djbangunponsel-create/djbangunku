@@ -47,6 +47,8 @@ function normaliseRow(row: Record<string, unknown>): Record<string, unknown> {
   const r = { ...row };
   r.Tanggal_Lahir  = convertExcelDate(r.Tanggal_Lahir);
   r.Tanggal_Masuk  = convertExcelDate(r.Tanggal_Masuk);
+  // Guarantee No_Anggota is always a string (never null/undefined)
+  r.No_Anggota = String(r.No_Anggota ?? "");
   return r;
 }
 // ───────────────────────────────────────────────────────────────────
@@ -127,12 +129,18 @@ export default function AnggotaClientContent() {
     PENGHASILAN_per_Bulan: 0,
   });
 
-  const filteredData = anggotaData.filter((a) =>
-    a.NAMA_ANGGOTA.toLowerCase().includes(search.toLowerCase()) ||
-    a.NIK.includes(search) ||
-    a.TELEPON.includes(search) ||
-    a.No_Anggota.includes(search)
-  );
+  const q = search.trim().toLowerCase();
+
+  const filteredData = (anggotaData ?? [])
+    .filter((a) => {
+      const nama  = String(a.NAMA_ANGGOTA  ?? "").toLowerCase();
+      const noAng = String(a.No_Anggota     ?? "");
+      return (
+        q === "" ||
+        nama.includes(q) ||
+        noAng.toLowerCase().includes(q)
+      );
+    });
 
   // Reset to page 1 when search or data changes
   useEffect(() => { setCurrentPage(1); }, [search]);
@@ -364,8 +372,8 @@ export default function AnggotaClientContent() {
                       </td>
                     </tr>
                   ) : (
-                    paginatedData.map((anggota) => (
-                      <tr key={anggota.No_Anggota} className="hover:bg-gray-50">
+                    paginatedData.map((anggota, idx) => (
+                      <tr key={`${anggota.No_Anggota ?? ""}-${idx}`} className="hover:bg-gray-50">
                         <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">{anggota.No_Anggota}</td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.NAMA_ANGGOTA}</td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.Jenis_Kelamin === "Laki-laki" ? "L" : "P"}</td>

@@ -10,9 +10,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 
 - [x] Aplikasi KSP Mulia Dana Sejahtera - halaman utama dengan dashboard
 - [x] Halaman Data Anggota - kelola data anggota KSP dengan form pendaftaran anggota baru yang muncul saat menekan tombol "Tambah Anggota"
-- [x] Menghapus kolom Simpanan dan Pinjaman dari tabel daftar anggota (untuk menghindari duplikasi data)
-- [x] Menambahkan field Simpanan & Pinjaman di form modal "Tambah Anggota Baru" pada halaman Data Anggota
-- [x] Menambahkan field Simpanan & Pinjaman di RegisterAnggotaForm.tsx (form pendaftaran anggota baru)
+- [x] Menghapus kolom Simpanan dan Pinjaman dari tabel daftar anggota (data simpanan/pinjaman dikelola di halaman terpisah)
 - [x] Halaman Simpanan - kelola simpanan (pokok, wajib, sukarela)
 - [x] Halaman Pinjaman - kelola pinjaman dengan bunga dan tenor
 - [x] Halaman Laporan - laporan keuangan lengkap dengan submenu:
@@ -60,5 +58,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | 2026-05-18 | Mengembalikan tampilan Dashboard utama seperti semula tanpa form input |
 | 2026-05-18 | Memindahkan komponen form pendaftaran anggota baru ke halaman Data Anggota |
 | 2026-05-18 | Memperbarui navigasi dan menu sesuai dengan perubahan |
-| 2026-05-19 | Menghapus kolom Simpanan & Pinjaman dari tabel daftar anggota |
-| 2026-05-19 | Menambahkan field Simpanan & Pinjaman di form pendaftaran anggota baru
+| 2026-05-19 | Menghapus kolom Simpanan & Pinjaman dari tabel daftar anggota (data dikelola di halaman simpanan/pinjaman terpisah)

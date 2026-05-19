@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Users, Wallet, FileText, BarChart3,
@@ -115,8 +115,8 @@ function BarChart({
       <style>{`@media (max-width: 640px) { text { font-size: 8px; } }`}</style>
 
       {/* ── Grid lines + Y labels ── */}
-      {yTicks.map(({ v, y }) => (
-        <g key={v}>
+      {yTicks.map(({ v, y }, index) => (
+        <g key={`yt-${v}-${index}`}>
           <line
             x1={padL} x2={W - padR} y1={y} y2={y}
             stroke="#E2E8F0" strokeWidth={1} strokeDasharray="4 3"
@@ -241,20 +241,14 @@ export default function Home() {
     "ksp_simpanan_data", [],
   );
 
-  const monthlySimpanan = useMemo(
-    () => aggregateMonthly(simpananRows, yyyyMmKeys, "jumlah"),
-    [simpananRows],
-  );
+  const monthlySimpanan = aggregateMonthly(simpananRows, yyyyMmKeys, "jumlah");
 
   // ── LocalStorage: Pinjaman ──────────────────────────────────────
   const pinjamanRows = readStored<Record<string, unknown>[]>(
     "ksp_pinjam_data", [],
   );
 
-  const monthlyPinjaman = useMemo(
-    () => aggregateMonthly(pinjamanRows, yyyyMmKeys),
-    [pinjamanRows],
-  );
+  const monthlyPinjaman = aggregateMonthly(pinjamanRows, yyyyMmKeys);
 
   // ── Totals ────────────────────────────────────────────────────
   const totalSimpanan = monthlySimpanan.reduce((a, b) => a + b, 0);

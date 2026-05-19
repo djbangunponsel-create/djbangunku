@@ -128,8 +128,7 @@ export default function AnggotaClientContent() {
   });
 
   /* ── Auto-fill Tanggal Masuk & next No. Anggota when form opens ── */
-  useEffect(() => {
-    if (!showForm) return;
+  const openTambahForm = useCallback(() => {
     const nextNo = (() => {
       if (anggotaData.length === 0) return '1';
       const max = anggotaData.reduce((maxN, a) => {
@@ -139,12 +138,29 @@ export default function AnggotaClientContent() {
       return String(max + 1);
     })();
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
       No_Anggota: nextNo,
+      NAMA_ANGGOTA: '',
+      Jenis_Kelamin: 'Laki-laki' as "Laki-laki" | "Perempuan",
+      Agama: '',
+      NIK: '',
+      Tempat_Lahir: '',
+      Tanggal_Lahir: '',
+      TELEPON: '',
+      Alamat: '',
       Tanggal_Masuk: today,
-    }));
-  }, [showForm, anggotaData]);
+      Status_Perkawinan: 'Belum Kawin' as "Belum Kawin" | "Kawin" | "Cerai Hidup" | "Cerai Mati",
+      Nama_Pasangan: '',
+      Jumlah_Anak: 0,
+      Nama_Ibu_Kandung: '',
+      Nama_Saudara: '',
+      No_HP_Saudara: '',
+      Hubungan_Saudara: '',
+      Pekerjaan: '',
+      PENGHASILAN_per_Bulan: 0,
+    });
+    setShowForm(true);
+  }, [anggotaData]);
 
   const filteredData = anggotaData.filter((a) =>
     a.NAMA_ANGGOTA.toLowerCase().includes(search.toLowerCase()) ||
@@ -193,42 +209,28 @@ export default function AnggotaClientContent() {
     if (!file) return;
     setImportFile(file);
     setImportError('');
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    if (ext === 'csv') {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const XLSX = require('xlsx');
-          const text = reader.result as string;
-          const workbook = XLSX.read(text, { type: 'string' });
-          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-          setImportPreview(rows.map(normaliseRow));
-        } catch (err) {
-          setImportError('Gagal membaca file CSV. Pastikan format file valid.');
-          setImportPreview([]);
-        }
-      };
-      reader.readAsText(file);
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      try {
-        const XLSX = (await import('xlsx')).default;
-        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const utils = (XLSX as any).utils;
-        const rows = utils.sheet_to_json(worksheet, { defval: '' });
-        setImportPreview(rows);
-      } catch (err) {
-        setImportError('Gagal membaca file Excel. Pastikan file .xlsx yang valid.');
-        setImportPreview([]);
-      }
+
+    const parseFile = async (data: ArrayBuffer) => {
+      const mod = await import('xlsx');
+      const XLSX = (mod as any).default ?? (mod as any);
+      const wb = XLSX.read(new Uint8Array(data), { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = (XLSX as any).utils.sheet_to_json(ws, { defval: '' });
+      setImportPreview(rows.map(normaliseRow));
     };
-    reader.readAsArrayBuffer(file);
+
+    const onError = () => {
+      setImportError('Gagal membaca file. Pastikan file yang dipilih valid.');
+      setImportPreview([]);
+    };
+
+    const bufReader = new FileReader();
+    bufReader.onload = async (ev) => {
+      try {
+        await parseFile(ev.target?.result as ArrayBuffer);
+      } catch { onError(); }
+    };
+    bufReader.readAsArrayBuffer(file);
   }, []);
 
   const handleImportConfirm = () => {
@@ -313,7 +315,7 @@ export default function AnggotaClientContent() {
                 <Upload className="mr-2 h-4 w-4" />
                 Import Excel
               </Button>
-              <Button variant="default" onClick={() => { resetForm(); setShowForm(true); }}>
+              <Button variant="default" onClick={openTambahForm}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Tambah Anggota Baru
               </Button>

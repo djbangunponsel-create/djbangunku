@@ -127,6 +127,25 @@ export default function AnggotaClientContent() {
     PENGHASILAN_per_Bulan: 0,
   });
 
+  /* ── Auto-fill Tanggal Masuk & next No. Anggota when form opens ── */
+  useEffect(() => {
+    if (!showForm) return;
+    const nextNo = (() => {
+      if (anggotaData.length === 0) return '1';
+      const max = anggotaData.reduce((maxN, a) => {
+        const n = parseInt(a.No_Anggota.replace(/\D/g, ''), 10) || 0;
+        return n > maxN ? n : maxN;
+      }, 0);
+      return String(max + 1);
+    })();
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    setFormData((prev) => ({
+      ...prev,
+      No_Anggota: nextNo,
+      Tanggal_Masuk: today,
+    }));
+  }, [showForm, anggotaData]);
+
   const filteredData = anggotaData.filter((a) =>
     a.NAMA_ANGGOTA.toLowerCase().includes(search.toLowerCase()) ||
     a.NIK.includes(search) ||
@@ -418,8 +437,8 @@ export default function AnggotaClientContent() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">No. Anggota *</label>
-                  <Input type="text" value={formData.No_Anggota} onChange={(e) => setFormData({...formData, No_Anggota: e.target.value})} required />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">No. Anggota * <span className="text-xs text-gray-400 font-normal">(otomatis)</span></label>
+                  <Input type="text" value={formData.No_Anggota} readOnly tabIndex={-1} className="bg-gray-50 cursor-not-allowed" required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Masuk *</label>

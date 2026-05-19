@@ -20,9 +20,8 @@ interface Anggota {
   pinjaman: number;
 }
 
-const anggotaData: Anggota[] = [];
-
 export default function AnggotaClientContent() {
+  const [anggotaData, setAnggotaData] = useState<Anggota[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [search, setSearch] = useState('');
@@ -188,7 +187,7 @@ export default function AnggotaClientContent() {
                 <tbody className="divide-y divide-gray-200">
                   {filteredData.length === 0 ? (
                     <tr>
-                      <td className="px-6 py-4 text-center text-gray-500" colSpan="9">
+                      <td className="px-6 py-4 text-center text-gray-500" colSpan={9}>
                         Tidak ada data anggota
                       </td>
                     </tr>
@@ -479,10 +478,10 @@ export default function AnggotaClientContent() {
                   accept=".xlsx,.csv"
                   className="hidden"
                   id="fileInput"
-                  onChange={(e) => {
-                    console.log('File selected:', e.target.files[0]);
-                    setShowImport(false);
-                  }}
+onChange={(e) => {
+                     console.log('File selected:', e.target.files?.[0]);
+                     setShowImport(false);
+                   }}
                 />
                 <label
                   htmlFor="fileInput"

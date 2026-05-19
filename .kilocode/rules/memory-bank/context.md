@@ -66,3 +66,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   | 2026-05-19 | Fix crash CJS: load xlsx via dynamic import dan require() fallback in useCallback
   | 2026-05-19 | Support CSV + XLSX (.csv, .xlsx, .xls) di import dialog anggota
   | 2026-05-19 | Persist anggotaData in localStorage so import survives page refresh
+  | 2026-05-19 | Refactor tabel utama: cuma 6 kolom (No_Anggota, Nama, JK, NIK, Telepon, Pekerjaan) + tombol Eye untuk pagination + detail modal (19 kolom)

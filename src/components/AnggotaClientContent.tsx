@@ -128,16 +128,16 @@ export default function AnggotaClientContent() {
   });
 
   /* ── Auto-fill Tanggal Masuk & next No. Anggota when form opens ── */
-  const openTambahForm = useCallback(() => {
-    const nextNo = (() => {
-      if (anggotaData.length === 0) return '1';
-      const max = anggotaData.reduce((maxN, a) => {
-        const n = parseInt(a.No_Anggota.replace(/\D/g, ''), 10) || 0;
-        return n > maxN ? n : maxN;
-      }, 0);
-      return String(max + 1);
-    })();
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  function computeNextNo(): string {
+    if (anggotaData.length === 0) return '1';
+    const max = anggotaData.reduce((maxN, a) => {
+      const n = parseInt(a.No_Anggota.replace(/\D/g, ''), 10) || 0;
+      return n > maxN ? n : maxN;
+    }, 0);
+    return String(max + 1);
+  }
+
+  function resetFormData(nextNo: string, today: string) {
     setFormData({
       No_Anggota: nextNo,
       NAMA_ANGGOTA: '',
@@ -159,8 +159,16 @@ export default function AnggotaClientContent() {
       Pekerjaan: '',
       PENGHASILAN_per_Bulan: 0,
     });
-    setShowForm(true);
-  }, [anggotaData]);
+  }
+
+  const handleTambahClick = () => {
+    try {
+      resetFormData(computeNextNo(), new Date().toISOString().slice(0, 10));
+      setShowForm(true);
+    } catch (err) {
+      console.error('Tambah button error:', err);
+    }
+  };
 
   const filteredData = anggotaData.filter((a) =>
     a.NAMA_ANGGOTA.toLowerCase().includes(search.toLowerCase()) ||
@@ -315,7 +323,39 @@ export default function AnggotaClientContent() {
                 <Upload className="mr-2 h-4 w-4" />
                 Import Excel
               </Button>
-              <Button variant="default" onClick={openTambahForm}>
+              <Button variant="default" onClick={() => {
+                const nextNo = (() => {
+                  if (anggotaData.length === 0) return '1';
+                  const maxN = anggotaData.reduce((maxVal, a) => {
+                    const nVal = parseInt((a.No_Anggota || '').replace(/\D/g, ''), 10) || 0;
+                    return nVal > maxVal ? nVal : maxVal;
+                  }, 0);
+                  return String(maxN + 1);
+                })();
+                const todayStr = new Date().toISOString().slice(0, 10);
+                setFormData({
+                  No_Anggota: nextNo,
+                  NAMA_ANGGOTA: '',
+                  Jenis_Kelamin: 'Laki-laki' as "Laki-laki" | "Perempuan",
+                  Agama: '',
+                  NIK: '',
+                  Tempat_Lahir: '',
+                  Tanggal_Lahir: '',
+                  TELEPON: '',
+                  Alamat: '',
+                  Tanggal_Masuk: todayStr,
+                  Status_Perkawinan: 'Belum Kawin' as "Belum Kawin" | "Kawin" | "Cerai Hidup" | "Cerai Mati",
+                  Nama_Pasangan: '',
+                  Jumlah_Anak: 0,
+                  Nama_Ibu_Kandung: '',
+                  Nama_Saudara: '',
+                  No_HP_Saudara: '',
+                  Hubungan_Saudara: '',
+                  Pekerjaan: '',
+                  PENGHASILAN_per_Bulan: 0,
+                });
+                setShowForm(true);
+              }}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Tambah Anggota Baru
               </Button>
@@ -431,7 +471,11 @@ export default function AnggotaClientContent() {
 
       {/* Tambah Anggota Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200]"
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Tambah Anggota Baru (19 Kolom)

@@ -22,9 +22,21 @@ function readAnggotaMap(): Record<string, string> {
   const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
   const map: Record<string, string> = {};
   for (const row of rows) {
-    const no = String(row.No_Anggota ?? '');
     const nama = String(row.NAMA_ANGGOTA ?? '');
+    const no = String(row.No_Anggota ?? '');
     if (no && nama) map[no.toLowerCase()] = nama;
+  }
+  return map;
+}
+
+// ── Read name-to-no lookup for Excel import ─────────────────────────
+function readAnggotaNameToNo(): Record<string, string> {
+  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const map: Record<string, string> = {};
+  for (const row of rows) {
+    const nama = String(row.NAMA_ANGGOTA ?? '').toLowerCase().trim();
+    const no = String(row.No_Anggota ?? '');
+    if (nama && no) map[nama] = no;
   }
   return map;
 }
@@ -212,23 +224,26 @@ export default function PinjamanClientContent() {
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = (XLSX as any).utils.sheet_to_json(ws, { defval: '' });
 
-      // Build name map once for bulk import
-      const anggotaLookup = readAnggotaMap();
+      // Build name-to-no lookup for name-based matching
+      const nameToNo = readAnggotaNameToNo();
 
       const normalised = rows.map((r: Record<string, unknown>, idx: number) => {
-      const no  = String(r.noAnggota ?? r.anggota ?? '').trim();
-      return {
-        id:       r.id ?? generateId(),
-        anggota:  anggotaLookup[no.toLowerCase()] ?? String(r.anggota ?? ''),
-        jumlah:   parseNumber(r.jumlah),
-        bunga:    parseNumber(r.bunga),
-        tenor:    parseNumber(r.tenor),
-        angsuran: parseNumber(r.angsuran),
-        sisa:     parseNumber(r.sisa),
-        status:   (r.status as 'Aktif' | 'Lunas') ?? 'Aktif',
-        tanggal:  convertExcelDate(r.tanggal) || new Date().toISOString().slice(0, 10),
-      };
-    });
+        // Get nama from Excel (column: 'nama') and find matching member
+        const namaFromExcel = String(r.nama ?? r.anggota ?? '').toLowerCase().trim();
+        const matchedNo = nameToNo[namaFromExcel] || '';
+
+        return {
+          id:       r.id ?? generateId(),
+          anggota:  matchedNo || String(r.nama ?? r.anggota ?? ''),
+          jumlah:   parseNumber(r.besarPinjaman ?? r.jumlah),
+          bunga:    parseNumber(r.bunga),
+          tenor:    parseNumber(r.jangkaWaktu ?? r.tenor),
+          angsuran: parseNumber(r.angsuran),
+          sisa:     parseNumber(r.sisa),
+          status:   (r.status as 'Aktif' | 'Lunas') ?? 'Aktif',
+          tanggal:  convertExcelDate(r.tanggalPinjam ?? r.tanggal) || new Date().toISOString().slice(0, 10),
+        };
+      });
       setImportPreview(normalised);
     };
 
@@ -375,7 +390,7 @@ export default function PinjamanClientContent() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID Pinjaman</TableHead>
-                  <TableHead>Anggota</TableHead>
+                  <TableHead>NAMA</TableHead>
                   <TableHead>Jumlah</TableHead>
                   <TableHead>Bunga</TableHead>
                   <TableHead>Tenor</TableHead>
@@ -504,7 +519,7 @@ export default function PinjamanClientContent() {
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                 <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-400 mb-3" />
                 <p className="text-sm text-gray-600 mb-2">Pilih file Excel (.xlsx, .xls, .csv) yang berisi data pinjaman</p>
-                <p className="text-xs text-gray-400 mb-4">Kolom yang dibutuhkan: anggota, jumlah, bunga, tenor, angsuran, sisa, status</p>
+                <p className="text-xs text-gray-400 mb-4">Kolom yang dibutuhkan: nama, tanggalPinjam, besarPinjaman, bunga, jangkaWaktu, angsuran, sisa, status</p>
                 <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileSelect} className="hidden" id="import-pinjaman-file" />
                 <label htmlFor="import-pinjaman-file" className="cursor-pointer inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
                   <Upload className="mr-2 h-4 w-4" />
@@ -525,7 +540,7 @@ export default function PinjamanClientContent() {
                   <div className="overflow-x-auto max-h-48">
                     <table className="min-w-full text-sm">
                       <thead className="bg-green-100 sticky top-0">
-                        <tr><th className="px-2 py-1 text-left">Anggota</th><th className="px-2 py-1 text-left">Jumlah</th><th className="px-2 py-1 text-left">Bunga</th></tr>
+                        <tr><th className="px-2 py-1 text-left">NAMA</th><th className="px-2 py-1 text-left">Jumlah</th><th className="px-2 py-1 text-left">Bunga</th></tr>
                       </thead>
                       <tbody className="divide-y divide-green-100">
                         {(importPreview as any[]).slice(0, 20).map((row, idx) => (

@@ -211,6 +211,10 @@ export default function PinjamanClientContent() {
       const wb = XLSX.read(new Uint8Array(data), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = (XLSX as any).utils.sheet_to_json(ws, { defval: '' });
+
+      // Build name map once for bulk import
+      const anggotaLookup = readAnggotaMap();
+
       const normalised = rows.map((r: Record<string, unknown>, idx: number) => {
       const no  = String(r.noAnggota ?? r.anggota ?? '').trim();
       return {

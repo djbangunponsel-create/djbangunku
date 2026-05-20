@@ -113,7 +113,10 @@ interface Pinjaman {
   tanggal: string;
   administrasi?: number;
   danaResiko?: number;
+  danaSosial?: number;
+  insentifPJ?: number;
   netto?: number;
+  penanggungJawab?: string;
 }
 
 function generateId(): string {
@@ -161,13 +164,16 @@ export default function PinjamanClientContent() {
     tenor: '',
     status: 'Aktif' as 'Aktif' | 'Lunas',
     tanggal: new Date().toISOString().slice(0, 10),
+    penanggungJawab: '',
   });
 
-  // Hitung potongan otomatis
+  // Hitung potongan otomatis (total 5%)
   const jumlahNum = parseFormattedNumber(formData.jumlah);
   const administrasi = Math.round(jumlahNum * 0.02);
   const danaResiko = Math.round(jumlahNum * 0.01);
-  const netto = jumlahNum - administrasi - danaResiko;
+  const danaSosial = Math.round(jumlahNum * 0.01);
+  const insentifPJ = Math.round(jumlahNum * 0.01);
+  const netto = jumlahNum - administrasi - danaResiko - danaSosial - insentifPJ;
 
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
@@ -207,7 +213,10 @@ export default function PinjamanClientContent() {
       tanggal: formData.tanggal,
       administrasi,
       danaResiko,
+      danaSosial,
+      insentifPJ,
       netto,
+      penanggungJawab: formData.penanggungJawab,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -224,6 +233,7 @@ export default function PinjamanClientContent() {
       tenor: '',
       status: 'Aktif',
       tanggal: new Date().toISOString().slice(0, 10),
+      penanggungJawab: '',
     });
     setMemberSearch('');
   };
@@ -675,7 +685,7 @@ const errors: string[] = [];
 
                 {/* Potongan Pinjaman */}
                 <div className="border-t pt-3 mt-2">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Potongan Pinjaman</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Potongan Pinjaman (Total 5%)</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">Administrasi Pinjaman (2%)</label>
@@ -685,6 +695,23 @@ const errors: string[] = [];
                       <label className="block text-xs text-gray-500 mb-1">Dana Resiko (1%)</label>
                       <Input type="text" value={formatNumberWithSeparator(danaResiko)} readOnly className="bg-gray-50" />
                     </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Dana Sosial (1%)</label>
+                      <Input type="text" value={formatNumberWithSeparator(danaSosial)} readOnly className="bg-gray-50" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Insentif Penanggung Jawab (1%)</label>
+                      <Input type="text" value={formatNumberWithSeparator(insentifPJ)} readOnly className="bg-gray-50" />
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <label className="block text-xs text-gray-500 mb-1">Nama Penanggung Jawab</label>
+                    <Input
+                      type="text"
+                      placeholder="Nama petugas KSP yang bertanggung jawab"
+                      value={formData.penanggungJawab}
+                      onChange={(e) => setFormData({...formData, penanggungJawab: e.target.value})}
+                    />
                   </div>
                 </div>
 

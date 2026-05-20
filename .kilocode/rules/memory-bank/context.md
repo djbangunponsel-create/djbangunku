@@ -52,7 +52,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   - [x] Total Pinjaman otomatis terupdate dari localStorage
   - [x] Chart bulanan menggunakan data dari localStorage dengan field tanggal
   - [x] Aktivitas terbaru menampilkan transaksi simpanan terbaru
-- [x] **NERACA TERHUBUNG DATA REAL-TIME**: pos "Kas" di AKTIVA menjumlah seluruh total simpanan (Pokok+Wajib+Sukarela) secara kumulatif; pos Simpanan Pokok/Wajib/Sukarela di PASIVA Ikuti jumlah yang sama sehingga Neraca seimbang (AKTIVA = PASIVA); filter periode bulan/tahun kumulatif dari awal sampai tanggal laporan; balance status bar ditampilkan; semua key props berbasis index untuk menghindari duplicate-key error
+- [x] **NERACA TERHUBUNG DATA REAL-TIME**: tabel 3 kolom [KETERANGAN][TAHUN INI][TAHUN SEBELUMNYA]; Tahun Ini = akumulasi sampai 31 Des tahun berjalan, Tahun Sebelumnya = akumulasi sampai 31 Des tahun lalu; yearConfig dibuat dari `new Date().getFullYear()` sehingga tahun otomatis berganti tanpa ubah kode; pos Kas = total simpanan (Pokok+Wajib+Sukarela), Simpanan Pokok/Wajib/Sukarela masuk Ekuitas di PASIVA; balance indicator per tahun; semua key props berbasis index untuk menghindari duplicate-key error; balance row menggunakan computed string sebelum JSX (tidak ada backtick-literal JSX)
 
 ## Current Structure
 
@@ -70,7 +70,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | `src/components/AnggotaClientContent.tsx` | Komponen utama data anggota |
 | `src/components/SimpananClientContent.tsx` | Komponen utama data simpanan (CRUD + Excel import) |
  | `src/components/PinjamanClientContent.tsx` | Komponen utama data pinjaman (CRUD + Excel import) |
- | `src/app/laporan/neraca/page.tsx`   | Neraca (Laporan Posisi Keuangan) — AKTIVA & PASIVA dari ksp_simpanan_data kumulatif |
+ | `src/app/laporan/neraca/page.tsx`   | Neraca — 3 kolom perbandingan TAHUN INI / TAHUN SEBELUMNYA, yearConfig dari system date, akumulator per tahun
 | `src/components/RegisterAnggotaForm.tsx` | Form pendaftaran anggota baru |
 
 ## Session History
@@ -99,4 +99,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 2026-05-19 | Fix Tambah modal tidak bisa dibuka: ganti useCallback dengan inline handler; hapus dead code computeNextNo/resetFormData/handleTambahClick; z-index z-[200]
  | 2026-05-20 | Implementasi CRUD penuh untuk Simpanan dan Pinjaman; dashboard terhubung localStorage real-time
  | 2026-05-20 | Fix PinjamanClientContent TS2304: tambah `anggotaLookup = readAnggotaMap()` sebelum `handleFileSelect` parseFile
- | 2026-05-20 | Neraca terhubung dengan data ksp_simpanan_data: Kas=totalSemua, Simpanan Pokok/Wajib/Sukarela di PASIVA, filter periode kumulatif, balance indicator, native <select>, lazy useState initializer untuk setState-in-effect fix
+| 2026-05-20 | Neraca terhubung data real-time; 3 kolom dinamis [KETERANGAN][TAHUN INI][TAHUN SEBELUMNYA] dengan akumulasi tahun-tahun tertentu (currYear/prevYear dari system date tanpa hardcode), balance indicator per tahun, native select + lazy useState untuk linter

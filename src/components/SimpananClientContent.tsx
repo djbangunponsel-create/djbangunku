@@ -353,27 +353,34 @@ export default function SimpananClientContent() {
   }, []);
 
   const handleImportConfirm = async () => {
+    console.log('[import] onClick fired — preview.length:', importPreview.length, 'importing:', importing);
     if (importPreview.length === 0) return;
     setImporting(true);
     setImportProgress({ done: 0, total: importPreview.length });
     try {
       // POST all rows to the bulk endpoint in a single server-side call
+      console.log('[import] POSTing', importPreview.length, 'rows to', BULK_API);
       const res = await fetch(BULK_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rows: importPreview }),
       });
+      console.log('[import] Bulk POST response status:', res.status);
       if (!res.ok) {
         const msg = await res.text().catch(() => 'Gagal meng-import');
         throw new Error(msg);
       }
       const result: { success: number; failed: number; total: number } = await res.json();
+      console.log('[import] bulk result:', result);
       if (result.failed > 0) {
         setImportError(`${result.failed} dari ${result.total} baris gagal disimpan. Berhasil: ${result.success}`);
       }
       // Re-fetch from DB so table shows server truth
+      console.log('[import] re-fetching from DB...');
       const rows = await fetchAllFromDB();
+      console.log('[import] DB returned', rows.length, 'rows');
       setSimpananData(rows as unknown as Simpanan[]);
+      console.log('[import] simpananData updated');
     } catch (e: any) {
       setImportError(`Import gagal: ${e.message}`);
     } finally {

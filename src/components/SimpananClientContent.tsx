@@ -415,18 +415,6 @@ export default function SimpananClientContent() {
       setImportProgress({ done: 0, total: 0 });
     }
   };
-    } catch (e: any) {
-      setImportError(`Import gagal: ${e.message}`);
-    } finally {
-      setShowImport(false);
-      setImportFile(null);
-      setImportPreview([]);
-      setImportError('');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      setImporting(false);
-      setImportProgress({ done: 0, total: 0 });
-    }
-  };
 
   const handleImportCancel = () => {
     setShowImport(false);

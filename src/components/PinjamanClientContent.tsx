@@ -715,27 +715,20 @@ const errors: string[] = [];
                   </div>
                 </div>
 
-                {/* Total Uang Diterima */}
+{/* Total Uang Diterima */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                   <label className="block text-sm font-medium text-blue-700 mb-1">Total Diterima Anggota</label>
                   <Input type="text" value={formatNumberWithSeparator(netto)} readOnly className="bg-white font-bold text-blue-700" />
                 </div>
 
-               <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-                 <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value as any})} className="w-full px-3 py-2 border" required>
-                   <option value="Aktif">Aktif</option>
-                   <option value="Lunas">Lunas</option>
-                 </select>
-               </div>
-               <div className="flex justify-end space-x-3 pt-4">
-                 <Button variant="outline" type="button" onClick={() => setShowForm(false)}>Batal</Button>
-                 <Button variant="default" type="submit">Simpan</Button>
-               </div>
-             </form>
-           </div>
-         </div>
-       )}
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button variant="outline" type="button" onClick={() => setShowForm(false)}>Batal</Button>
+                  <Button variant="default" type="submit">Simpan</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       {/* Import Excel Modal */}
       {showImport && (

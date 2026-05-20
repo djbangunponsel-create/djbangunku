@@ -8,6 +8,40 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { PlusCircle, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil, Trash2, Search } from 'lucide-react';
 import Link from 'next/link';
 
+// ── Read localStorage helper ───────────────────────────────────────
+function readStored<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch { return fallback; }
+}
+
+// ── Read all members from localStorage ────────────────────────────
+function readAnggotaMap(): Record<string, string> {
+  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const map: Record<string, string> = {};
+  for (const row of rows) {
+    const no = String(row.No_Anggota ?? '');
+    const nama = String(row.NAMA_ANGGOTA ?? '');
+    if (no && nama) map[no.toLowerCase()] = nama;
+  }
+  return map;
+}
+
+// ── Sanitize currency/number string from Excel ────────────────────
+function parseNumber(v: unknown): number {
+  if (typeof v === 'number') return v;
+  const s = String(v ?? '')
+    .replace(/Rp\s?/gi, '')
+    .replace(/\./g, '')
+    .replace(/,/g, '')
+    .replace(/\s+/g, '')
+    .trim();
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
 // ── Date helper for Excel serial dates ─────────────────────────────
 const EXCEL_EPOCH_OFFSET = 25569;
 
@@ -19,9 +53,7 @@ function convertExcelDate(v: unknown): string {
   if (isExcelSerial(v)) {
     const ms = Math.round((v - EXCEL_EPOCH_OFFSET) * 86400_000);
     const d = new Date(ms);
-    if (!isNaN(d.getTime())) {
-      return d.toISOString().slice(0, 10);
-    }
+    if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
   }
   if (v instanceof Date) return v.toISOString().slice(0, 10);
   const s = String(v ?? '');
@@ -70,13 +102,15 @@ export default function PinjamanClientContent() {
   const [showEdit, setShowEdit] = useState(false);
   const [editData, setEditData] = useState<Pinjaman | null>(null);
 
+  // Load from localStorage on mount + clear IMPTR test rows
   useEffect(() => {
-    const saved = window.localStorage.getItem('ksp_pinjam_data');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as Pinjaman[];
-        setPinjamanData(parsed);
-      } catch { /* ignore corrupt data */ }
+    const saved = readStored<Pinjaman[]>('ksp_pinjam_data', []);
+    const cleaned = saved.filter((p) => !p.id.startsWith('IMPTR-'));
+    if (cleaned.length !== saved.length) {
+      setPinjamanData(cleaned);
+      window.localStorage.setItem('ksp_pinjam_data', JSON.stringify(cleaned));
+    } else {
+      setPinjamanData(saved);
     }
   }, []);
 
@@ -177,17 +211,20 @@ export default function PinjamanClientContent() {
       const wb = XLSX.read(new Uint8Array(data), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = (XLSX as any).utils.sheet_to_json(ws, { defval: '' });
-      const normalised = rows.map((r: Record<string, unknown>) => ({
-        id: r.id ?? generateId(),
-        anggota: String(r.anggota ?? ''),
-        jumlah: Number(r.jumlah) || 0,
-        bunga: Number(r.bunga) || 0,
-        tenor: Number(r.tenor) || 0,
-        angsuran: Number(r.angsuran) || 0,
-        sisa: Number(r.sisa) || 0,
-        status: (r.status as 'Aktif' | 'Lunas') ?? 'Aktif',
-        tanggal: convertExcelDate(r.tanggal) || new Date().toISOString().slice(0, 10),
-      }));
+      const normalised = rows.map((r: Record<string, unknown>, idx: number) => {
+      const no  = String(r.noAnggota ?? r.anggota ?? '').trim();
+      return {
+        id:       r.id ?? generateId(),
+        anggota:  anggotaLookup[no.toLowerCase()] ?? String(r.anggota ?? ''),
+        jumlah:   parseNumber(r.jumlah),
+        bunga:    parseNumber(r.bunga),
+        tenor:    parseNumber(r.tenor),
+        angsuran: parseNumber(r.angsuran),
+        sisa:     parseNumber(r.sisa),
+        status:   (r.status as 'Aktif' | 'Lunas') ?? 'Aktif',
+        tanggal:  convertExcelDate(r.tanggal) || new Date().toISOString().slice(0, 10),
+      };
+    });
       setImportPreview(normalised);
     };
 

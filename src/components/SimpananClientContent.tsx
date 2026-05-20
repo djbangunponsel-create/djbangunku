@@ -44,6 +44,21 @@ function readStored<T>(key: string, fallback: T): T {
   } catch { return fallback; }
 }
 
+// ── Sanitize currency/number string from Excel ────────────────────
+// Accepts: "Rp 50.000", "50,000", "50 000", "50000", 50000, 50.5
+// Returns: pure Number (50000, 50000, 50000, 50000, 50000, 50.5)
+function parseNumber(v: unknown): number {
+  if (typeof v === 'number') return v;
+  const s = String(v ?? '')
+    .replace(/Rp\s?/gi, '')    // strip "Rp "
+    .replace(/\./g, '')         // strip thousand-separator dots  "50.000" → "50000"
+    .replace(/,/g, '')          // strip commas  "50,000" → "50000"
+    .replace(/\s+/g, '')        // strip spaces/nbsp
+    .trim();
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
 // ── Read all members from localStorage ────────────────────────────
 function readAnggotaMap(): Record<string, string> {
   const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
@@ -102,10 +117,16 @@ export default function SimpananClientContent() {
     return () => window.removeEventListener('storage', handler);
   }, []);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount + clear IMPTR test rows
   useEffect(() => {
     const saved = readStored<Simpanan[]>('ksp_simpanan_data', []);
-    setSimpananData(saved);
+    const cleaned = saved.filter((s) => !s.id.startsWith('IMPTR-'));
+    if (cleaned.length !== saved.length) {
+      setSimpananData(cleaned);
+      window.localStorage.setItem('ksp_simpanan_data', JSON.stringify(cleaned));
+    } else {
+      setSimpananData(saved);
+    }
   }, []);
 
   // Persist to localStorage on every change
@@ -249,7 +270,7 @@ export default function SimpananClientContent() {
           noAnggota:      no,
           namaAnggota:    anggotaLookup[no.toLowerCase()] ?? String(r.namaAnggota ?? r.anggota ?? ''),
           tipe,
-          jumlah:         Number(r.jumlah) || 0,
+          jumlah:         parseNumber(r.jumlah),
           tanggalSetor:   convertExcelDate(r.tanggalSetor ?? r.tanggal ?? new Date()),
           status:         (r.status === 'Ditarik' ? 'Ditarik' : 'Aktif'),
         };

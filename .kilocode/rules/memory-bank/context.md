@@ -51,7 +51,8 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   - [x] Total Simpanan otomatis terupdate dari localStorage
   - [x] Total Pinjaman otomatis terupdate dari localStorage
   - [x] Chart bulanan menggunakan data dari localStorage dengan field tanggal
-  - [x] Aktivitas terbaru menampilkan transaksi simpanan terbaru
+   - [x] Aktivitas terbaru menampilkan transaksi simpanan terbaru
+- [x] **DATA SIMPANAN MIGRATED KE SQL (Drizzle ORM + LibSQL):** `localStorage` tidak lagi menjadi sumber data utama — semua data sekarang persisten di tabel `simpanan` (Cloudflare D1 / Turso atau file SQLite lokal): fetch dari `GET /api/simpanan` saat mount; INSERT/UPSERT via `POST /api/simpanan` per baris; impor Excel bulks loof per baris POST + progress bar + re-fetch dari DB; loading/error states ditampilkan; `search` state (`useState('')`) tetap berfungsi untuk filter tabel; semua error lint/typecheck sulut
 - [x] **NERACA TERHUBUNG DATA REAL-TIME**: tabel 3 kolom [KETERANGAN][TAHUN INI][TAHUN SEBELUMNYA]; Tahun Ini = akumulasi sampai 31 Des tahun berjalan, Tahun Sebelumnya = akumulasi sampai 31 Des tahun lalu; yearConfig dibuat dari `new Date().getFullYear()` sehingga tahun otomatis berganti tanpa ubah kode; pos Kas = total simpanan (Pokok+Wajib+Sukarela), Simpanan Pokok/Wajib/Sukarela masuk Ekuitas di PASIVA; balance indicator per tahun; semua key props berbasis index untuk menghindari duplicate-key error; balance row menggunakan computed string sebelum JSX (tidak ada backtick-literal JSX)
 
 ## Current Structure
@@ -71,7 +72,11 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | `src/components/SimpananClientContent.tsx` | Komponen utama data simpanan (CRUD + Excel import) |
  | `src/components/PinjamanClientContent.tsx` | Komponen utama data pinjaman (CRUD + Excel import) |
  | `src/app/laporan/neraca/page.tsx`   | Neraca — 3 kolom perbandingan TAHUN INI / TAHUN SEBELUMNYA, yearConfig dari system date, akumulator per tahun
-| `src/components/RegisterAnggotaForm.tsx` | Form pendaftaran anggota baru |
+| `src/lib/database/db.ts`              | Database connection (drizzle-orm/libsql + @libsql/client) |
+| `src/lib/database/schema.ts`         | Drizzle ORM schema — simpanan table |
+| `drizzle/0001_create_simpanan.sql`  | D1 raw SQL migration — simpanan table DDL |
+| `src/app/api/simpanan/route.ts`      | GET all / POST single simpanan row |
+| `src/app/api/simpanan/bulk/route.ts` | POST bulk import — loof every row, per-row upsert, returns success/failed/total |
 
 ## Session History
 
@@ -99,4 +104,5 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 2026-05-19 | Fix Tambah modal tidak bisa dibuka: ganti useCallback dengan inline handler; hapus dead code computeNextNo/resetFormData/handleTambahClick; z-index z-[200]
  | 2026-05-20 | Implementasi CRUD penuh untuk Simpanan dan Pinjaman; dashboard terhubung localStorage real-time
  | 2026-05-20 | Fix PinjamanClientContent TS2304: tambah `anggotaLookup = readAnggotaMap()` sebelum `handleFileSelect` parseFile
-| 2026-05-20 | Neraca terhubung data real-time; 3 kolom dinamis [KETERANGAN][TAHUN INI][TAHUN SEBELUMNYA] dengan akumulasi tahun-tahun tertentu (currYear/prevYear dari system date tanpa hardcode), balance indicator per tahun, native select + lazy useState untuk linter
+ | 2026-05-20 | Neraca terhubung data real-time; 3 kolom dinamis [KETERANGAN][TAHUN INI][TAHUN SEBELUMNYA] dengan akumulasi tahun-tahun tertentu (currYear/prevYear dari system date tanpa hardcode), balance indicator per tahun, native select + lazy useState untuk linter
+ | 2026-05-20 | SimpananClientContent fix: tambah `const [search, setSearch] = useState('')` + `const [formData, setFormData]`, `editFormData`, search filter block, importConfirm menggunakan bulkImportToDB + fetchAllFromDB dengan loading state + disabled import button enquanto importing; drizzle-orm `drizzle-orm/@libsql/{client,migrator}` → `drizzle-orm/libsql` + `drizzle-orm/libsql/migrator` dengan `createClient(@libsql/client)` instance passing

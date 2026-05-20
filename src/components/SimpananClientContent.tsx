@@ -99,7 +99,10 @@ const BULK_API   = '/api/simpanan/bulk';
 // ── Fetch all simpanan rows from the SQL database ─────────────────
 async function fetchAllFromDB(): Promise<Array<Record<string, unknown>>> {
   try {
-    const res = await fetch(API_BASE, { cache: 'no-store' });
+    const res = await fetch(
+      `${API_BASE}?t=${Date.now()}`,
+      { cache: 'no-store', next: { revalidate: 0 } }
+    );
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       throw new Error(`Server error ${res.status}: ${body || 'unknown'}`);
@@ -375,12 +378,43 @@ export default function SimpananClientContent() {
       if (result.failed > 0) {
         setImportError(`${result.failed} dari ${result.total} baris gagal disimpan. Berhasil: ${result.success}`);
       }
-      // Re-fetch from DB so table shows server truth
+
+      // ── Re-fetch from DB so table reflects server truth ──────────
       console.log('[import] re-fetching from DB...');
       const rows = await fetchAllFromDB();
-      console.log('[import] DB returned', rows.length, 'rows');
-      setSimpananData(rows as unknown as Simpanan[]);
+
+      if (rows.length > 0) {
+        // DB return data → use it (canonical path)
+        console.log('[import] DB returned', rows.length, 'rows — using DB data');
+        setSimpananData(rows as unknown as Simpanan[]);
+      } else {
+        // DB returned nothing — normalise preview locally so table is
+        // never left blank immediately after a successful bulk import
+        console.log('[import] DB returned 0 rows — normalising importPreview locally');
+        const normalised: Simpanan[] = importPreview.map((r, idx) => ({
+          id:             String(r.id ?? `IMPTR-${idx + 1}`),
+          noAnggota:      String(r.noAnggota ?? ''),
+          namaAnggota:    String(r.namaAnggota ?? ''),
+          tipe:           (r.tipe === 'Wajib' || r.tipe === 'Sukarela') ? r.tipe : 'Pokok',
+          jumlah:         typeof r.jumlah === 'number' ? r.jumlah : Number(r.jumlah) || 0,
+          tanggalSetor:   convertExcelDate(r.tanggalSetor ?? r.tanggal ?? new Date()),
+          status:         r.status === 'Ditarik' ? 'Ditarik' : 'Aktif',
+        }));
+        setSimpananData(normalised);
+      }
       console.log('[import] simpananData updated');
+    } catch (e: any) {
+      setImportError(`Import gagal: ${e.message}`);
+    } finally {
+      setShowImport(false);
+      setImportFile(null);
+      setImportPreview([]);
+      setImportError('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setImporting(false);
+      setImportProgress({ done: 0, total: 0 });
+    }
+  };
     } catch (e: any) {
       setImportError(`Import gagal: ${e.message}`);
     } finally {

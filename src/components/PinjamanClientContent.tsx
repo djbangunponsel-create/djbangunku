@@ -226,30 +226,84 @@ export default function PinjamanClientContent() {
 
       // Build name-to-no lookup for name-based matching
       const nameToNo = readAnggotaNameToNo();
+      const allNames = Object.keys(nameToNo);
 
-      const normalised = rows.map((r: Record<string, unknown>, idx: number) => {
+const errors: string[] = [];
+       const validatedData: Record<string, unknown>[] = [];
+
+      rows.forEach((r: Record<string, unknown>, idx: number) => {
+        const rowNum = idx + 2; // +2 because row 1 is header
+        let hasError = false;
+
         // Get nama from Excel (column: 'nama') and find matching member
-        const namaFromExcel = String(r.nama ?? r.anggota ?? '').toLowerCase().trim();
-        const matchedNo = nameToNo[namaFromExcel] || '';
+        const namaRaw = r.nama ?? '';
+        const namaFromExcel = String(namaRaw).toLowerCase().trim();
 
-        const jumlah = parseNumber(r.besarPinjaman ?? r.jumlah);
-        const tenor = parseNumber(r.jangkaWaktu ?? r.tenor);
-        // Hitung angsuran otomatis: jumlah / tenor
-        const angsuran = tenor > 0 ? Math.round(jumlah / tenor) : 0;
+        // Validation 1: Check if name exists in database
+        if (!namaFromExcel) {
+          errors.push(`Eror Baris ${rowNum}: Nama tidak boleh kosong.`);
+          hasError = true;
+        } else if (!nameToNo[namaFromExcel]) {
+          errors.push(`Eror Baris ${rowNum}: Nama '${String(namaRaw)}' tidak terdaftar di database anggota KSP.`);
+          hasError = true;
+        }
 
-        return {
-          id:       r.id ?? generateId(),
-          anggota:  matchedNo || String(r.nama ?? r.anggota ?? ''),
-          jumlah,
-          bunga:    parseNumber(r.bunga),
-          tenor,
-          angsuran,
-          sisa:     jumlah, // Sisa awal = jumlah pinjaman
-          status:   'Aktif' as const, // Default status Belum Lunas
-          tanggal:  convertExcelDate(r.tanggalPinjam ?? r.tanggal) || new Date().toISOString().slice(0, 10),
-        };
+        // Validation 2: Check numeric fields for currency/format symbols
+        const numericFields = [
+          { key: 'besarPinjaman', label: 'besarPinjaman' },
+          { key: 'bunga', label: 'bunga' },
+          { key: 'jangkaWaktu', label: 'jangkaWaktu' },
+        ];
+
+        for (const field of numericFields) {
+          const val = String(r[field.key] ?? '');
+          if (val && /Rp|%|\$|€|£|¥|[\.,]/.test(val) && !/^\d+([.,]\d+)?$/.test(val.replace(/[.,]/g, ''))) {
+            errors.push(`Eror Baris ${rowNum}: Kolom ${field.label} harus berupa angka murni tanpa simbol.`);
+            hasError = true;
+          }
+        }
+
+        // Validation 3: Check date format
+        const tgl = r.tanggalPinjam ?? '';
+        if (!tgl) {
+          errors.push(`Eror Baris ${rowNum}: Format tanggal harus YYYY-MM-DD.`);
+          hasError = true;
+        } else {
+          const dateStr = String(tgl);
+          const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          if (!isoMatch) {
+            errors.push(`Eror Baris ${rowNum}: Format tanggal harus YYYY-MM-DD.`);
+            hasError = true;
+          }
+        }
+
+        if (!hasError) {
+          const matchedNo = nameToNo[namaFromExcel];
+          const jumlah = parseNumber(r.besarPinjaman ?? r.jumlah);
+          const tenor = parseNumber(r.jangkaWaktu ?? r.tenor);
+          const angsuran = tenor > 0 ? Math.round(jumlah / tenor) : 0;
+
+          const validatedItem: Record<string, unknown> = {
+            id: String(r.id ?? generateId()),
+            anggota: matchedNo || String(namaRaw),
+            jumlah,
+            bunga: parseNumber(r.bunga),
+            tenor,
+            angsuran,
+            sisa: jumlah,
+            status: 'Aktif',
+            tanggal: convertExcelDate(r.tanggalPinjam ?? r.tanggal) || new Date().toISOString().slice(0, 10),
+          };
+          validatedData.push(validatedItem);
+        }
       });
-      setImportPreview(normalised);
+
+      if (errors.length > 0) {
+        setImportError(errors.join('\n'));
+        setImportPreview([]);
+      } else {
+        setImportPreview(validatedData);
+      }
     };
 
     const onError = () => {
@@ -532,11 +586,12 @@ export default function PinjamanClientContent() {
                 </label>
                 {importFile && (<p className="text-sm text-green-600 mt-2">File terpilih: <strong>{importFile.name}</strong></p>)}
               </div>
-              {importError && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0" /><p className="text-sm">{importError}</p>
-                </div>
-              )}
+{importError && (
+                 <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                   <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                   <div className="text-sm whitespace-pre-line">{importError}</div>
+                 </div>
+               )}
               {importPreview.length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-md p-4">
                   <div className="flex items-center gap-2 text-green-700 mb-2">

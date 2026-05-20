@@ -99,6 +99,12 @@ function readAllAnggota(): { no: string; nama: string }[] {
   })).filter((a) => a.no && a.nama);
 }
 
+// ── Get eligible petugas penanggung jawab ───────────────────────────
+const PETUGAS_ALLOWED_NO = ['1', '3', '4', '5', '6', '7', '8', '9', '195'];
+function getPetugasList(): { no: string; nama: string }[] {
+  return readAllAnggota().filter((a) => PETUGAS_ALLOWED_NO.includes(a.no));
+}
+
 // ─────────────────────────────────────────────────────────────────────
 
 interface Pinjaman {
@@ -162,7 +168,6 @@ export default function PinjamanClientContent() {
     bunga: '',
     jenisPinjaman: 'Flat' as 'Flat' | 'Musiman',
     tenor: '',
-    status: 'Aktif' as 'Aktif' | 'Lunas',
     tanggal: new Date().toISOString().slice(0, 10),
     penanggungJawab: '',
   });
@@ -209,7 +214,7 @@ export default function PinjamanClientContent() {
       tenor,
       angsuran,
       sisa: jumlah,
-      status: formData.status,
+      status: 'Aktif',
       tanggal: formData.tanggal,
       administrasi,
       danaResiko,
@@ -228,10 +233,9 @@ export default function PinjamanClientContent() {
       anggota: '',
       anggotaNo: '',
       jumlah: '',
-      bunga: '2.5',
+      bunga: '',
       jenisPinjaman: 'Flat',
       tenor: '',
-      status: 'Aktif',
       tanggal: new Date().toISOString().slice(0, 10),
       penanggungJawab: '',
     });
@@ -706,12 +710,16 @@ const errors: string[] = [];
                   </div>
                   <div className="mt-2">
                     <label className="block text-xs text-gray-500 mb-1">Nama Penanggung Jawab</label>
-                    <Input
-                      type="text"
-                      placeholder="Nama petugas KSP yang bertanggung jawab"
+                    <select
                       value={formData.penanggungJawab}
                       onChange={(e) => setFormData({...formData, penanggungJawab: e.target.value})}
-                    />
+                      className="w-full px-3 py-2 border"
+                    >
+                      <option value="">Pilih Petugas</option>
+                      {getPetugasList().map((p) => (
+                        <option key={p.no} value={p.nama}>{p.no} - {p.nama}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

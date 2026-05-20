@@ -92,8 +92,9 @@ function fmtRupiah(n: number): string {
   return n.toLocaleString('id-ID');
 }
 
-// ── API endpoint ──────────────────────────────────────────────────
-const API_BASE = '/api/simpanan';
+// ── API endpoints ──────────────────────────────────────────────────
+const API_BASE   = '/api/simpanan';
+const BULK_API   = '/api/simpanan/bulk';
 
 // ── Fetch all simpanan rows from the SQL database ─────────────────
 async function fetchAllFromDB(): Promise<Array<Record<string, unknown>>> {
@@ -113,6 +114,9 @@ async function fetchAllFromDB(): Promise<Array<Record<string, unknown>>> {
 
 // ── Post a single row to the SQL database ─────────────────────────
 async function postRowToDB(row: Record<string, unknown>): Promise<void> {
+  // Skip any residual IMPTR-* test rows — same logic as bulk route
+  const rawId = String(row.id ?? '');
+  if (rawId.startsWith('IMPTR-')) return;
   const res = await fetch(API_BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -353,24 +357,31 @@ export default function SimpananClientContent() {
     setImporting(true);
     setImportProgress({ done: 0, total: importPreview.length });
     try {
-      const result = await bulkImportToDB(
-        importPreview,
-        (done, total) => setImportProgress({ done, total }),
-      );
+      // POST all rows to the bulk endpoint in a single server-side call
+      const res = await fetch(BULK_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rows: importPreview }),
+      });
+      if (!res.ok) {
+        const msg = await res.text().catch(() => 'Gagal meng-import');
+        throw new Error(msg);
+      }
+      const result: { success: number; failed: number; total: number } = await res.json();
       if (result.failed > 0) {
         setImportError(`${result.failed} dari ${result.total} baris gagal disimpan. Berhasil: ${result.success}`);
       }
       // Re-fetch from DB so table shows server truth
       const rows = await fetchAllFromDB();
       setSimpananData(rows as unknown as Simpanan[]);
+    } catch (e: any) {
+      setImportError(`Import gagal: ${e.message}`);
+    } finally {
       setShowImport(false);
       setImportFile(null);
       setImportPreview([]);
       setImportError('');
       if (fileInputRef.current) fileInputRef.current.value = '';
-    } catch (e: any) {
-      setImportError(`Import gagal: ${e.message}`);
-    } finally {
       setImporting(false);
       setImportProgress({ done: 0, total: 0 });
     }
@@ -865,7 +876,7 @@ export default function SimpananClientContent() {
               <Button
                 variant="default"
                 onClick={handleImportConfirm}
-                disabled={importPreview.length === 0 || importing}
+                disabled={importing}
               >
                 <Upload className="mr-2 h-4 w-4" />
                 Import {importPreview.length > 0 ? `${importPreview.length} Data` : ''}

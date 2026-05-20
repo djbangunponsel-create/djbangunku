@@ -743,9 +743,8 @@ const errors: string[] = [];
                       <option value="BPKB Roda 4">BPKB Roda 4</option>
                       <option value="BPKB Roda 6/8">BPKB Roda 6/8</option>
                       <option value="Simpanan Sukarela Berjangka (Sisujang)">Simpanan Sukarela Berjangka (Sisujang)</option>
-                    </select>
+                       </select>
                   </div>
-                </div>
 
 {/* Total Uang Diterima */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">

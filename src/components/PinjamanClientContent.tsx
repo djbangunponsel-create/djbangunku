@@ -80,6 +80,25 @@ function formatDateDDMMYYYY(v: unknown): string {
   if (!y || !m || !d) return String(v ?? '');
   return `${String(d).padStart(2, '0')}-${String(m).padStart(2, '0')}-${y}`;
 }
+// ── Format number with thousand separator ────────────────────────
+function formatNumberWithSeparator(v: number): string {
+  return v.toLocaleString('id-ID');
+}
+
+// ── Parse number from formatted string ──────────────────────────────
+function parseFormattedNumber(v: string): number {
+  return Number(v.replace(/[^\d]/g, '')) || 0;
+}
+
+// ── Read all members for autocomplete ─────────────────────────────
+function readAllAnggota(): { no: string; nama: string }[] {
+  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  return rows.map((r) => ({
+    no: String(r.No_Anggota ?? ''),
+    nama: String(r.NAMA_ANGGOTA ?? ''),
+  })).filter((a) => a.no && a.nama);
+}
+
 // ─────────────────────────────────────────────────────────────────────
 
 interface Pinjaman {
@@ -132,14 +151,23 @@ export default function PinjamanClientContent() {
 
   const [formData, setFormData] = useState({
     anggota: '',
-    jumlah: 0,
-    bunga: 0,
-    tenor: 0,
-    angsuran: 0,
-    sisa: 0,
+    anggotaNo: '',
+    jumlah: '',
+    bunga: '',
+    jenisPinjaman: 'Flat' as 'Flat' | 'Musiman',
+    tenor: '',
     status: 'Aktif' as 'Aktif' | 'Lunas',
     tanggal: new Date().toISOString().slice(0, 10),
   });
+
+  const [showMemberDropdown, setShowMemberDropdown] = useState(false);
+  const [memberSearch, setMemberSearch] = useState('');
+
+  useEffect(() => {
+    if (formData.jenisPinjaman === 'Musiman') {
+      setFormData(prev => ({ ...prev, bunga: '2.5' }));
+    }
+  }, [formData.jenisPinjaman]);
 
   const q = search.trim().toLowerCase();
   const filteredData = (pinjamanData ?? [])
@@ -153,9 +181,21 @@ export default function PinjamanClientContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const jumlah = parseFormattedNumber(String(formData.jumlah));
+    const tenor = parseInt(formData.tenor) || 0;
+    const bunga = parseFloat(formData.bunga) || 0;
+    const angsuran = tenor > 0 ? Math.round(jumlah / tenor) : 0;
+
     const newPinjaman: Pinjaman = {
       id: generateId(),
-      ...formData,
+      anggota: formData.anggotaNo || formData.anggota,
+      jumlah,
+      bunga,
+      tenor,
+      angsuran,
+      sisa: jumlah,
+      status: formData.status,
+      tanggal: formData.tanggal,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -165,14 +205,15 @@ export default function PinjamanClientContent() {
   const resetForm = () => {
     setFormData({
       anggota: '',
-      jumlah: 0,
-      bunga: 0,
-      tenor: 0,
-      angsuran: 0,
-      sisa: 0,
+      anggotaNo: '',
+      jumlah: '',
+      bunga: '2.5',
+      jenisPinjaman: 'Flat',
+      tenor: '',
       status: 'Aktif',
       tanggal: new Date().toISOString().slice(0, 10),
     });
+    setMemberSearch('');
   };
 
   const handleDelete = (id: string) => {
@@ -518,51 +559,123 @@ const errors: string[] = [];
         </Card>
       </main>
 
-      {/* Tambah Pinjaman Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200]" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Tambah Pinjaman Baru</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota *</label>
-                <Input type="text" value={formData.anggota} onChange={(e) => setFormData({...formData, anggota: e.target.value})} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Pinjaman (Rp) *</label>
-                <Input type="number" min="0" value={formData.jumlah} onChange={(e) => setFormData({...formData, jumlah: Number(e.target.value)})} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bunga (%) *</label>
-                <Input type="number" min="0" step="0.1" value={formData.bunga} onChange={(e) => setFormData({...formData, bunga: Number(e.target.value)})} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tenor (bulan) *</label>
-                <Input type="number" min="0" value={formData.tenor} onChange={(e) => setFormData({...formData, tenor: Number(e.target.value)})} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Angsuran/Bulan (Rp) *</label>
-                <Input type="number" min="0" value={formData.angsuran} onChange={(e) => setFormData({...formData, angsuran: Number(e.target.value)})} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sisa Pinjaman (Rp) *</label>
-                <Input type="number" min="0" value={formData.sisa} onChange={(e) => setFormData({...formData, sisa: Number(e.target.value)})} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-                <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value as any})} className="w-full px-3 py-2 border" required>
-                  <option value="Aktif">Aktif</option>
-                  <option value="Lunas">Lunas</option>
-                </select>
-              </div>
-              <div className="flex justify-end space-x-3 pt-4">
-                <Button variant="outline" type="button" onClick={() => setShowForm(false)}>Batal</Button>
-                <Button variant="default" type="submit">Simpan</Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+{/* Tambah Pinjaman Modal */}
+       {showForm && (
+         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200]" role="dialog" aria-modal="true">
+           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+             <h2 className="text-xl font-bold text-gray-900 mb-4">Tambah Pinjaman Baru</h2>
+             <form onSubmit={handleSubmit} className="space-y-4">
+               {/* Nama Anggota - Auto Complete */}
+               <div className="relative">
+                 <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota *</label>
+                 <Input
+                   type="text"
+                   placeholder="Ketik nama anggota..."
+                   value={formData.anggota}
+                   onChange={(e) => {
+                     setFormData({...formData, anggota: e.target.value});
+                     setMemberSearch(e.target.value);
+                     setShowMemberDropdown(true);
+                   }}
+                   onFocus={() => setShowMemberDropdown(true)}
+                   required
+                 />
+                 {showMemberDropdown && (
+                   <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                     {readAllAnggota()
+                       .filter((a) => a.nama.toLowerCase().includes(memberSearch.toLowerCase()) || a.no.toLowerCase().includes(memberSearch.toLowerCase()))
+                       .slice(0, 10)
+                       .map((a) => (
+                         <button
+                           key={a.no}
+                           type="button"
+                           className="w-full text-left px-3 py-2 hover:bg-gray-100"
+                           onClick={() => {
+                             setFormData({...formData, anggota: `${a.no} - ${a.nama}`, anggotaNo: a.no});
+                             setShowMemberDropdown(false);
+                           }}
+                         >
+                           {a.no} - {a.nama}
+                         </button>
+                       ))}
+                     {readAllAnggota().filter((a) => a.nama.toLowerCase().includes(memberSearch.toLowerCase()) || a.no.toLowerCase().includes(memberSearch.toLowerCase())).length === 0 && (
+                       <div className="px-3 py-2 text-gray-500">Tidak ada data</div>
+                     )}
+                   </div>
+                 )}
+               </div>
+
+               {/* Jumlah Pinjaman dengan Separator Ribuan */}
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Pinjaman (Rp) *</label>
+                 <Input
+                   type="text"
+                   placeholder="Contoh: 10.000.000"
+                   value={formatNumberWithSeparator(parseFormattedNumber(formData.jumlah))}
+                   onChange={(e) => setFormData({...formData, jumlah: e.target.value.replace(/[^\d]/g, '')})}
+                   required
+                 />
+               </div>
+
+               {/* Jenis Pinjaman Dropdown */}
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Pinjaman *</label>
+                 <select
+                   value={formData.jenisPinjaman}
+                   onChange={(e) => setFormData({...formData, jenisPinjaman: e.target.value as any})}
+                   className="w-full px-3 py-2 border"
+                   required
+                 >
+                   <option value="Flat">Flat</option>
+                   <option value="Musiman">Musiman</option>
+                 </select>
+               </div>
+
+               {/* Bunga - Conditional Disabled */}
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">Bunga (%) *</label>
+                 <Input
+                   type="number"
+                   min="0"
+                   step="0.1"
+                   value={formData.bunga}
+                   onChange={(e) => setFormData({...formData, bunga: e.target.value})}
+                   disabled={formData.jenisPinjaman === 'Musiman'}
+                   required
+                 />
+               </div>
+
+               {/* Tenor - Dropdown with conditional options */}
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">Tenor (bulan) *</label>
+                 <select
+                   value={formData.tenor}
+                   onChange={(e) => setFormData({...formData, tenor: e.target.value})}
+                   className="w-full px-3 py-2 border"
+                   required
+                 >
+                   <option value="">Pilih Tenor</option>
+                   {formData.jenisPinjaman === 'Musiman'
+                     ? [1, 2, 3, 4, 5, 6, 7, 8].map((m) => <option key={m} value={m}>{m} bulan</option>)
+                     : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36].map((m) => <option key={m} value={m}>{m} bulan</option>)}
+                 </select>
+               </div>
+
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                 <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value as any})} className="w-full px-3 py-2 border" required>
+                   <option value="Aktif">Aktif</option>
+                   <option value="Lunas">Lunas</option>
+                 </select>
+               </div>
+               <div className="flex justify-end space-x-3 pt-4">
+                 <Button variant="outline" type="button" onClick={() => setShowForm(false)}>Batal</Button>
+                 <Button variant="default" type="submit">Simpan</Button>
+               </div>
+             </form>
+           </div>
+         </div>
+       )}
 
       {/* Import Excel Modal */}
       {showImport && (

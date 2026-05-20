@@ -232,15 +232,20 @@ export default function PinjamanClientContent() {
         const namaFromExcel = String(r.nama ?? r.anggota ?? '').toLowerCase().trim();
         const matchedNo = nameToNo[namaFromExcel] || '';
 
+        const jumlah = parseNumber(r.besarPinjaman ?? r.jumlah);
+        const tenor = parseNumber(r.jangkaWaktu ?? r.tenor);
+        // Hitung angsuran otomatis: jumlah / tenor
+        const angsuran = tenor > 0 ? Math.round(jumlah / tenor) : 0;
+
         return {
           id:       r.id ?? generateId(),
           anggota:  matchedNo || String(r.nama ?? r.anggota ?? ''),
-          jumlah:   parseNumber(r.besarPinjaman ?? r.jumlah),
+          jumlah,
           bunga:    parseNumber(r.bunga),
-          tenor:    parseNumber(r.jangkaWaktu ?? r.tenor),
-          angsuran: parseNumber(r.angsuran),
-          sisa:     parseNumber(r.sisa),
-          status:   (r.status as 'Aktif' | 'Lunas') ?? 'Aktif',
+          tenor,
+          angsuran,
+          sisa:     jumlah, // Sisa awal = jumlah pinjaman
+          status:   'Aktif' as const, // Default status Belum Lunas
           tanggal:  convertExcelDate(r.tanggalPinjam ?? r.tanggal) || new Date().toISOString().slice(0, 10),
         };
       });
@@ -519,7 +524,7 @@ export default function PinjamanClientContent() {
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                 <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-400 mb-3" />
                 <p className="text-sm text-gray-600 mb-2">Pilih file Excel (.xlsx, .xls, .csv) yang berisi data pinjaman</p>
-                <p className="text-xs text-gray-400 mb-4">Kolom yang dibutuhkan: nama, tanggalPinjam, besarPinjaman, bunga, jangkaWaktu, angsuran, sisa, status</p>
+                <p className="text-xs text-gray-400 mb-4">Kolom yang dibutuhkan: nama, tanggalPinjam, besarPinjaman, bunga, jangkaWaktu, jenisPinjaman</p>
                 <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileSelect} className="hidden" id="import-pinjaman-file" />
                 <label htmlFor="import-pinjaman-file" className="cursor-pointer inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
                   <Upload className="mr-2 h-4 w-4" />

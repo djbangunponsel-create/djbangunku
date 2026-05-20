@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# sqlite databases (local dev only)
+*.db
+*.sqlite
+.drizzle
+## local dev files
+ksp.db

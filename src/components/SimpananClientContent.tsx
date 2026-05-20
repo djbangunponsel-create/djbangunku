@@ -97,9 +97,18 @@ const API_BASE = '/api/simpanan';
 
 // ── Fetch all simpanan rows from the SQL database ─────────────────
 async function fetchAllFromDB(): Promise<Array<Record<string, unknown>>> {
-  const res = await fetch(API_BASE, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Gagal memuat data dari server');
-  return res.json();
+  try {
+    const res = await fetch(API_BASE, { cache: 'no-store' });
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`Server error ${res.status}: ${body || 'unknown'}`);
+    }
+    return res.json();
+  } catch (e: any) {
+    // Network failure, CORS, build-race, table-not-found → return empty
+    console.warn('fetchAllFromDB:', e.message);
+    return [];
+  }
 }
 
 // ── Post a single row to the SQL database ─────────────────────────

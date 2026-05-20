@@ -5,7 +5,7 @@ import * as schema from './schema';
 import path from 'node:path';
 import fs from 'node:fs';
 
-// ── shared config (used by both drizzle(db) and API routes) ─────────
+// ── shared config ─────────────────────────────────────────────────
 function getConnectionConfig(): { url: string; authToken?: string } {
   const tursoUrl   = process.env.TURSO_DATABASE_URL;
   const tursoToken = process.env.TURSO_AUTH_TOKEN;
@@ -18,10 +18,11 @@ function getConnectionConfig(): { url: string; authToken?: string } {
   return { url: `file:${dbPath}` };
 }
 
-const connConfig = getConnectionConfig();
-const client = createClient(connConfig);
+const connConfig  = getConnectionConfig();
+const libsql      = createClient(connConfig);   // raw @libsql/client instance
 
-export const db = drizzle(client, { schema });
+export const db         = drizzle(libsql, { schema });
+export const libsqlDb   = libsql;   // raw @libsql/client instance — used by API route raw-SQL handlers
 
 // ── Run migrations on startup (idempotent) ─────────────────────────
 export async function runMigrations() {

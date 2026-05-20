@@ -92,49 +92,55 @@ function fmtRupiah(n: number): string {
   return n.toLocaleString('id-ID');
 }
 
+// ── API endpoint ──────────────────────────────────────────────────
+const API_BASE = '/api/simpanan';
+
+// ── Fetch all simpanan rows from the SQL database ─────────────────
+async function fetchAllFromDB(): Promise<Array<Record<string, unknown>>> {
+  const res = await fetch(API_BASE, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Gagal memuat data dari server');
+  return res.json();
+}
+
+// ── Post a single row to the SQL database ─────────────────────────
+async function postRowToDB(row: Record<string, unknown>): Promise<void> {
+  const res = await fetch(API_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(row),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => 'Unknown error');
+    throw new Error(`Gagal menyimpan: ${msg}`);
+  }
+}
+
+// ── Bulk import: loop every row and POST individually ─────────────
+async function bulkImportToDB(
+  rows: Array<Record<string, unknown>>,
+  onProgress?: (done: number, total: number) => void,
+): Promise<{ success: number; failed: number }> {
+  let success = 0;
+  let failed  = 0;
+  for (let i = 0; i < rows.length; i++) {
+    try {
+      await postRowToDB(rows[i]);
+      success++;
+    } catch (e) {
+      console.error('Bulk row error:', e, rows[i]);
+      failed++;
+    }
+    onProgress?.(i + 1, rows.length);
+  }
+  return { success, failed };
+}
+
 export default function SimpananClientContent() {
   const [simpananData, setSimpananData] = useState<Simpanan[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [showImport, setShowImport] = useState(false);
-  const [importFile, setImportFile] = useState<File | null>(null);
-  const [importPreview, setImportPreview] = useState<Record<string, unknown>[]>([]);
-  const [importError, setImportError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
-  const [showDetail, setShowDetail] = useState(false);
-  const [selectedSimpanan, setSelectedSimpanan] = useState<Simpanan | null>(null);
-  const [showEdit, setShowEdit] = useState(false);
-  const [editData, setEditData] = useState<Simpanan | null>(null);
-
-  // Build anggota name map once; refresh on storage change
-  const [anggotaMap, setAnggotaMap] = useState<Record<string, string>>({});
-  useEffect(() => {
-    setAnggotaMap(readAnggotaMap());
-    const handler = () => setAnggotaMap(readAnggotaMap());
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, []);
-
-  // Load from localStorage on mount + clear IMPTR test rows
-  useEffect(() => {
-    const saved = readStored<Simpanan[]>('ksp_simpanan_data', []);
-    const cleaned = saved.filter((s) => !s.id.startsWith('IMPTR-'));
-    if (cleaned.length !== saved.length) {
-      setSimpananData(cleaned);
-      window.localStorage.setItem('ksp_simpanan_data', JSON.stringify(cleaned));
-    } else {
-      setSimpananData(saved);
-    }
-  }, []);
-
-  // Persist to localStorage on every change
-  useEffect(() => {
-    window.localStorage.setItem('ksp_simpanan_data', JSON.stringify(simpananData));
-  }, [simpananData]);
-
-  // ── Form state ───────────────────────────────────────────────────
+  const [loading, setLoading]             = useState(true);
+  const [loadError, setLoadError]         = useState<string>('');
+  const [importing, setImporting]         = useState(false);
+  const [importProgress, setImportProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const today = new Date().toISOString().slice(0, 10);
 
   const [formData, setFormData] = useState({

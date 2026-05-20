@@ -22,13 +22,16 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "@libsql/client": "^0.17.3",
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24.10.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@tailwindcss/postcss": "^4.1.17",
-    "tailwindcss": "^4.1.17",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
     "eslint": "^9.39.1",
-    "eslint-config-next": "^16.0.0"
+    "eslint-config-next": "^16.0.0",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
   }
 }

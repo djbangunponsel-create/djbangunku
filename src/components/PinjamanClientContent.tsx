@@ -111,6 +111,9 @@ interface Pinjaman {
   sisa: number;
   status: 'Aktif' | 'Lunas';
   tanggal: string;
+  administrasi?: number;
+  danaResiko?: number;
+  netto?: number;
 }
 
 function generateId(): string {
@@ -160,6 +163,12 @@ export default function PinjamanClientContent() {
     tanggal: new Date().toISOString().slice(0, 10),
   });
 
+  // Hitung potongan otomatis
+  const jumlahNum = parseFormattedNumber(formData.jumlah);
+  const administrasi = Math.round(jumlahNum * 0.02);
+  const danaResiko = Math.round(jumlahNum * 0.01);
+  const netto = jumlahNum - administrasi - danaResiko;
+
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
 
@@ -181,7 +190,7 @@ export default function PinjamanClientContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const jumlah = parseFormattedNumber(String(formData.jumlah));
+    const jumlah = jumlahNum;
     const tenor = parseInt(formData.tenor) || 0;
     const bunga = parseFloat(formData.bunga) || 0;
     const angsuran = tenor > 0 ? Math.round(jumlah / tenor) : 0;
@@ -196,6 +205,9 @@ export default function PinjamanClientContent() {
       sisa: jumlah,
       status: formData.status,
       tanggal: formData.tanggal,
+      administrasi,
+      danaResiko,
+      netto,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -645,21 +657,42 @@ const errors: string[] = [];
                  />
                </div>
 
-               {/* Tenor - Dropdown with conditional options */}
-               <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">Tenor (bulan) *</label>
-                 <select
-                   value={formData.tenor}
-                   onChange={(e) => setFormData({...formData, tenor: e.target.value})}
-                   className="w-full px-3 py-2 border"
-                   required
-                 >
-                   <option value="">Pilih Tenor</option>
-                   {formData.jenisPinjaman === 'Musiman'
-                     ? [1, 2, 3, 4, 5, 6, 7, 8].map((m) => <option key={m} value={m}>{m} bulan</option>)
-                     : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36].map((m) => <option key={m} value={m}>{m} bulan</option>)}
-                 </select>
-               </div>
+{/* Tenor - Dropdown with conditional options */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tenor (bulan) *</label>
+                  <select
+                    value={formData.tenor}
+                    onChange={(e) => setFormData({...formData, tenor: e.target.value})}
+                    className="w-full px-3 py-2 border"
+                    required
+                  >
+                    <option value="">Pilih Tenor</option>
+                    {formData.jenisPinjaman === 'Musiman'
+                      ? [1, 2, 3, 4, 5, 6, 7, 8].map((m) => <option key={m} value={m}>{m} bulan</option>)
+                      : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36].map((m) => <option key={m} value={m}>{m} bulan</option>)}
+                  </select>
+                </div>
+
+                {/* Potongan Pinjaman */}
+                <div className="border-t pt-3 mt-2">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Potongan Pinjaman</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Administrasi Pinjaman (2%)</label>
+                      <Input type="text" value={formatNumberWithSeparator(administrasi)} readOnly className="bg-gray-50" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Dana Resiko (1%)</label>
+                      <Input type="text" value={formatNumberWithSeparator(danaResiko)} readOnly className="bg-gray-50" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total Uang Diterima */}
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                  <label className="block text-sm font-medium text-blue-700 mb-1">Total Diterima Anggota</label>
+                  <Input type="text" value={formatNumberWithSeparator(netto)} readOnly className="bg-white font-bold text-blue-700" />
+                </div>
 
                <div>
                  <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>

@@ -113,3 +113,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | 2026-05-20 | Tambah Pinjaman form: added Potongan Administrasi (2%), Dana Resiko (1%), and Total Diterima Netto calculation - all auto-calculated and stored in database
 |  | 2026-05-20 | Pinjaman form: added Dana Sosial (1%), Insentif Penanggung Jawab (1%), Nama Penanggung Jawab field - total potongan now 5%, all saved to database
 |  | 2026-05-20 | Removed Status field from Tambah Pinjaman form - new loans automatically set to Aktif status
+|  | 2026-05-20 | Nama Penanggung Jawab changed to dropdown - filtered to specific No_Anggota (1,3,4,5,6,7,8,9,195) from Master_Anggota_KSP

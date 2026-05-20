@@ -123,6 +123,7 @@ interface Pinjaman {
   insentifPJ?: number;
   netto?: number;
   penanggungJawab?: string;
+  jenisAgunan?: 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)';
 }
 
 function generateId(): string {
@@ -170,6 +171,7 @@ export default function PinjamanClientContent() {
     tenor: '',
     tanggal: new Date().toISOString().slice(0, 10),
     penanggungJawab: '',
+    jenisAgunan: '' as 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)',
   });
 
   // Hitung potongan otomatis (total 5%)
@@ -222,6 +224,7 @@ export default function PinjamanClientContent() {
       insentifPJ,
       netto,
       penanggungJawab: formData.penanggungJawab,
+      jenisAgunan: formData.jenisAgunan,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -238,6 +241,7 @@ export default function PinjamanClientContent() {
       tenor: '',
       tanggal: new Date().toISOString().slice(0, 10),
       penanggungJawab: '',
+      jenisAgunan: '' as 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)',
     });
     setMemberSearch('');
   };
@@ -719,6 +723,26 @@ const errors: string[] = [];
                       {getPetugasList().map((p) => (
                         <option key={p.no} value={p.nama}>{p.no} - {p.nama}</option>
                       ))}
+                    </select>
+                  </div>
+                </div>
+                  <div className="mt-2">
+                    <label className="block text-xs text-gray-500 mb-1">Jenis Agunan *</label>
+                    <select
+                      value={formData.jenisAgunan}
+                      onChange={(e) => setFormData({...formData, jenisAgunan: e.target.value as any})}
+                      className="w-full px-3 py-2 border"
+                      required
+                    >
+                      <option value="">Pilih Jenis Agunan</option>
+                      <option value="Pendiri">Pendiri</option>
+                      <option value="Simpanan">Simpanan</option>
+                      <option value="Akta Tanah">Akta Tanah</option>
+                      <option value="Sertifikat Hak Milik (SHM)">Sertifikat Hak Milik (SHM)</option>
+                      <option value="BPKB Roda 2">BPKB Roda 2</option>
+                      <option value="BPKB Roda 4">BPKB Roda 4</option>
+                      <option value="BPKB Roda 6/8">BPKB Roda 6/8</option>
+                      <option value="Simpanan Sukarela Berjangka (Sisujang)">Simpanan Sukarela Berjangka (Sisujang)</option>
                     </select>
                   </div>
                 </div>

@@ -109,3 +109,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | 2026-05-20 | Pinjaman import changed: column 'nama' now used for name-based lookup against Master_Anggota_KSP table; header updated to 'NAMA'; supported columns: nama, tanggalPinjam, besarPinjaman, bunga, jangkaWaktu, angsuran, sisa, status
 |  | 2026-05-20 | Pinjaman import finalized: required columns locked to nama, tanggalPinjam, besarPinjaman, bunga, jangkaWaktu, jenisPinjaman; angsuran, sisa, status auto-calculated by system
 |  | 2026-05-20 | Pinjaman import validation: detailed error messages for NAMA not found, numeric field symbols, and date format issues
+|  | 2026-05-20 | Tambah Pinjaman form redesigned: autocomplete member search, thousand separator for jumlah, jenisPinjaman dropdown (Flat/Musiman) with conditional tenor/bunga rules, removed angsuran/sisa fields

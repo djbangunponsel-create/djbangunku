@@ -119,7 +119,7 @@ async function postRowToDB(row: Record<string, unknown>): Promise<void> {
 async function bulkImportToDB(
   rows: Array<Record<string, unknown>>,
   onProgress?: (done: number, total: number) => void,
-): Promise<{ success: number; failed: number }> {
+): Promise<{ success: number; failed: number; total: number }> {
   let success = 0;
   let failed  = 0;
   for (let i = 0; i < rows.length; i++) {
@@ -132,17 +132,59 @@ async function bulkImportToDB(
     }
     onProgress?.(i + 1, rows.length);
   }
-  return { success, failed };
+  return { success, failed, total: rows.length };
 }
 
 export default function SimpananClientContent() {
   const [simpananData, setSimpananData] = useState<Simpanan[]>([]);
   const [loading, setLoading]             = useState(true);
   const [loadError, setLoadError]         = useState<string>('');
+  const [search, setSearch]               = useState('');
+
   const [importing, setImporting]         = useState(false);
   const [importProgress, setImportProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const today = new Date().toISOString().slice(0, 10);
 
+  const [showForm, setShowForm]           = useState(false);
+  const [showImport, setShowImport]       = useState(false);
+  const [importFile, setImportFile]       = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<Record<string, unknown>[]>([]);
+  const [importError, setImportError]     = useState('');
+  const fileInputRef                      = useRef<HTMLInputElement>(null);
+
+  const [currentPage, setCurrentPage]     = useState(1);
+  const rowsPerPage                       = 10;
+
+  const [showDetail, setShowDetail]       = useState(false);
+  const [selectedSimpanan, setSelectedSimpanan] = useState<Simpanan | null>(null);
+  const [showEdit, setShowEdit]           = useState(false);
+  const [editData, setEditData]           = useState<Simpanan | null>(null);
+
+  // anggota lookup map (reactive to storage events)
+  const [anggotaMap, setAnggotaMap] = useState<Record<string, string>>(() => readAnggotaMap());
+  useEffect(() => {
+    const handler = () => setAnggotaMap(readAnggotaMap());
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+
+  // Load from SQL database on mount
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await fetchAllFromDB();
+        if (!cancelled) setSimpananData(rows as unknown as Simpanan[]);
+      } catch (e: any) {
+        if (!cancelled) setLoadError(e.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+   }, []);
+
+  // ── Form state ───────────────────────────────────────────────────
   const [formData, setFormData] = useState({
     noAnggota: '',
     namaAnggota: '',
@@ -164,9 +206,9 @@ export default function SimpananClientContent() {
   // ── Search / filter ───────────────────────────────────────────────
   const q = search.trim().toLowerCase();
   const filteredData = (simpananData ?? []).filter((s) => {
-    const id  = String(s.id ?? '').toLowerCase();
-    const no  = String(s.noAnggota ?? '').toLowerCase();
-    const nama = String(s.namaAnggota ?? '').toLowerCase();
+    const id    = String(s.id ?? '').toLowerCase();
+    const no    = String(s.noAnggota ?? '').toLowerCase();
+    const nama  = String(s.namaAnggota ?? '').toLowerCase();
     return q === '' || id.includes(q) || no.includes(q) || nama.includes(q);
   });
 
@@ -297,15 +339,32 @@ export default function SimpananClientContent() {
     bufReader.readAsArrayBuffer(file);
   }, []);
 
-  const handleImportConfirm = () => {
+  const handleImportConfirm = async () => {
     if (importPreview.length === 0) return;
-    const newRows = importPreview as unknown as Simpanan[];
-    setSimpananData((prev) => [...prev, ...newRows]);
-    setShowImport(false);
-    setImportFile(null);
-    setImportPreview([]);
-    setImportError('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    setImporting(true);
+    setImportProgress({ done: 0, total: importPreview.length });
+    try {
+      const result = await bulkImportToDB(
+        importPreview,
+        (done, total) => setImportProgress({ done, total }),
+      );
+      if (result.failed > 0) {
+        setImportError(`${result.failed} dari ${result.total} baris gagal disimpan. Berhasil: ${result.success}`);
+      }
+      // Re-fetch from DB so table shows server truth
+      const rows = await fetchAllFromDB();
+      setSimpananData(rows as unknown as Simpanan[]);
+      setShowImport(false);
+      setImportFile(null);
+      setImportPreview([]);
+      setImportError('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (e: any) {
+      setImportError(`Import gagal: ${e.message}`);
+    } finally {
+      setImporting(false);
+      setImportProgress({ done: 0, total: 0 });
+    }
   };
 
   const handleImportCancel = () => {
@@ -353,6 +412,16 @@ export default function SimpananClientContent() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* ── Loading / Error ─────────────────────────────────────────── */}
+        {loading && (
+          <div className="text-center py-12 text-gray-500">Memuat data simpanan…</div>
+        )}
+        {loadError && !loading && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {loadError}
+          </div>
+        )}
 
         {/* ── Summary Cards ─────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -410,9 +479,9 @@ export default function SimpananClientContent() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <Button variant="outline" onClick={() => setShowImport(true)}>
+              <Button variant="outline" onClick={() => !importing && setShowImport(true)}>
                 <Upload className="mr-2 h-4 w-4" />
-                Import Excel Simpanan
+                {importing ? `Meng-import… ${importProgress.done}/${importProgress.total}` : 'Import Excel Simpanan'}
               </Button>
               <Button variant="default" onClick={() => setShowForm(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -787,7 +856,7 @@ export default function SimpananClientContent() {
               <Button
                 variant="default"
                 onClick={handleImportConfirm}
-                disabled={importPreview.length === 0}
+                disabled={importPreview.length === 0 || importing}
               >
                 <Upload className="mr-2 h-4 w-4" />
                 Import {importPreview.length > 0 ? `${importPreview.length} Data` : ''}

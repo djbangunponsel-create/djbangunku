@@ -224,20 +224,29 @@ export default function PinjamanClientContent() {
 
   // ── Nilai Agunan (pasar diisi manual, likuidasi dihitung otomatis) ───
   const nilaiPasarAgunan    = parseFormattedNumber(formData.nilaiPasar);
-  const AGUNAN_PCT_LIKUIDASI = formData.jenisAgunan === 'Pendiri' || formData.jenisAgunan === 'Simpanan'
-    ? 100
-    : ['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan)
-      ? 70
-      : 80;
+  const isSisujang          = formData.jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)';
+  const AGUNAN_PCT_LIKUIDASI = isSisujang
+    ? 5
+    : formData.jenisAgunan === 'Pendiri' || formData.jenisAgunan === 'Simpanan'
+      ? 100
+      : ['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan)
+        ? 70
+        : 80;
   const nilaiLikuidasiAgunan = Math.round(nilaiPasarAgunan * AGUNAN_PCT_LIKUIDASI / 100);
-  const agunanMencukupi      = jumlahNum > 0 ? jumlahNum <= nilaiPasarAgunan : true;
+  const agunanMencukupi      = isSisujang ? true : (jumlahNum > 0 ? jumlahNum <= nilaiPasarAgunan : true);
 
-  // Hitung potongan otomatis (total 5%)
-  // Insentif Penanggung Jawab: 1% HANYA jika agunan TIDAK mencukupi pinjaman
-  const administrasi = Math.round(jumlahNum * 0.02);
-  const danaResiko = Math.round(jumlahNum * 0.01);
-  const danaSosial = Math.round(jumlahNum * 0.01);
-  const insentifPJ  = !agunanMencukupi ? Math.round(jumlahNum * 0.01) : 0;
+  // Hitung potongan otomatis
+  // SISUJANG: hanya administrasi 2%
+  // Lainnya: administrasi(2%), dana resiko(1%), dana sosial(1%), insentif PJ(1% jika agunan tidak mencukupi)
+  const baseAdministrasi = Math.round(jumlahNum * 0.02);
+  const baseDanaResiko = Math.round(jumlahNum * 0.01);
+  const baseDanaSosial = Math.round(jumlahNum * 0.01);
+  const baseInsentifPJ  = !agunanMencukupi ? Math.round(jumlahNum * 0.01) : 0;
+
+  const administrasi = isSisujang ? baseAdministrasi : baseAdministrasi;
+  const danaResiko   = isSisujang ? 0 : baseDanaResiko;
+  const danaSosial   = isSisujang ? 0 : baseDanaSosial;
+  const insentifPJ   = isSisujang ? 0 : baseInsentifPJ;
 
   // Biaya tambahan otomatis
   const biayaMaterai = formData.legalisasiNotaris === 'Ya' ? 24000 : 12000;
@@ -328,6 +337,7 @@ export default function PinjamanClientContent() {
       legalisasiNotaris: formData.legalisasiNotaris,
       iuranBpjstk: formData.iuranBpjstk,
       masaBpjstk: parseInt(formData.masaBpjstk) || 0,
+      opsiSwk: formData.opsiSwk || undefined,
       pemilikAgunan: formData.pemilikAgunan || undefined,
       nilaiPasarAgunan,
       nilaiLikuidasiAgunan,
@@ -1217,16 +1227,16 @@ const errors: string[] = [];
           data={{
             ...lastPinjaman,
             potongan: {
-              administrasi,
-              danaResiko,
-              danaSosial,
-              insentifPJ,
-              biayaMaterai,
-              biayaNotaris,
-              biayaBpjstk,
+              administrasi: lastPinjaman.administrasi ?? 0,
+              danaResiko:   lastPinjaman.danaResiko ?? 0,
+              danaSosial:   lastPinjaman.danaSosial ?? 0,
+              insentifPJ:   lastPinjaman.insentifPJ ?? 0,
+              biayaMaterai: lastPinjaman.biayaMaterai ?? 0,
+              biayaNotaris: lastPinjaman.biayaNotaris ?? 0,
+              biayaBpjstk:  lastPinjaman.biayaBpjstk ?? 0,
             },
-            masaBpjstk: parseInt(formData.masaBpjstk) || 0,
-            opsiSwk: formData.opsiSwk,
+            masaBpjstk: lastPinjaman.masaBpjstk ?? 0,
+            opsiSwk:    lastPinjaman.opsiSwk,
           } as Parameters<typeof KwitansiPinjaman>[0]['data']}
           onClose={() => { setShowKwitansi(false); setLastPinjaman(null); }}
         />

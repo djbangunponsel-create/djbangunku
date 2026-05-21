@@ -63,7 +63,8 @@ function parseNumber(v: unknown): number {
 function readAnggotaMap(): Record<string, string> {
   const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
   const map: Record<string, string> = {};
-  for (const row of rows) {
+  const safeRows = Array.isArray(rows) ? rows : [];
+  for (const row of safeRows) {
     const no = String(row.No_Anggota ?? '');
     const nama = String(row.NAMA_ANGGOTA ?? '');
     if (no && nama) map[no.toLowerCase()] = nama;

@@ -69,7 +69,7 @@ export default function StatistikPage() {
   // ── Calculate monthly savings for last 6 months ─────────────────────────────────
   const calculateMonthlySavings = () => {
     const now = new Date()
-    const monthlyData: { month: string; total: number }[] = []
+    const monthlyData: { month: string; count: number; total?: number }[] = []
     
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
@@ -79,7 +79,7 @@ export default function StatistikPage() {
         .reduce((sum, s) => sum + (s.jumlah || 0), 0)
       monthlyData.push({
         month: getMonthName(d),
-        total
+        count: total
       })
     }
     return monthlyData

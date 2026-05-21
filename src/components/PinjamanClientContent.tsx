@@ -219,7 +219,7 @@ export default function PinjamanClientContent() {
   // Nilai dasar pinjaman (diperlukan Agunan & semua potongan)
   const jumlahNum = parseFormattedNumber(formData.jumlah);
 
-  // ── Nilai Agunan (dihitung dulu karena insentifPJ tergantung padanya) ───
+  // ── Nilai Agunan (pasar diisi manual, likuidasi dihitung otomatis) ───
   const nilaiPasarAgunan    = parseFormattedNumber(formData.nilaiPasar);
   const AGUNAN_PCT_LIKUIDASI = formData.jenisAgunan === 'Pendiri' || formData.jenisAgunan === 'Simpanan'
     ? 100
@@ -259,10 +259,51 @@ export default function PinjamanClientContent() {
   const angsuranBunga = Math.round(jumlahNum * bungaNum / 100);
   const totalAngsuranPerBulan = angsuranPokok + angsuranBunga + nilaiSwk;
 
+  
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
   const memberSearchRef = useRef<HTMLDivElement>(null);
 
+  // Clickoutside untuk menutup dropdown pencarian anggota
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (memberSearchRef.current && !memberSearchRef.current.contains(event.target as Node)) {
+        setShowMemberDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Helper: update satu field detail agunan tanpa membuat baru keseluruhan formData
+  const applyDetail = (field: string, value: string) =>
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+  useEffect(() => {
+    if (formData.jenisPinjaman === 'Musiman') {
+      setFormData(prev => ({ ...prev, bunga: '2.5' }));
+    }
+  }, [formData.jenisPinjaman]);
+
+  const q = search.trim().toLowerCase();
+  const filteredData = (pinjamanData ?? [])
+    .filter((p) => {
+      const anggota = String(p.anggota ?? '').toLowerCase();
+      const id = String(p.id ?? '').toLowerCase();
+      return q === '' || anggota.includes(q) || id.includes(q);
+    });
+
+  useEffect(() => { setCurrentPage(1); }, [search]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const jumlah = jumlahNum;
+    const tenor = parseInt(formData.tenor) || 0;
+    const bunga = parseFloat(formData.bunga) || 0;
+    const angsuran = tenor > 0 ? Math.round(jumlah / tenor) : 0;
+
+    const newPinjaman: Pinjaman = {
+      id: generateId(),
       anggota: formData.anggotaNo || formData.anggota,
       jumlah,
       bunga,

@@ -124,13 +124,32 @@ export default function AnggotaClientContent() {
   const [editData, setEditData] = useState<Anggota | null>(null);
   
   useEffect(() => {
-    const saved = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
-    if (saved && saved.length > 0) {
+    // Try to load from server first, fallback to localStorage
+    const loadFromServer = async () => {
       try {
-        const normalised = saved.map(normaliseRow) as unknown as Anggota[];
-        setAnggotaData(normalised);
-      } catch { /* ignore corrupt data */ }
-    }
+        const res = await fetch('/api/anggota');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setAnggotaData(data as Anggota[]);
+            // Also save to localStorage as backup
+            writeStored(KEYS.ANGGOTA, data);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load from server, using localStorage backup:', err);
+      }
+      // Fallback to localStorage
+      const saved = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
+      if (saved && saved.length > 0) {
+        try {
+          const normalised = saved.map(normaliseRow) as unknown as Anggota[];
+          setAnggotaData(normalised);
+        } catch { /* ignore corrupt data */ }
+      }
+    };
+    loadFromServer();
   }, []);
 
   useEffect(() => {
@@ -236,9 +255,43 @@ setFormData({
     bufReader.readAsArrayBuffer(file);
   }, []);
 
-  const handleImportConfirm = () => {
+  const handleImportConfirm = async () => {
     if (importPreview.length === 0) return;
     const newRows = importPreview.map((r) => r as unknown as Anggota);
+    
+    // Save to server database via API
+    try {
+      for (const row of newRows) {
+        await fetch('/api/anggota', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            noAnggota: row.No_Anggota,
+            namaAnggota: row.NAMA,
+            jenisKelamin: row.Jenis_Kelamin,
+            agama: row.Agama,
+            nik: row.NIK,
+            tempatLahir: row.Tempat_Lahir,
+            tanggalLahir: row.Tanggal_Lahir,
+            telepon: row.TELEPON,
+            alamat: row.Alamat,
+            tanggalMasuk: row.Tanggal_Masuk,
+            statusPerkawinan: row.Status_Perkawinan,
+            namaPasangan: row.Nama_Pasangan,
+            jumlahAnak: row.Jumlah_Anak,
+            namaIbuKandung: row.Nama_Ibu_Kandung,
+            namaSaudara: row.Nama_Saudara,
+            noHpSaudara: row.No_HP_Saudara,
+            hubunganSaudara: row.Hubungan_Saudara,
+            pekerjaan: row.Pekerjaan,
+            penghasilanPerBulan: row.PENGHASILAN_per_Bulan
+          })
+        });
+      }
+    } catch (err) {
+      console.error('Import to server failed:', err);
+    }
+    
     setAnggotaData((prev) => [...prev, ...newRows]);
     setShowImport(false);
     setImportFile(null);

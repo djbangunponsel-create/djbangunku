@@ -167,3 +167,4 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - **Nama Pemilik Agunan** ditambahkan di 5 agunan detail section (BPKB, Akta/SHM, Simpanan, Sisujang, Pendiri) full-width sebelum grid detail
     - kecukupan agunan (ACC/DITOLAK) tetap menggunakan nilaiPasarAgunan (bukan likuidasi)
     - Pinjaman interface + handleSubmit + resetForm ter-update dengan `pemilikAgunan` field
+|  | 2026-05-21 | **Fix dropdown Nama Penanggung Jawab kosong** (`src/components/PinjamanClientContent.tsx:846`): penghapusan fungsi `getPetugasList()` beserta hardcoded `PETUGAS_ALLOWED_NO = ['1','3','4','5','6','7','8','9','195']` yang menjadi penyebab seluruh anggota tersaring sehingga opsi dropdown menjadi kosong; mengganti pemanggilan `getPetugasList().map()` menjadi `readAllAnggota().map()` sehingga semua anggota yang terdaftar di `ksp_anggota_data` bisa dipilih sebagai penanggung jawab (petugas); typecheck + lint pass clean

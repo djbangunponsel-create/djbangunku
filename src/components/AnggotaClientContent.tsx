@@ -75,6 +75,35 @@ interface Anggota {
   PENGHASILAN_per_Bulan: number
 }
 
+// ── Simpanan helpers ────────────────────────────────────────────────
+function readSimpananRows(): Record<string, unknown>[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem('ksp_simpan_data');
+    return raw ? (JSON.parse(raw) as Record<string, unknown>[]) : [];
+  } catch { return []; }
+}
+
+type SimpKey = 'Pokok' | 'Wajib' | 'Sibuhar' | 'Sisujang' | 'Simapan' | 'Sihat' | 'Sihar';
+
+const SIMPANAN_TYPE_LIST: SimpKey[] = [
+  'Pokok', 'Wajib', 'Sibuhar', 'Sisujang', 'Simapan', 'Sihat', 'Sihar',
+];
+
+function getAnggotaSaldoByProduct(anggotaNo: string): Record<string, number> {
+  const rows   = readSimpananRows();
+  const result: Record<string, number> = {};
+  for (const row of rows) {
+    const no   = String(row.noAnggota ?? row.No_Anggota ?? '').toLowerCase();
+    const tipe = String(row.tipe ?? '') as SimpKey;
+    if (no !== anggotaNo.toLowerCase()) continue;
+    if (row.status && String(row.status).toLowerCase() !== 'aktif') continue;
+    if (!SIMPANAN_TYPE_LIST.includes(tipe)) continue;
+    result[tipe] = (result[tipe] || 0) + (typeof row.jumlah === 'number' ? row.jumlah : 0);
+  }
+  return result;
+}
+
 export default function AnggotaClientContent() {
   const [anggotaData, setAnggotaData] = useState<Anggota[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -757,8 +786,50 @@ export default function AnggotaClientContent() {
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Penghasilan per Bulan</p>
                 <p className="text-sm text-gray-900">Rp {selectedAnggota.PENGHASILAN_per_Bulan.toLocaleString('id-ID')}</p>
-              </div>
-            </div>
+               </div>
+            </div>   {/* close grid grid-cols-1 md:grid-cols-2 */}
+
+            {/* ── Simpanan per Produk ── */}
+            {(() => {
+              const saldo = getAnggotaSaldoByProduct(selectedAnggota.No_Anggota);
+              const fmt   = (n: number) => n.toLocaleString('id-ID');
+              return (
+                <div className="md:col-span-2 mt-2">
+                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Saldo Simpanan per Produk</p>
+                  <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table className="w-full text-xs">
+                      <thead className="bg-emerald-50">
+                        <tr>
+                          {SIMPANAN_TYPE_LIST.map((t) => (
+                            <th key={t} className="px-2 py-1.5 text-center font-semibold text-emerald-800 border-b">
+                              {t}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          {SIMPANAN_TYPE_LIST.map((t) => (
+                            <td key={t} className="px-2 py-1.5 text-center font-medium text-emerald-700 border-b border-gray-100">
+                              Rp {fmt(saldo[t] || 0)}
+                            </td>
+                          ))}
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-emerald-100">
+                          {SIMPANAN_TYPE_LIST.map((t) => (
+                            <td key={t} className="px-2 py-1.5 text-center font-bold text-emerald-900">
+                             Rp {t === 'Pokok' ? fmt(saldo.Pokok || 0) : ''}
+                            </td>
+                          ))}
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="flex justify-end pt-4 mt-4 border-t">
               <Button variant="outline" onClick={closeDetail}>

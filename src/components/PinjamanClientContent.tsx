@@ -105,15 +105,20 @@ function readSimpananList(): Record<string, unknown>[] {
   return readStored<Record<string, unknown>[]>('ksp_simpan_data', []);
 }
 
+// ── All product types included in "Simpanan" collateral ──────────────
+const SIMPANAN_COLLATERAL_TYPES = new Set([
+  'pokok', 'wajib', 'sibuhar', 'simapan', 'sihat', 'sihar',
+]);
+
 // ── Compute available balance for the selected member ───────────────
-//   Simpanan   → sum ALL simpanan (Pokok + Wajib + Sukarela) for anggotano
-//   Sisujang   → sum only Sukarela for anggotano
+//   Simpanan (non-Sisujang) → SP + SW + Sibuhar + Simapan + Sihat + Sihar
+//   Sisujang                → only Sisujang
 function computeSaldoTersedia(anggotaNo: string, jenisAgunan: string): number {
   if (!anggotaNo) return 0;
   const allRows = readSimpananList();
   const isSisujang = jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)';
   return allRows.reduce((total, row) => {
-    const no = String(row.noAnggota ?? row.No_Anggota ?? '').toLowerCase();
+    const no   = String(row.noAnggota ?? row.No_Anggota ?? '').toLowerCase();
     const tipe = String(row.tipe ?? '').toLowerCase();
     const jumlah = parseNumber(row.jumlah);
     const matchesNo = no === anggotaNo.toLowerCase();
@@ -121,9 +126,9 @@ function computeSaldoTersedia(anggotaNo: string, jenisAgunan: string): number {
     const isAktif = status === 'aktif' || status === '' || !row.status;
     if (!matchesNo || !isAktif) return total;
     if (isSisujang) {
-      if (tipe === 'sukarela') return total + jumlah;
+      if (tipe === 'sisujang') return total + jumlah;
     } else {
-      if (tipe === 'pokok' || tipe === 'wajib' || tipe === 'sukarela') return total + jumlah;
+      if (SIMPANAN_COLLATERAL_TYPES.has(tipe as any)) return total + jumlah;
     }
     return total;
   }, 0);
@@ -862,8 +867,31 @@ const errors: string[] = [];
                  >
                    <option value="Flat">Flat</option>
                    <option value="Musiman">Musiman</option>
-                 </select>
-               </div>
+                        </select>
+                      </div>
+
+                    {/* ── Penarikan Saldo Jaminan Otomatis ── */}
+                    {(formData.jenisAgunan === 'Simpanan' || formData.jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)') && (
+                      <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-xs font-semibold text-blue-700">
+                              Total Saldo Tersedia (Rp)
+                            </p>
+                            <p className="text-[10px] text-blue-500 mt-0.5">
+                              {formData.jenisAgunan === 'Simpanan'
+                                ? 'SP + SW + Sibuhar + Simapan + Sihat + Sihar'
+                                : 'Hanya Simpanan Sukarela Berjangka (Sisujang)'}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-blue-700">
+                              Rp {formatNumberWithSeparator(saldoTersedia)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                {/* Bunga - Conditional Disabled */}
                <div>

@@ -62,23 +62,26 @@ function parseMonthISO(iso: unknown): string | null {
   return m ? `${m[1]}-${m[2]}` : null;
 }
 
-// ── Aggregate raw transactions into 6-month bucket totals ──────
-function aggregateMonthly(
-  rows: Record<string, unknown>[],
-  bucketKeys: string[],
-  amountField: string = "jumlah",
-): number[] {
-  const buckets = new Array(bucketKeys.length).fill(0);
-  for (const row of rows) {
-    const mk = parseMonthISO(row.tanggal as string);
-    if (!mk) continue;
-    const idx = bucketKeys.indexOf(mk);
-    if (idx < 0) continue;
-    const val = Number(row[amountField]) || 0;
-    buckets[idx] += val;
+  // ── Aggregate raw transactions into 6-month bucket totals ──────
+  // Supports tanggal (pinjaman) and tanggalSetor (simpanan) field names.
+  function aggregateMonthly(
+    rows: Record<string, unknown>[],
+    bucketKeys: string[],
+    amountField: string = "jumlah",
+    dateField?: string,
+  ): number[] {
+    const df = dateField ?? "tanggal";
+    const buckets = new Array(bucketKeys.length).fill(0);
+    for (const row of rows) {
+      const mk = parseMonthISO(row[df] as string);
+      if (!mk) continue;
+      const idx = bucketKeys.indexOf(mk);
+      if (idx < 0) continue;
+      const val = Number(row[amountField]) || 0;
+      buckets[idx] += val;
+    }
+    return buckets;
   }
-  return buckets;
-}
 
 // ── Simple SVG Bar Chart ───────────────────────────────────────
 function BarChart({
@@ -237,11 +240,12 @@ export default function Home() {
   const totalAnggota = anggotaRows.length;
 
   // ── LocalStorage: Simpanan ───────────────────────────────────────
+  // Storage key is ksp_simpan_data (single source, used by SimpananClientContent)
   const simpananRows = readStored<Record<string, unknown>[]>(
-    "ksp_simpanan_data", [],
+    "ksp_simpan_data", [],
   );
 
-  const monthlySimpanan = aggregateMonthly(simpananRows, yyyyMmKeys, "jumlah");
+  const monthlySimpanan = aggregateMonthly(simpananRows, yyyyMmKeys, "jumlah", "tanggalSetor");
 
   // ── LocalStorage: Pinjaman ──────────────────────────────────────
   const pinjamanRows = readStored<Record<string, unknown>[]>(
@@ -472,7 +476,7 @@ export default function Home() {
                       </p>
                       <p className="text-[9px] text-gray-400">
                         {simpananRows.filter((r: Record<string, unknown>) =>
-                          parseMonthISO(r.tanggal as string) === yyyyMmKeys[i]
+                          parseMonthISO(r.tanggalSetor as string) === yyyyMmKeys[i]
                         ).length} transaksi
                       </p>
                     </div>
@@ -508,7 +512,7 @@ export default function Home() {
       <footer className="mt-8 border-t bg-white/60 py-4">
         <p className="text-center text-[11px] text-gray-400">
           &copy; 2026 KSP Mulia Dana Sejahtera &mdash;
-          Data transaksi: localStorage (<code>ksp_simpanan_data</code> / <code>ksp_pinjam_data</code>)
+           Data transaksi: localStorage (<code>ksp_simpan_data</code> / <code>ksp_pinjam_data</code>)
         </p>
       </footer>
     </div>

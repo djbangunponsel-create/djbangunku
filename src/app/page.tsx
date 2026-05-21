@@ -73,8 +73,9 @@ function parseMonthISO(iso: unknown): string | null {
     dateField?: string,
   ): number[] {
     const df = dateField ?? "tanggal";
+    const safeRows = Array.isArray(rows) ? rows : [];
     const buckets = new Array(bucketKeys.length).fill(0);
-    for (const row of rows) {
+    for (const row of safeRows) {
       const mk = parseMonthISO(row[df] as string);
       if (!mk) continue;
       const idx = bucketKeys.indexOf(mk);

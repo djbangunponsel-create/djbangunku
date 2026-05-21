@@ -10,8 +10,24 @@ import { readStored, KEYS } from "@/lib/storage"
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Anggota {
   No_Anggota: string
-  NAMA_ANGGOTA: string
+  NAMA: string
   Tanggal_Masuk: string
+  Jenis_Kelamin: string
+  Agama: string
+  NIK: string
+  Tempat_Lahir: string
+  Tanggal_Lahir: string
+  TELEPON: string
+  Alamat: string
+  Status_Perkawinan: string
+  Nama_Pasangan: string
+  Jumlah_Anak: number
+  Nama_Ibu_Kandung: string
+  Nama_Saudara: string
+  No_HP_Saudara: string
+  Hubungan_Saudara: string
+  Pekerjaan: string
+  PENGHASILAN_per_Bulan: number
 }
 
 interface Simpanan {

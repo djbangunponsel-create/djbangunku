@@ -47,6 +47,12 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   - [x] Import Excel: Modal import dengan preview data sebelum konfirmasi
   - [x] Detail view: Modal detail pinjaman
   - [x] Stats cards: Total Aktif, Lunas, Angsuran/Bulan, Pendapatan Bunga
+  - [x] **Biaya Tambahan & Logika Otomatis** di form Tambah Pinjaman:
+    - [x] Biaya Materai (auto: Rp 12.000 default / Rp 24.000 jika Legalisasi Notaris = Ya)
+    - [x] Legalisasi Notaris (Ya/Tidak, muncul hanya jika Jenis Agunan = Akta Tanah/SHM/BPKB; Biaya Notaris Rp 400.000/Rp 0)
+    - [x] Iuran BPJSTK PBPU (Ya/Tidak + Masa Iuran bulan 1-12 × Rp 20.000)
+    - [x] Rumus Total Diterima Anggota diperbarui: kurangi semua biaya baru secara real-time
+    - [x] Semua field baru tersimpan ke localStorage via Pinjaman interface dan handleSubmit
 - [x] **UPDATE DASHBOARD**: Dashboard sudah terhubung dengan data localStorage ksp_simpanan_data dan ksp_pinjam_data
   - [x] Total Simpanan otomatis terupdate dari localStorage
   - [x] Total Pinjaman otomatis terupdate dari localStorage
@@ -114,3 +120,12 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | 2026-05-20 | Pinjaman form: added Dana Sosial (1%), Insentif Penanggung Jawab (1%), Nama Penanggung Jawab field - total potongan now 5%, all saved to database
 |  | 2026-05-20 | Removed Status field from Tambah Pinjaman form - new loans automatically set to Aktif status
 |  | 2026-05-20 | Nama Penanggung Jawab changed to dropdown - filtered to specific No_Anggota (1,3,4,5,6,7,8,9,195) from Master_Anggota_KSP
+|  | 2026-05-21 | Fix build error src/components/PinjamanClientContent.tsx — removed spurious `</div>` on line 748 with no matching opener; `<div>` ↔ `</div>` balanced back to 70/70; typecheck and lint pass clean
+|  | 2026-05-21 | **Biaya Tambahan & Logika Otomatis** added to Tambah Pinjaman form (between Jenis Agunan and Total Diterima):
+    - **Biaya Materai**: read-only, Rp 12.000 default; jadi Rp 24.000 jika Legalisasi Notaris = Ya
+    - **Legalisasi Notaris**: Ya/Tidak dropdown — muncul HANYA jika Jenis Agunan ∈ {Akta Tanah, SHM, BPKB Roda 2/4/6-8}; auto-hide untuk Pendiri, Simpanan, Sisujang; Biaya Notaris Rp 400.000 jika Ya, Rp 0 jika Tidak
+    - **Iuran BPJSTK PBPU**: Ya/Tidak dropdown; jika Ya → Muncul "Masa Iuran (Bulan)" 1-12, biaya = bulan × Rp 20.000; jika Tidak → Rp 0
+    - **Total Diterima Anggota** rumus baru: Jumlah Pinjaman − [Potongan 5% + Biaya Materai + Biaya Notaris + Biaya BPJSTK]
+    - Pinjaman interface diperluas dengan 5 field optional: biayaMaterai, biayaNotaris, biayaBpjstk, legalisasiNotaris, iuranBpjstk, masaBpjstk
+    - handleSubmit dan resetForm diperbarui untuk menyimpan dan mereset field baru
+    - typecheck + lint pass clean

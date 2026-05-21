@@ -124,6 +124,12 @@ interface Pinjaman {
   netto?: number;
   penanggungJawab?: string;
   jenisAgunan?: 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)';
+  biayaMaterai?: number;
+  biayaNotaris?: number;
+  biayaBpjstk?: number;
+  legalisasiNotaris?: 'Ya' | 'Tidak';
+  iuranBpjstk?: 'Ya' | 'Tidak';
+  masaBpjstk?: number;
 }
 
 function generateId(): string {
@@ -172,6 +178,9 @@ export default function PinjamanClientContent() {
     tanggal: new Date().toISOString().slice(0, 10),
     penanggungJawab: '',
     jenisAgunan: '' as 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)',
+    legalisasiNotaris: 'Tidak' as 'Ya' | 'Tidak',
+    iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
+    masaBpjstk: '1',
   });
 
   // Hitung potongan otomatis (total 5%)
@@ -180,7 +189,15 @@ export default function PinjamanClientContent() {
   const danaResiko = Math.round(jumlahNum * 0.01);
   const danaSosial = Math.round(jumlahNum * 0.01);
   const insentifPJ = Math.round(jumlahNum * 0.01);
-  const netto = jumlahNum - administrasi - danaResiko - danaSosial - insentifPJ;
+
+  // Biaya tambahan otomatis
+  const biayaMaterai = formData.legalisasiNotaris === 'Ya' ? 24000 : 12000;
+  const biayaNotaris  = formData.legalisasiNotaris === 'Ya' ? 400000 : 0;
+  const biayaBpjstk   = formData.iuranBpjstk === 'Ya'
+    ? (parseInt(formData.masaBpjstk) || 0) * 20000
+    : 0;
+
+  const netto = jumlahNum - administrasi - danaResiko - danaSosial - insentifPJ - biayaMaterai - biayaNotaris - biayaBpjstk;
 
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
@@ -225,6 +242,12 @@ export default function PinjamanClientContent() {
       netto,
       penanggungJawab: formData.penanggungJawab,
       jenisAgunan: formData.jenisAgunan,
+      biayaMaterai,
+      biayaNotaris,
+      biayaBpjstk,
+      legalisasiNotaris: formData.legalisasiNotaris,
+      iuranBpjstk: formData.iuranBpjstk,
+      masaBpjstk: parseInt(formData.masaBpjstk) || 0,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -242,6 +265,9 @@ export default function PinjamanClientContent() {
       tanggal: new Date().toISOString().slice(0, 10),
       penanggungJawab: '',
       jenisAgunan: '' as 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)',
+      legalisasiNotaris: 'Tidak' as 'Ya' | 'Tidak',
+      iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
+      masaBpjstk: '1',
     });
     setMemberSearch('');
   };
@@ -744,7 +770,77 @@ const errors: string[] = [];
                       <option value="BPKB Roda 6/8">BPKB Roda 6/8</option>
                       <option value="Simpanan Sukarela Berjangka (Sisujang)">Simpanan Sukarela Berjangka (Sisujang)</option>
                        </select>
+                   </div>
+
+                {/* ───────────── Biaya Tambahan ───────────── */}
+                <div className="border-t pt-3 mt-2">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Biaya Tambahan</h4>
+
+                  {/* Biaya Materai — auto computed */}
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Biaya Materai</label>
+                    <Input type="text" value={formatNumberWithSeparator(biayaMaterai)} readOnly className="bg-gray-50" />
                   </div>
+
+                  {/* Legalisasi Notaris — only when Agunan is property / document type */}
+                  {['Akta Tanah', 'Sertifikat Hak Milik (SHM)', 'BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan) && (
+                    <>
+                      <div className="mt-2">
+                        <label className="block text-xs text-gray-500 mb-1">Legalisasi Notaris</label>
+                        <select
+                          value={formData.legalisasiNotaris}
+                          onChange={(e) => setFormData({ ...formData, legalisasiNotaris: e.target.value as 'Ya' | 'Tidak' })}
+                          className="w-full px-3 py-2 border"
+                        >
+                          <option value="Tidak">Tidak</option>
+                          <option value="Ya">Ya</option>
+                        </select>
+                      </div>
+
+                      {formData.legalisasiNotaris === 'Ya' && (
+                        <div className="mt-2">
+                          <label className="block text-xs text-gray-500 mb-1">Biaya Notaris</label>
+                          <Input type="text" value={formatNumberWithSeparator(biayaNotaris)} readOnly className="bg-gray-50" />
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Iuran BPJSTK PBPU — optional dropdown with duration */}
+                  <div className="mt-2">
+                    <label className="block text-xs text-gray-500 mb-1">Iuran BPJSTK PBPU</label>
+                    <select
+                      value={formData.iuranBpjstk}
+                      onChange={(e) => setFormData({ ...formData, iuranBpjstk: e.target.value as 'Ya' | 'Tidak' })}
+                      className="w-full px-3 py-2 border"
+                    >
+                      <option value="Tidak">Tidak</option>
+                      <option value="Ya">Ya</option>
+                    </select>
+                  </div>
+
+                  {formData.iuranBpjstk === 'Ya' && (
+                    <>
+                      <div className="mt-2">
+                        <label className="block text-xs text-gray-500 mb-1">Masa Iuran (Bulan)</label>
+                        <select
+                          value={formData.masaBpjstk}
+                          onChange={(e) => setFormData({ ...formData, masaBpjstk: e.target.value })}
+                          className="w-full px-3 py-2 border"
+                        >
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
+                            <option key={m} value={m}>{m} bulan</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="mt-2">
+                        <label className="block text-xs text-gray-500 mb-1">Biaya Iuran BPJSTK</label>
+                        <Input type="text" value={formatNumberWithSeparator(biayaBpjstk)} readOnly className="bg-gray-50" />
+                      </div>
+                    </>
+                  )}
+                </div>
 
 {/* Total Uang Diterima */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">

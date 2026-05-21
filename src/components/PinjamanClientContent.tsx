@@ -99,12 +99,6 @@ function readAllAnggota(): { no: string; nama: string }[] {
   })).filter((a) => a.no && a.nama);
 }
 
-// ── Get eligible petugas penanggung jawab ───────────────────────────
-const PETUGAS_ALLOWED_NO = ['1', '3', '4', '5', '6', '7', '8', '9', '195'];
-function getPetugasList(): { no: string; nama: string }[] {
-  return readAllAnggota().filter((a) => PETUGAS_ALLOWED_NO.includes(a.no));
-}
-
 // ─────────────────────────────────────────────────────────────────────
 
 interface Pinjaman {
@@ -849,7 +843,7 @@ const errors: string[] = [];
                       className="w-full px-3 py-2 border"
                     >
                       <option value="">Pilih Petugas</option>
-                      {getPetugasList().map((p) => (
+                      {readAllAnggota().map((p) => (
                         <option key={p.no} value={p.nama}>{p.no} - {p.nama}</option>
                       ))}
                     </select>

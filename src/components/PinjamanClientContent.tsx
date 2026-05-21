@@ -130,6 +130,10 @@ interface Pinjaman {
   legalisasiNotaris?: 'Ya' | 'Tidak';
   iuranBpjstk?: 'Ya' | 'Tidak';
   masaBpjstk?: number;
+  opsiSwk?: '1%' | 'flat';
+  nilaiPasarAgunan?: number;
+  nilaiLikuidasiAgunan?: number;
+  agunanMencukupi?: boolean;
 }
 
 function generateId(): string {
@@ -214,6 +218,25 @@ export default function PinjamanClientContent() {
   const angsuranBunga = Math.round(jumlahNum * bungaNum / 100);
   const totalAngsuranPerBulan = angsuranPokok + angsuranBunga + nilaiSwk;
 
+  // ── Nilai Pasar dan Nilai Likuidasi per jenis agunan ──────────────────
+  const agunanValues: Record<string, { pasar: number; likuidasi: number }> = {
+    Pendiri:                                  { pasar: 10_000_000, likuidasi: 8_000_000 },
+    Simpanan:                                 { pasar: 10_000_000, likuidasi: 8_500_000 },
+    'Akta Tanah':                             { pasar: 150_000_000, likuidasi: 120_000_000 },
+    'Sertifikat Hak Milik (SHM)':             { pasar: 150_000_000, likuidasi: 120_000_000 },
+    'BPKB Roda 2':                            { pasar: 50_000_000, likuidasi: 40_000_000 },
+    'BPKB Roda 4':                            { pasar: 100_000_000, likuidasi: 80_000_000 },
+    'BPKB Roda 6/8':                          { pasar: 150_000_000, likuidasi: 120_000_000 },
+    'Simpanan Sukarela Berjangka (Sisujang)': { pasar: 10_000_000, likuidasi: 8_500_000 },
+  };
+
+  const selectedAgunan = formData.jenisAgunan
+    ? agunanValues[formData.jenisAgunan]
+    : null;
+  const nilaiPasarAgunan   = selectedAgunan?.pasar      ?? 0;
+  const nilaiLikuidasiAgunan = selectedAgunan?.likuidasi ?? 0;
+  const agunanMencukupi     = selectedAgunan != null && jumlahNum <= nilaiPasarAgunan;
+
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
 
@@ -263,6 +286,9 @@ export default function PinjamanClientContent() {
       legalisasiNotaris: formData.legalisasiNotaris,
       iuranBpjstk: formData.iuranBpjstk,
       masaBpjstk: parseInt(formData.masaBpjstk) || 0,
+      nilaiPasarAgunan,
+      nilaiLikuidasiAgunan,
+      agunanMencukupi,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -785,10 +811,50 @@ const errors: string[] = [];
                       <option value="BPKB Roda 4">BPKB Roda 4</option>
                       <option value="BPKB Roda 6/8">BPKB Roda 6/8</option>
                       <option value="Simpanan Sukarela Berjangka (Sisujang)">Simpanan Sukarela Berjangka (Sisujang)</option>
-                       </select>
-                   </div>
+                        </select>
+                    </div>
 
-                {/* ───────────── Biaya Tambahan ───────────── */}
+                 {/* ───────────── Detail Agunan ───────────── */}
+                 <div className="border-t pt-3 mt-2">
+                   <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan</h4>
+                   {selectedAgunan && (
+                     <>
+                       <div className="grid grid-cols-2 gap-3">
+                         <div>
+                           <label className="block text-xs text-gray-500 mb-1">Nilai Pasar Agunan</label>
+                           <Input type="text" value={formatNumberWithSeparator(nilaiPasarAgunan)} readOnly className="bg-gray-50" />
+                         </div>
+                         <div>
+                           <label className="block text-xs text-gray-500 mb-1">Nilai Likuidasi Agunan</label>
+                           <Input type="text" value={formatNumberWithSeparator(nilaiLikuidasiAgunan)} readOnly className="bg-gray-50" />
+                         </div>
+                       </div>
+                       <div className="mt-2">
+                         <label className="block text-xs text-gray-500 mb-1">Kecukupan Agunan</label>
+                         <div className={`flex items-center gap-2 px-3 py-2 rounded ${
+                           agunanMencukupi
+                             ? 'bg-green-50 border border-green-200'
+                             : 'bg-red-50 border border-red-200'
+                         }`}>
+                           {agunanMencukupi ? (
+                             <span className="text-sm font-medium text-green-700">
+                               ✓ Agunan CUKUP mencukupi pinjaman Rp {formatNumberWithSeparator(jumlahNum)}
+                             </span>
+                           ) : (
+                             <span className="text-sm font-medium text-red-700">
+                               ✗ Agunan TIDAK cukup! Pinjaman Rp {formatNumberWithSeparator(jumlahNum)} melebihi nilai pasar agunan Rp {formatNumberWithSeparator(nilaiPasarAgunan)}
+                             </span>
+                           )}
+                         </div>
+                       </div>
+                     </>
+                   )}
+                   {!selectedAgunan && (
+                     <div className="text-xs text-gray-400 italic">Pilih jenis agunan untuk melihat detail nilai.</div>
+                   )}
+                 </div>
+
+                 {/* ───────────── Biaya Tambahan ───────────── */}
                 <div className="border-t pt-3 mt-2">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Biaya Tambahan</h4>
 

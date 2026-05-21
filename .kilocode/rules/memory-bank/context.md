@@ -56,6 +56,10 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
   - [x] **Opsi SWK + Rincian Angsuran Per Bulan** di bawah Total Diterima:
     - [x] Dropdown Opsi SWK: 1% dari Besar Pinjaman atau Flat Rp 25.000; nominal otomatis tampil di kotak read-only
     - [x] Grid RINCIAN ANGSURAN PER BULAN: Angsuran Pokok, Angsuran Bunga, SWK, TOTAL ANGSURAN (bold biru) — semua diformat titik ribuan
+  - [x] **Detail Agunan & Kecukupan Pinjaman** di bawah dropdown Jenis Agunan:
+    - [x] Nilai Pasar & Nilai Likuidasi untuk setiap jenis agunan (8 tipe) displayed read-only
+    - [x] Kotak Kecukupan Agunan: ACCEPTED (hijau) jika pinjaman <= nilai pasar; DITOLAK (merah) jika pinjaman > nilai pasar
+    - [x] Nilai persisted ke Pinjaman interface: nilaiPasarAgunan, nilaiLikuidasiAgunan, agunanMencukupi
 - [x] **UPDATE DASHBOARD**: Dashboard sudah terhubung dengan data localStorage ksp_simpanan_data dan ksp_pinjam_data
   - [x] Total Simpanan otomatis terupdate dari localStorage
   - [x] Total Pinjaman otomatis terupdate dari localStorage
@@ -142,4 +146,10 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - **Total Diterima Anggota** rumus baru: Jumlah Pinjaman − [Potongan 5% + Biaya Materai + Biaya Notaris + Biaya BPJSTK]
     - Pinjaman interface diperluas dengan 5 field optional: biayaMaterai, biayaNotaris, biayaBpjstk, legalisasiNotaris, iuranBpjstk, masaBpjstk
     - handleSubmit dan resetForm diperbarui untuk menyimpan dan mereset field baru
+    - typecheck + lint pass clean
+|  | 2026-05-21 | **Detail Agunan** ditambahkan di bawah dropdown Jenis Agunan (sebelum Biaya Tambahan):
+    - lookup object `agunanValues` dengan 8 jenis agunan: nilai pasar dan nilai likuidasi masing-masing
+    - Menampilkan 2 kolom read-only: **Nilai Pasar Agunan** dan **Nilai Likuidasi Agunan** dengan format thousand-separator
+    - Kotak **Kecukupan Agunan**: jika `jumlahNum <= nilaiPasarAgunan` → hijau ACCEPTED; jika tidak → merah DITOLAK dengan pesan detail beserta perbandingan nominal
+    - `agunanMencukupi` = boolean, `nilaiPasarAgunan` / `nilaiLikuidasiAgunan` ditambahkan ke interface Pinjaman + disimpan di handleSubmit
     - typecheck + lint pass clean

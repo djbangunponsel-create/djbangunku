@@ -167,4 +167,12 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - **Nama Pemilik Agunan** ditambahkan di 5 agunan detail section (BPKB, Akta/SHM, Simpanan, Sisujang, Pendiri) full-width sebelum grid detail
     - kecukupan agunan (ACC/DITOLAK) tetap menggunakan nilaiPasarAgunan (bukan likuidasi)
     - Pinjaman interface + handleSubmit + resetForm ter-update dengan `pemilikAgunan` field
-|  | 2026-05-21 | **Fix dropdown Nama Penanggung Jawab kosong** (`src/components/PinjamanClientContent.tsx:846`): penghapusan fungsi `getPetugasList()` beserta hardcoded `PETUGAS_ALLOWED_NO = ['1','3','4','5','6','7','8','9','195']` yang menjadi penyebab seluruh anggota tersaring sehingga opsi dropdown menjadi kosong; mengganti pemanggilan `getPetugasList().map()` menjadi `readAllAnggota().map()` sehingga semua anggota yang terdaftar di `ksp_anggota_data` bisa dipilih sebagai penanggung jawab (petugas); typecheck + lint pass clean
+|  | 2026-05-21 | **Fix Pencarian Nama Anggota di form Tambah Pinjaman Baru** (`src/components/PinjamanClientContent.tsx:733-784`): total refactor JSX dropdown autocomplete pencarian anggota:
+    - Tambah `memberSearchRef = useRef<HTMLDivElement>(null)` + `useEffect` click-outside handler (mousedown on document, hapus listener saat unmount)
+    - Refactor JSX dari chained `.filter().map()` menjadi **IIFE `(() => { ... })()`** sehingga `readAllAnggota()` hanya dipanggil SEKALI per render (bukan 2x di baris 738 dan 754)
+    - Filter sekarang pakai `const q = memberSearch.toLowerCase().trim()` (tambahan `.trim()`)
+    - `onFocus` input sekarang JUGAA mengisi `memberSearch(formData.anggota)` mencegah stale state jika user memilih lalu mengetik ulang
+    - `onClick` di tombol pilihan anggota sekarang memanggil `setMemberSearch("")` mengosongkan pencarian setelah memilih
+    - Dropdown z-index dinaikkan dari `z-10` menjadi `z-50` dan `max-h-48` menjadi `max-h-60` agar tidak tertutup oleh elemen lain
+    - Display hasil pencarian sekarang menampilkan `<b>Nama Anggota</b>` dengan tebal dan `No. XXX` berwarna abu-abu di sebelahnya agar jelas field mana yang cocok
+    - typecheck + lint pass clean

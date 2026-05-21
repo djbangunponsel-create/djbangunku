@@ -56,7 +56,8 @@ export default function StatistikPage() {
     for (let i = 11; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
       const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-      const count = anggotaData.filter(a => getYearMonth(a.Tanggal_Masuk) === yearMonth).length
+      const safeAnggotaData = Array.isArray(anggotaData) ? anggotaData : []
+      const count = safeAnggotaData.filter(a => getYearMonth(a.Tanggal_Masuk) === yearMonth).length
       monthlyData.push({
         month: getMonthName(d),
         count

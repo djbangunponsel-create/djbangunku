@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import KwitansiPinjaman from '@/components/KwitansiPinjaman';
 import { PlusCircle, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil, Trash2, Search } from 'lucide-react';
 import Link from 'next/link';
 
@@ -153,6 +154,8 @@ function generateId(): string {
 export default function PinjamanClientContent() {
   const [pinjamanData, setPinjamanData] = useState<Pinjaman[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showKwitansi, setShowKwitansi] = useState(false);
+  const [lastPinjaman, setLastPinjaman] = useState<Pinjaman | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importPreview, setImportPreview] = useState<Record<string, unknown>[]>([]);
@@ -344,8 +347,11 @@ export default function PinjamanClientContent() {
       simpananNoRekening: formData.simpananNoRekening || undefined,
       simpananMasaBerjangka: formData.simpananMasaBerjangka || undefined,
     };
-    setPinjamanData([...pinjamanData, newPinjaman]);
+    const saved = [...pinjamanData, newPinjaman];
+    setPinjamanData(saved);
+    setLastPinjaman(newPinjaman);
     setShowForm(false);
+    setShowKwitansi(true);
     resetForm();
   };
 
@@ -1204,6 +1210,27 @@ const errors: string[] = [];
             </div>
           </div>
         )}
+
+      {/* ═══════════════ KWITANSI PINJAMAN ═══════════════ */}
+      {showKwitansi && lastPinjaman && (
+        <KwitansiPinjaman
+          data={{
+            ...lastPinjaman,
+            potongan: {
+              administrasi,
+              danaResiko,
+              danaSosial,
+              insentifPJ,
+              biayaMaterai,
+              biayaNotaris,
+              biayaBpjstk,
+            },
+            masaBpjstk: parseInt(formData.masaBpjstk) || 0,
+            opsiSwk: formData.opsiSwk,
+          } as Parameters<typeof KwitansiPinjaman>[0]['data']}
+          onClose={() => { setShowKwitansi(false); setLastPinjaman(null); }}
+        />
+      )}
 
       {/* Import Excel Modal */}
       {showImport && (

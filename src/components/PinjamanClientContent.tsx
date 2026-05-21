@@ -837,39 +837,43 @@ const errors: string[] = [];
                    }}
                    required
                  />
-                 {showMemberDropdown && (
-                   <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                     {(() => {
-                       const members = readAllAnggota();
-                       const q = memberSearch.toLowerCase().trim();
-                       const filtered = members.filter(
-                         (a) => a.nama.toLowerCase().includes(q) || a.no.toLowerCase().includes(q)
-                       );
-                       if (filtered.length === 0) {
-                         return <div className="px-3 py-2 text-gray-500 text-sm">Tidak ada data</div>;
-                       }
-                       return (
-                         <>
-                           {filtered.slice(0, 10).map((a) => (
-                             <button
-                               key={a.no}
-                               type="button"
-                               className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm"
-                               onClick={() => {
-                                 setFormData({ ...formData, anggota: `${a.no} - ${a.nama}`, anggotaNo: a.no });
-                                 setShowMemberDropdown(false);
-                                 setMemberSearch("");
-                               }}
-                             >
-                               <span className="font-medium">{a.nama}</span>
-                               <span className="text-gray-400 ml-2">No. {a.no}</span>
-                             </button>
-                           ))}
-                         </>
-                       );
-                     })()}
-                   </div>
-                 )}
+{showMemberDropdown && (
+                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {(() => {
+                        const members = readAllAnggota();
+                        const q = memberSearch.toLowerCase().trim();
+                        // Jika pencarian kosong, tampilkan semua data
+                        // Jika ada pencarian, filter berdasarkan nama atau nomor anggota (case-insensitive)
+                        const filtered = q === '' 
+                          ? members 
+                          : members.filter(
+                              (a) => a.nama.toLowerCase().includes(q) || a.no.toLowerCase().includes(q)
+                            );
+                        if (filtered.length === 0) {
+                          return <div className="px-3 py-2 text-gray-500 text-sm">Tidak ada data</div>;
+                        }
+                        return (
+                          <>
+                            {filtered.slice(0, 10).map((a) => (
+                              <button
+                                key={a.no}
+                                type="button"
+                                className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm"
+                                onClick={() => {
+                                  setFormData({ ...formData, anggota: `${a.no} - ${a.nama}`, anggotaNo: a.no });
+                                  setShowMemberDropdown(false);
+                                  setMemberSearch("");
+                                }}
+                              >
+                                <span className="font-medium">{a.nama}</span>
+                                <span className="text-gray-400 ml-2">No. {a.no}</span>
+                              </button>
+                            ))}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                </div>
 
 

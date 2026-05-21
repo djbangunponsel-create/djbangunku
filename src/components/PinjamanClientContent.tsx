@@ -100,6 +100,35 @@ function readAllAnggota(): { no: string; nama: string }[] {
   })).filter((a) => a.no && a.nama);
 }
 
+// ── Read all simpanan rows from localStorage ────────────────────────
+function readSimpananList(): Record<string, unknown>[] {
+  return readStored<Record<string, unknown>[]>('ksp_simpan_data', []);
+}
+
+// ── Compute available balance for the selected member ───────────────
+//   Simpanan   → sum ALL simpanan (Pokok + Wajib + Sukarela) for anggotano
+//   Sisujang   → sum only Sukarela for anggotano
+function computeSaldoTersedia(anggotaNo: string, jenisAgunan: string): number {
+  if (!anggotaNo) return 0;
+  const allRows = readSimpananList();
+  const isSisujang = jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)';
+  return allRows.reduce((total, row) => {
+    const no = String(row.noAnggota ?? row.No_Anggota ?? '').toLowerCase();
+    const tipe = String(row.tipe ?? '').toLowerCase();
+    const jumlah = parseNumber(row.jumlah);
+    const matchesNo = no === anggotaNo.toLowerCase();
+    const status = String(row.status ?? 'Aktif').toLowerCase();
+    const isAktif = status === 'aktif' || status === '' || !row.status;
+    if (!matchesNo || !isAktif) return total;
+    if (isSisujang) {
+      if (tipe === 'sukarela') return total + jumlah;
+    } else {
+      if (tipe === 'pokok' || tipe === 'wajib' || tipe === 'sukarela') return total + jumlah;
+    }
+    return total;
+  }, 0);
+}
+
 // ─────────────────────────────────────────────────────────────────────
 
 interface Pinjaman {
@@ -234,6 +263,12 @@ export default function PinjamanClientContent() {
         : 80;
   const nilaiLikuidasiAgunan = Math.round(nilaiPasarAgunan * AGUNAN_PCT_LIKUIDASI / 100);
   const agunanMencukupi      = isSisujang ? true : (jumlahNum > 0 ? jumlahNum <= nilaiPasarAgunan : true);
+
+  // ── Saldo Tersedia Simpanan ─────────────────────────────────────
+  const isSimpananAgunan = formData.jenisAgunan === 'Simpanan' || isSisujang;
+  const saldoTersedia    = isSimpananAgunan && formData.anggotaNo
+    ? computeSaldoTersedia(formData.anggotaNo, formData.jenisAgunan)
+    : 0;
 
   // Hitung potongan otomatis
   // SISUJANG: hanya administrasi 2%

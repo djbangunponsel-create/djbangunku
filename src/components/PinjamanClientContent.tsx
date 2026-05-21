@@ -134,6 +134,21 @@ interface Pinjaman {
   nilaiPasarAgunan?: number;
   nilaiLikuidasiAgunan?: number;
   agunanMencukupi?: boolean;
+  // Detail agunan (sesuai jenis, disimpan sebagai flat key/value)
+  bpkbMerkMbl?: string;
+  bpkbTipeMbl?: string;
+  bpkbTahun?: string;
+  bpkbNoRangka?: string;
+  bpkbNoMesin?: string;
+  bpkbNoPolisi?: string;
+  bpkbWarna?: string;
+  bpkbTipeKet?: string;
+  aktaNoSertifikat?: string;
+  aktaLuasTanah?: string;
+  aktaLuasBangunan?: string;
+  aktaLokasi?: string;
+  simpananNoRekening?: string;
+  simpananMasaBerjangka?: string;
 }
 
 function generateId(): string {
@@ -186,6 +201,24 @@ export default function PinjamanClientContent() {
     iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
     masaBpjstk: '1',
     opsiSwk: '1%' as '1%' | 'flat' | '',
+    // Detail Agunan – semua diisi manual
+    nilaiPasar: '',
+    nilaiLikuidasi: '',
+    // Detail sesuai jenis agunan (semua nullable)
+    bpkbMerkMbl: '',
+    bpkbTipeMbl: '',
+    bpkbTahun: '',
+    bpkbNoRangka: '',
+    bpkbNoMesin: '',
+    bpkbNoPolisi: '',
+    bpkbWarna: '',
+    bpkbTipeKet: '',
+    aktaNoSertifikat: '',
+    aktaLuasTanah: '',
+    aktaLuasBangunan: '',
+    aktaLokasi: '',
+    simpananNoRekening: '',
+    simpananMasaBerjangka: '',
   });
 
   // Hitung potongan otomatis (total 5%)
@@ -218,27 +251,17 @@ export default function PinjamanClientContent() {
   const angsuranBunga = Math.round(jumlahNum * bungaNum / 100);
   const totalAngsuranPerBulan = angsuranPokok + angsuranBunga + nilaiSwk;
 
-  // ── Nilai Pasar dan Nilai Likuidasi per jenis agunan ──────────────────
-  const agunanValues: Record<string, { pasar: number; likuidasi: number }> = {
-    Pendiri:                                  { pasar: 10_000_000, likuidasi: 8_000_000 },
-    Simpanan:                                 { pasar: 10_000_000, likuidasi: 8_500_000 },
-    'Akta Tanah':                             { pasar: 150_000_000, likuidasi: 120_000_000 },
-    'Sertifikat Hak Milik (SHM)':             { pasar: 150_000_000, likuidasi: 120_000_000 },
-    'BPKB Roda 2':                            { pasar: 50_000_000, likuidasi: 40_000_000 },
-    'BPKB Roda 4':                            { pasar: 100_000_000, likuidasi: 80_000_000 },
-    'BPKB Roda 6/8':                          { pasar: 150_000_000, likuidasi: 120_000_000 },
-    'Simpanan Sukarela Berjangka (Sisujang)': { pasar: 10_000_000, likuidasi: 8_500_000 },
-  };
-
-  const selectedAgunan = formData.jenisAgunan
-    ? agunanValues[formData.jenisAgunan]
-    : null;
-  const nilaiPasarAgunan   = selectedAgunan?.pasar      ?? 0;
-  const nilaiLikuidasiAgunan = selectedAgunan?.likuidasi ?? 0;
-  const agunanMencukupi     = selectedAgunan != null && jumlahNum <= nilaiPasarAgunan;
+  // ── Nilai Agunan (diisi manual) ─────────────────────────────────────
+  const nilaiPasarAgunan   = parseFormattedNumber(formData.nilaiPasar);
+  const nilaiLikuidasiAgunan = parseFormattedNumber(formData.nilaiLikuidasi);
+  const agunanMencukupi    = jumlahNum > 0 ? jumlahNum <= nilaiPasarAgunan : true;
 
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
+
+  // Helper: update satu field detail agunan tanpa membuat baru keseluruhan formData
+  const applyDetail = (field: string, value: string) =>
+    setFormData(prev => ({ ...prev, [field]: value }));
 
   useEffect(() => {
     if (formData.jenisPinjaman === 'Musiman') {
@@ -289,6 +312,20 @@ export default function PinjamanClientContent() {
       nilaiPasarAgunan,
       nilaiLikuidasiAgunan,
       agunanMencukupi,
+      bpkbMerkMbl: formData.bpkbMerkMbl || undefined,
+      bpkbTipeMbl: formData.bpkbTipeMbl || undefined,
+      bpkbTahun: formData.bpkbTahun || undefined,
+      bpkbNoRangka: formData.bpkbNoRangka || undefined,
+      bpkbNoMesin: formData.bpkbNoMesin || undefined,
+      bpkbNoPolisi: formData.bpkbNoPolisi || undefined,
+      bpkbWarna: formData.bpkbWarna || undefined,
+      bpkbTipeKet: formData.bpkbTipeKet || undefined,
+      aktaNoSertifikat: formData.aktaNoSertifikat || undefined,
+      aktaLuasTanah: formData.aktaLuasTanah || undefined,
+      aktaLuasBangunan: formData.aktaLuasBangunan || undefined,
+      aktaLokasi: formData.aktaLokasi || undefined,
+      simpananNoRekening: formData.simpananNoRekening || undefined,
+      simpananMasaBerjangka: formData.simpananMasaBerjangka || undefined,
     };
     setPinjamanData([...pinjamanData, newPinjaman]);
     setShowForm(false);
@@ -310,6 +347,23 @@ export default function PinjamanClientContent() {
       iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
       masaBpjstk: '1',
       opsiSwk: '1%' as '1%' | 'flat' | '',
+      // Detail Agunan – di-reset otomatis
+      nilaiPasar: '',
+      nilaiLikuidasi: '',
+      bpkbMerkMbl: '',
+      bpkbTipeMbl: '',
+      bpkbTahun: '',
+      bpkbNoRangka: '',
+      bpkbNoMesin: '',
+      bpkbNoPolisi: '',
+      bpkbWarna: '',
+      bpkbTipeKet: '',
+      aktaNoSertifikat: '',
+      aktaLuasTanah: '',
+      aktaLuasBangunan: '',
+      aktaLokasi: '',
+      simpananNoRekening: '',
+      simpananMasaBerjangka: '',
     });
     setMemberSearch('');
   };
@@ -814,45 +868,167 @@ const errors: string[] = [];
                         </select>
                     </div>
 
-                 {/* ───────────── Detail Agunan ───────────── */}
-                 <div className="border-t pt-3 mt-2">
-                   <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan</h4>
-                   {selectedAgunan && (
-                     <>
-                       <div className="grid grid-cols-2 gap-3">
-                         <div>
-                           <label className="block text-xs text-gray-500 mb-1">Nilai Pasar Agunan</label>
-                           <Input type="text" value={formatNumberWithSeparator(nilaiPasarAgunan)} readOnly className="bg-gray-50" />
-                         </div>
-                         <div>
-                           <label className="block text-xs text-gray-500 mb-1">Nilai Likuidasi Agunan</label>
-                           <Input type="text" value={formatNumberWithSeparator(nilaiLikuidasiAgunan)} readOnly className="bg-gray-50" />
-                         </div>
-                       </div>
-                       <div className="mt-2">
-                         <label className="block text-xs text-gray-500 mb-1">Kecukupan Agunan</label>
-                         <div className={`flex items-center gap-2 px-3 py-2 rounded ${
-                           agunanMencukupi
-                             ? 'bg-green-50 border border-green-200'
-                             : 'bg-red-50 border border-red-200'
-                         }`}>
-                           {agunanMencukupi ? (
-                             <span className="text-sm font-medium text-green-700">
-                               ✓ Agunan CUKUP mencukupi pinjaman Rp {formatNumberWithSeparator(jumlahNum)}
-                             </span>
-                           ) : (
-                             <span className="text-sm font-medium text-red-700">
-                               ✗ Agunan TIDAK cukup! Pinjaman Rp {formatNumberWithSeparator(jumlahNum)} melebihi nilai pasar agunan Rp {formatNumberWithSeparator(nilaiPasarAgunan)}
-                             </span>
-                           )}
-                         </div>
-                       </div>
-                     </>
-                   )}
-                   {!selectedAgunan && (
-                     <div className="text-xs text-gray-400 italic">Pilih jenis agunan untuk melihat detail nilai.</div>
-                   )}
-                 </div>
+                  {/* ───────────── Detail Agunan ───────────── */}
+                  <div className="border-t pt-3 mt-2">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan</h4>
+                    {!!formData.jenisAgunan && (
+                      <>
+                        {/* Nilai Agunan - diisi manual */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Nilai Pasar Agunan (Rp)</label>
+                            <Input
+                              type="text"
+                              placeholder="Contoh: 150.000.000"
+                              value={formatNumberWithSeparator(nilaiPasarAgunan)}
+                              onChange={(e) => setFormData({ ...formData, nilaiPasar: e.target.value.replace(/[^\d]/g, '') })}
+                              className="bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Nilai Likuidasi Agunan (Rp)</label>
+                            <Input
+                              type="text"
+                              placeholder="Contoh: 120.000.000"
+                              value={formatNumberWithSeparator(nilaiLikuidasiAgunan)}
+                              onChange={(e) => setFormData({ ...formData, nilaiLikuidasi: e.target.value.replace(/[^\d]/g, '') })}
+                              className="bg-white"
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <label className="block text-xs text-gray-500 mb-1">Kecukupan Agunan</label>
+                          <div className={`flex items-center gap-2 px-3 py-2 rounded ${
+                            agunanMencukupi
+                              ? 'bg-green-50 border border-green-200'
+                              : 'bg-red-50 border border-red-200'
+                          }`}>
+                            {agunanMencukupi ? (
+                              <span className="text-sm font-medium text-green-700">
+                                ✓ Agunan CUKUP – Pinjaman Rp {formatNumberWithSeparator(jumlahNum)} ≤ Nilai Pasar Rp {formatNumberWithSeparator(nilaiPasarAgunan)}
+                              </span>
+                            ) : (
+                              <span className="text-sm font-medium text-red-700">
+                                ✗ Agunan TIDAK CUKUP – Pinjaman Rp {formatNumberWithSeparator(jumlahNum)} melebihi Nilai Pasar Rp {formatNumberWithSeparator(nilaiPasarAgunan)}. Periksa nilai atau kurangi jumlah pinjaman.
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Detail khusus BPKB */}
+                        {['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan) && (
+                          <div className="mt-3 border-t pt-3">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — BPKB {formData.jenisAgunan.replace('BPKB ', '')}</h4>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Merk / Model</label>
+                                <Input type="text" placeholder="Contoh: Toyota Avanza" value={formData.bpkbMerkMbl} onChange={(e) => setFormData({ ...formData, bpkbMerkMbl: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Tipe Kendaraan</label>
+                                <Input type="text" placeholder="Contoh: 1.3 E M/T" value={formData.bpkbTipeMbl} onChange={(e) => setFormData({ ...formData, bpkbTipeMbl: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Tahun Pembuatan</label>
+                                <Input type="text" placeholder="Contoh: 2020" value={formData.bpkbTahun} onChange={(e) => setFormData({ ...formData, bpkbTahun: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Nomor Rangka</label>
+                                <Input type="text" placeholder="No. Rangka BPKB" value={formData.bpkbNoRangka} onChange={(e) => setFormData({ ...formData, bpkbNoRangka: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Nomor Mesin</label>
+                                <Input type="text" placeholder="No. Mesin BPKB" value={formData.bpkbNoMesin} onChange={(e) => setFormData({ ...formData, bpkbNoMesin: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Nomor Polisi</label>
+                                <Input type="text" placeholder="Contoh: B 1234 XYZ" value={formData.bpkbNoPolisi} onChange={(e) => setFormData({ ...formData, bpkbNoPolisi: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Warna</label>
+                                <Input type="text" placeholder="Contoh: Silver Metalik" value={formData.bpkbWarna} onChange={(e) => setFormData({ ...formData, bpkbWarna: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Tipe / Keterangan BPKB</label>
+                                <Input type="text" placeholder="Tipe tambahan BPKB" value={formData.bpkbTipeKet} onChange={(e) => setFormData({ ...formData, bpkbTipeKet: e.target.value })} />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Detail khusus Akta Tanah / SHM */}
+                        {['Akta Tanah', 'Sertifikat Hak Milik (SHM)'].includes(formData.jenisAgunan) && (
+                          <div className="mt-3 border-t pt-3">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — {formData.jenisAgunan}</h4>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">No. Sertifikat</label>
+                                <Input type="text" placeholder="No. Sertifikat tanah" value={formData.aktaNoSertifikat} onChange={(e) => setFormData({ ...formData, aktaNoSertifikat: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Luas Tanah (m²)</label>
+                                <Input type="text" placeholder="Contoh: 100" value={formData.aktaLuasTanah} onChange={(e) => setFormData({ ...formData, aktaLuasTanah: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Luas Bangunan (m²)</label>
+                                <Input type="text" placeholder="Contoh: 50" value={formData.aktaLuasBangunan} onChange={(e) => setFormData({ ...formData, aktaLuasBangunan: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Lokasi / Desa</label>
+                                <Input type="text" placeholder="Nama desa / lokasi tanah" value={formData.aktaLokasi} onChange={(e) => setFormData({ ...formData, aktaLokasi: e.target.value })} />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Detail khusus Simpanan */}
+                        {formData.jenisAgunan === 'Simpanan' && (
+                          <div className="mt-3 border-t pt-3">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — Simpanan</h4>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">No. Rekening Simpanan</label>
+                                <Input type="text" placeholder="No. Rekening Tabungan Anggota" value={formData.simpananNoRekening} onChange={(e) => setFormData({ ...formData, simpananNoRekening: e.target.value })} />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Detail khusus Simpanan Sukarela Berjangka (Sisujang) */}
+                        {formData.jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)' && (
+                          <div className="mt-3 border-t pt-3">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — Simpanan Sukarela Berjangka (Sisujang)</h4>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">No. Rekening Simpanan</label>
+                                <Input type="text" placeholder="No. Rekening Sukarela Berjangka" value={formData.simpananNoRekening} onChange={(e) => setFormData({ ...formData, simpananNoRekening: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Masa Berjangka / Keterangan</label>
+                                <Input type="text" placeholder="Contoh: 12 bulan, 6 bulan" value={formData.simpananMasaBerjangka} onChange={(e) => setFormData({ ...formData, simpananMasaBerjangka: e.target.value })} />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Detail khusus Pendiri */}
+                        {formData.jenisAgunan === 'Pendiri' && (
+                          <div className="mt-3 border-t pt-3">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — Simpanan Pokok (Pendiri)</h4>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="col-span-2">
+                                <label className="block text-xs text-gray-500 mb-1">Bukti / Keterangan Simpanan Pokok</label>
+                                <Input type="text" placeholder="No. Bukti Setoran / Keterangan tambahan" value={formData.bpkbTipeKet} onChange={(e) => setFormData({ ...formData, bpkbTipeKet: e.target.value })} />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {!formData.jenisAgunan && (
+                      <div className="text-xs text-gray-400 italic">Pilih jenis agunan untuk melihat detail nilai dan formulirnya.</div>
+                    )}
+                  </div>
 
                  {/* ───────────── Biaya Tambahan ───────────── */}
                 <div className="border-t pt-3 mt-2">

@@ -60,6 +60,18 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - [x] Nilai Pasar & Nilai Likuidasi untuk setiap jenis agunan (8 tipe) displayed read-only
     - [x] Kotak Kecukupan Agunan: ACCEPTED (hijau) jika pinjaman <= nilai pasar; DITOLAK (merah) jika pinjaman > nilai pasar
     - [x] Nilai persisted ke Pinjaman interface: nilaiPasarAgunan, nilaiLikuidasiAgunan, agunanMencukupi
+  - [x] **Detail Agunan Manual + Form Bertingkat** per jenis agunan (menghapus lookup tetap):
+    - [x] Nilai Pasar & Nilai Likuidasi **diisi manual** oleh admin dengan input teks + format thousand-separator
+    - [x] Kecukupan Agunan: ACCEPTED (hijau) jika jumlahPinjaman <= nilaiPasar; DITOLAK (merah, pesan detail) jika melebihi
+    - [x] **BPKB Roda 2 / 4 / 6-8**: Merk/Model, Tipe Kendaraan, Tahun Pembuatan, No. Rangka, No. Mesin, No. Polisi, Warna, Tipe/Ket BPKB
+    - [x] **Akta Tanah / SHM**: No. Sertifikat, Luas Tanah (m²), Luas Bangunan (m²), Lokasi/Desa
+    - [x] **Simpanan**: No. Rekening Simpanan
+    - [x] **Simpanan Sukarela Berjangka (Sisujang)**: No. Rekening, Masa Berjangka/Keterangan
+    - [x] **Pendiri / Simpanan Pokok**: Keterangan / No. Bukti Setoran
+    - [x] Setiap detail section menampilkan label heading `Detail Agunan — <Jenis>` dan grid 2 kolom
+    - [x] Tracehelpers: `applyDetail()` helper + direct setFormData calls; fix TS2367 `jenisAgunan ===>` `!!jenisAgunan`
+    - [x] Pinjaman interface diperluas: 9 field optional (bpkbMerkMbl, bpkbTipeMbl, bpkbTahun, bpkbNoRangka, bpkbNoMesin, bpkbNoPolisi, bpkbWarna, bpkbTipeKet, aktaNoSertifikat, aktaLuasTanah, aktaLuasBangunan, aktaLokasi, simpananNoRekening, simpananMasaBerjangka)
+    - [x] typecheck + lint pass clean
 - [x] **UPDATE DASHBOARD**: Dashboard sudah terhubung dengan data localStorage ksp_simpanan_data dan ksp_pinjam_data
   - [x] Total Simpanan otomatis terupdate dari localStorage
   - [x] Total Pinjaman otomatis terupdate dari localStorage
@@ -127,6 +139,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | 2026-05-20 | Pinjaman form: added Dana Sosial (1%), Insentif Penanggung Jawab (1%), Nama Penanggung Jawab field - total potongan now 5%, all saved to database
 |  | 2026-05-20 | Removed Status field from Tambah Pinjaman form - new loans automatically set to Aktif status
 |  | 2026-05-20 | Nama Penanggung Jawab changed to dropdown - filtered to specific No_Anggota (1,3,4,5,6,7,8,9,195) from Master_Anggota_KSP
+|  | 2026-05-21 | **Detail Agunan Manual + Form Bertingkat** per jenis agunan: menghapus lookup tetap nilai pasar/likuidasi; Nilai Pasar & Likuidasi sekarang diisi manual oleh admin dengan format thousand-separator; kotak Kecukupan Agunan (ACC hijau / DITOLAK merah dengan pesan detail) real-time; form bertingkat setiap jenis: BPKB (Merk/Model, Tipe, Tahun, No. Rangka/Mesin/Polisi, Warna, Ket), Akta/SHM (No. Sertifikat, Luas Tanah/Bangunan, Lokasi), Simpanan (No. Rekening), Sisujang (No. Rekening + Masa Berjangka), Pendiri (Bukti/Ket); Pinjaman interface diperluas 14 field agunan optional; formData tambah 17 detail field; applyDetail helper + !!jenisAgunan type guards; resetForm da ulas semua field agunan; typecheck + lint pass clean
 |  | 2026-05-21 | **Opsi Simpanan Wajib Kapitalisasi (SWK) + Rincian Angsuran Per Bulan** ditambahkan di bawah kotak biru "Total Diterima Anggota":
     - **Opsi SWK** (formData.opsiSwk): dropdown "Pilih Opsi SWK / 1% dari Besar Pinjaman / Flat Rp 25.000"; nominal otomatis dihitung real-time: nilaiSwk = (opsiSwk === '1%') → Math.round(jumlahNum × 0.01) atau (opsiSwk === 'flat') → 25000
     - **RINCIAN ANGSURAN PER BULAN** (read-only grid 2 kolom):

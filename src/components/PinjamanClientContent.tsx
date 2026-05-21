@@ -198,12 +198,19 @@ export default function PinjamanClientContent() {
   // Load from localStorage on mount + clear IMPTR test rows
   useEffect(() => {
     const saved = readStored<Pinjaman[]>('ksp_pinjam_data', []);
-    const cleaned = saved.filter((p) => !p.id.startsWith('IMPTR-'));
-    if (cleaned.length !== saved.length) {
-      setPinjamanData(cleaned);
-      window.localStorage.setItem('ksp_pinjam_data', JSON.stringify(cleaned));
+    // Pastikan data 'saved' benar-benar berbentuk Array sebelum di-filter
+    if (Array.isArray(saved)) {
+      const cleaned = saved.filter((p) => !p.id.startsWith('IMPTR-'));
+      if (cleaned.length !== saved.length) {
+        setPinjamanData(cleaned);
+        window.localStorage.setItem('ksp_pinjam_data', JSON.stringify(cleaned));
+      } else {
+        setPinjamanData(saved);
+      }
     } else {
-      setPinjamanData(saved);
+      // Jika data corrupt atau bukan array, reset menjadi array kosong yang aman
+      setPinjamanData([]);
+      window.localStorage.setItem('ksp_pinjam_data', JSON.stringify([]));
     }
   }, []);
 

@@ -6,27 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-// ── localStorage helpers ──────────────────────────────────────────
-function readStored<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch  { return fallback; }
-}
-
-function parseNumber(v: unknown): number {
-  if (typeof v === 'number') return v;
-  const s = String(v ?? '')
-    .replace(/Rp\s?/gi, '')
-    .replace(/\./g, '')
-    .replace(/,/g, '')
-    .replace(/\s+/g, '')
-    .trim();
-  const n = Number(s);
-  return Number.isFinite(n) ? n : 0;
-}
+import { readStored, KEYS } from '@/lib/storage';
 
 // ── Date helpers ──────────────────────────────────────────────────
 const EXCEL_EPOCH_OFFSET = 25569;
@@ -71,6 +51,23 @@ function emptySimpBucket(): Record<SimpKey, number> {
   return { Pokok: 0, Wajib: 0, Sibuhar: 0, Sisujang: 0, Simapan: 0, Sihat: 0, Sihar: 0 };
 }
 
+// ── KSP settings shape ────────────────────────────────────────────
+interface KspSettings {
+  logo: string;
+  namaKsp: string;
+  alamat: string;
+  badanHukum: string;
+  telepon: string;
+  email: string;
+  ketuaKoperasi: string;
+  sekretaris: string;
+  bendahara: string;
+  managerOperasional: string;
+  kasir: string;
+  admin: string;
+  penjamin: string[];
+}
+
 // ── Sub-components ────────────────────────────────────────────────
 
 function SectionRow({ label, currYear, prevYear, indent = 'pl-4', sub = false }: {
@@ -90,6 +87,28 @@ function SectionRow({ label, currYear, prevYear, indent = 'pl-4', sub = false }:
     </tr>
   );
 }
+
+// ── KSP settings: kopsurat + identity (sourced from Pengaturan KSP) ─
+const _kspSettingsDefault: KspSettings = {
+  logo: '', namaKsp: 'KSP Mulia Dana Sejahtera', alamat:
+  'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala',
+  telepon: '', ketuaKoperasi: '', sekretaris: '', bendahara: '',
+  managerOperasional: '', kasir: '', admin: '', penjamin: [],
+  email: '', badanHukum: '',
+};
+
+function _readKspSettings(): KspSettings {
+  try {
+    const raw = window.localStorage.getItem(KEYS.SETTINGS);
+    return raw ? (JSON.parse(raw) as KspSettings) : _kspSettingsDefault;
+  } catch { return _kspSettingsDefault; }
+}
+
+const KSP_SET = _readKspSettings();
+const KSP_NAMA   = KSP_SET.namaKsp    || _kspSettingsDefault.namaKsp;
+const KSP_ALAMAT = KSP_SET.alamat    || _kspSettingsDefault.alamat;
+const KSP_LOGO   = KSP_SET.logo;
+const KSP_TELP   = KSP_SET.telepon  || '';
 
 function SubHeaderRow({ label, indent = 'pl-8' }: { label: string; indent?: string }) {
   return (
@@ -317,6 +336,20 @@ export default function NeracaPage() {
             </div>
           </CardHeader>
           <CardContent>
+            {/* ── Print-only Kop Surat ─────────────────────────── */}
+            <div className="text-center border-b-2 border-double border-gray-400 pb-2 mb-4 print:mb-2 hidden print:block">
+              {KSP_LOGO && (
+                <img
+                  src={KSP_LOGO}
+                  alt="Logo KSP"
+                  className="w-10 h-10 object-contain mx-auto mb-0.5"
+                />
+              )}
+              <p className="text-xs font-bold tracking-wide">{KSP_NAMA}</p>
+              <p className="text-[9px] text-gray-500 leading-tight">{KSP_ALAMAT}</p>
+              {KSP_TELP && <p className="text-[9px] text-gray-500">Telp. {KSP_TELP}</p>}
+            </div>
+
             <div className="space-y-6">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">

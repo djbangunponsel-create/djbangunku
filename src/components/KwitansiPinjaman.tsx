@@ -3,6 +3,44 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Printer, X } from 'lucide-react';
+import { readStored, KEYS } from '@/lib/storage';
+
+// ── Helper: read KSP settings (kopsurat + signature names) ───────
+interface KspSettings {
+  logo: string;
+  namaKsp: string;
+  alamat: string;
+  telepon: string;
+  ketuaKoperasi: string;
+  sekretaris: string;
+  bendahara: string;
+  managerOperasional: string;
+  kasir: string;
+  admin: string;
+  penjamin: string[];
+}
+
+function readKspSettings(): KspSettings {
+  try {
+    const raw = window.localStorage.getItem(KEYS.SETTINGS);
+    if (!raw) {
+      return { logo: '', namaKsp: 'KSP Mulia Dana Sejahtera', alamat: 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala', telepon: '', ketuaKoperasi: '', sekretaris: '', bendahara: '', managerOperasional: '', kasir: '', admin: '', penjamin: [] };
+    }
+    return JSON.parse(raw) as KspSettings;
+  } catch {
+    return { logo: '', namaKsp: 'KSP Mulia Dana Sejahtera', alamat: 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala', telepon: '', ketuaKoperasi: '', sekretaris: '', bendahara: '', managerOperasional: '', kasir: '', admin: '', penjamin: [] };
+  }
+}
+
+const _kspSettings = readKspSettings();
+const KSP_NAMA   = _kspSettings.namaKsp            || 'KSP Mulia Dana Sejahtera';
+const KSP_ALAMAT = _kspSettings.alamat            || 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala';
+const KSP_LOGO   = _kspSettings.logo;
+const KSP_TELP   = _kspSettings.telepon;
+
+// Signature names sourced from Pengaturan; fall back to legacy hard-coded values.
+const SIG_CASIR  = _kspSettings.kasir            || 'Erni Sembiring';
+const SIG_MANAGER= _kspSettings.managerOperasional|| 'Marwan Esra Bangun';
 
 interface Potongan {
   administrasi: number;
@@ -117,9 +155,16 @@ export default function KwitansiPinjaman({ data, onClose }: Props) {
         <div className="p-5 print:p-0">
           {/* ─── Kop Surat ─────────────────────────────── */}
           <div className="text-center border-b-2 border-double border-gray-400 pb-2 mb-3 print:mb-1.5 print:break-inside-avoid">
-            <p className="text-[10px] text-gray-500 leading-tight">
-              Alamat: Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala
-            </p>
+            {KSP_LOGO && (
+              <img
+                src={KSP_LOGO}
+                alt="Logo KSP"
+                className="w-10 h-10 object-contain mx-auto mb-0.5 print:w-10 print:h-10"
+              />
+            )}
+            <p className="text-xs font-bold tracking-wide">{KSP_NAMA}</p>
+            <p className="text-[9px] text-gray-500 leading-tight">{KSP_ALAMAT}</p>
+            {KSP_TELP && <p className="text-[9px] text-gray-500">Telp. {KSP_TELP}</p>}
           </div>
 
           {/* ─── Judul Kwitansi ───────────────────────── */}
@@ -269,16 +314,16 @@ export default function KwitansiPinjaman({ data, onClose }: Props) {
                 <p className="text-[10px] font-bold text-gray-700">Peminjam</p>
               </div>
             </div>
-            {/* Kolom 2: Kasir — Erni Sembiring */}
+            {/* Kolom 2: Kasir */}
             <div>
-              <p className="font-semibold mb-8">Erni Sembiring</p>
+              <p className="font-semibold mb-8">{SIG_CASIR}</p>
               <div className="border-t border-gray-500 pt-1">
                 <p className="text-[10px] font-bold text-gray-700">Kasir</p>
               </div>
             </div>
-            {/* Kolom 3: Manager — Marwan Esra Bangun */}
+            {/* Kolom 3: Manager */}
             <div>
-              <p className="font-semibold mb-8">Marwan Esra Bangun</p>
+              <p className="font-semibold mb-8">{SIG_MANAGER}</p>
               <div className="border-t border-gray-500 pt-1">
                 <p className="text-[10px] font-bold text-gray-700">Manager</p>
               </div>

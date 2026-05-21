@@ -6,6 +6,7 @@ import {
   Users, Wallet, FileText, BarChart3,
   CreditCard, PiggyBank, TrendingUp,
   UserPlus, FileSpreadsheet, ArrowRight,
+  Settings,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,12 +26,13 @@ const C = {
 
 // ── Horizontal icon-menu items ─────────────────────────────────
 const navItems = [
-  { icon: Users,      label: "Anggota",     href: "/anggota",          color: "text-blue-600",   bg: "bg-blue-50"     },
-  { icon: PiggyBank,  label: "Simpanan",    href: "/simpanan",         color: "text-emerald-600",bg: "bg-emerald-50"  },
-  { icon: CreditCard, label: "Pinjaman",    href: "/pinjaman",         color: "text-orange-600", bg: "bg-orange-50"   },
-  { icon: FileText,   label: "Laporan",     href: "/laporan",          color: "text-purple-600", bg: "bg-purple-50"   },
-  { icon: BarChart3,  label: "Statistik",   href: "/statistik",        color: "text-indigo-600", bg: "bg-indigo-50"   },
-  { icon: FileSpreadsheet, label: "Summary", href: "/anggota/summary", color: "text-teal-600",  bg: "bg-teal-50"     },
+  { icon: Users,      label: "Anggota",      href: "/anggota",          color: "text-blue-600",   bg: "bg-blue-50"     },
+  { icon: PiggyBank,  label: "Simpanan",     href: "/simpanan",         color: "text-emerald-600",bg: "bg-emerald-50"  },
+  { icon: CreditCard, label: "Pinjaman",     href: "/pinjaman",         color: "text-orange-600", bg: "bg-orange-50"   },
+  { icon: FileText,   label: "Laporan",      href: "/laporan",          color: "text-purple-600", bg: "bg-purple-50"   },
+  { icon: BarChart3,  label: "Statistik",    href: "/statistik",        color: "text-indigo-600", bg: "bg-indigo-50"   },
+  { icon: FileSpreadsheet, label: "Summary", href: "/anggota/summary",  color: "text-teal-600",  bg: "bg-teal-50"     },
+  { icon: Settings,   label: "Pengaturan",   href: "/pengaturan",       color: "text-gray-600",  bg: "bg-gray-100"    },
 ];
 
 // ── 6-month labels + matching YYYY-MM keys ─────────────────────

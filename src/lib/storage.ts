@@ -23,11 +23,12 @@
  *     The original corrupt blob is preserved in `localStorage` so an
  *     admin can recover it later if needed.
  *
- *  Storages managed by this layer:
- *    ksp_anggota_data   — Master Anggota KSP
- *    ksp_pinjam_data    — Transaksi Pinjaman
- *    ksp_simpan_data    — Transaksi Simpanan
- *    ksp_laporan_data   — Laporan Arus Kas
+  *  Storages managed by this layer:
+  *    ksp_anggota_data   — Master Anggota KSP
+  *    ksp_pinjam_data    — Transaksi Pinjaman
+  *    ksp_simpan_data    — Transaksi Simpanan
+  *    ksp_laporan_data   — Laporan Arus Kas
+  *    ksp_settings_data  — Pengaturan / Identitas KSP
  *
  *  Schema version history
  *    v1  (initial) — base tables
@@ -48,6 +49,7 @@ export const KEYS = {
   PINJAM:  'ksp_pinjam_data',
   SIMPAN:  'ksp_simpan_data',
   LAPORAN: 'ksp_laporan_data',
+  SETTINGS:'ksp_settings_data',
 } as const;
 
 // ── Internal helpers ───────────────────────────────────────────────

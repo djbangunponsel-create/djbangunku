@@ -124,6 +124,7 @@ interface Pinjaman {
   netto?: number;
   penanggungJawab?: string;
   jenisAgunan?: 'Pendiri' | 'Simpanan' | 'Akta Tanah' | 'Sertifikat Hak Milik (SHM)' | 'BPKB Roda 2' | 'BPKB Roda 4' | 'BPKB Roda 6/8' | 'Simpanan Sukarela Berjangka (Sisujang)';
+  pemilikAgunan?: string;
   biayaMaterai?: number;
   biayaNotaris?: number;
   biayaBpjstk?: number;
@@ -201,9 +202,9 @@ export default function PinjamanClientContent() {
     iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
     masaBpjstk: '1',
     opsiSwk: '1%' as '1%' | 'flat' | '',
-    // Detail Agunan – semua diisi manual
+    // Detail Agunan
+    pemilikAgunan: '',
     nilaiPasar: '',
-    nilaiLikuidasi: '',
     // Detail sesuai jenis agunan (semua nullable)
     bpkbMerkMbl: '',
     bpkbTipeMbl: '',
@@ -251,10 +252,15 @@ export default function PinjamanClientContent() {
   const angsuranBunga = Math.round(jumlahNum * bungaNum / 100);
   const totalAngsuranPerBulan = angsuranPokok + angsuranBunga + nilaiSwk;
 
-  // ── Nilai Agunan (diisi manual) ─────────────────────────────────────
-  const nilaiPasarAgunan   = parseFormattedNumber(formData.nilaiPasar);
-  const nilaiLikuidasiAgunan = parseFormattedNumber(formData.nilaiLikuidasi);
-  const agunanMencukupi    = jumlahNum > 0 ? jumlahNum <= nilaiPasarAgunan : true;
+  // ── Nilai Agunan (pasar diisi manual, likuidasi dihitung otomatis) ───
+  const nilaiPasarAgunan    = parseFormattedNumber(formData.nilaiPasar);
+  const AGUNAN_PCT_LIKUIDASI = formData.jenisAgunan === 'Pendiri' || formData.jenisAgunan === 'Simpanan'
+    ? 100
+    : ['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan)
+      ? 70
+      : 80;
+  const nilaiLikuidasiAgunan = Math.round(nilaiPasarAgunan * AGUNAN_PCT_LIKUIDASI / 100);
+  const agunanMencukupi      = jumlahNum > 0 ? jumlahNum <= nilaiPasarAgunan : true;
 
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
@@ -309,6 +315,7 @@ export default function PinjamanClientContent() {
       legalisasiNotaris: formData.legalisasiNotaris,
       iuranBpjstk: formData.iuranBpjstk,
       masaBpjstk: parseInt(formData.masaBpjstk) || 0,
+      pemilikAgunan: formData.pemilikAgunan || undefined,
       nilaiPasarAgunan,
       nilaiLikuidasiAgunan,
       agunanMencukupi,
@@ -347,9 +354,9 @@ export default function PinjamanClientContent() {
       iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
       masaBpjstk: '1',
       opsiSwk: '1%' as '1%' | 'flat' | '',
-      // Detail Agunan – di-reset otomatis
+      // Detail Agunan
+      pemilikAgunan: '',
       nilaiPasar: '',
-      nilaiLikuidasi: '',
       bpkbMerkMbl: '',
       bpkbTipeMbl: '',
       bpkbTahun: '',
@@ -886,13 +893,12 @@ const errors: string[] = [];
                             />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-500 mb-1">Nilai Likuidasi Agunan (Rp)</label>
+                            <label className="block text-xs text-gray-500 mb-1">Nilai Likuidasi Agunan (Rp) — {AGUNAN_PCT_LIKUIDASI}% dari Nilai Pasar</label>
                             <Input
                               type="text"
-                              placeholder="Contoh: 120.000.000"
                               value={formatNumberWithSeparator(nilaiLikuidasiAgunan)}
-                              onChange={(e) => setFormData({ ...formData, nilaiLikuidasi: e.target.value.replace(/[^\d]/g, '') })}
-                              className="bg-white"
+                              readOnly
+                              className="bg-gray-50"
                             />
                           </div>
                         </div>
@@ -919,6 +925,10 @@ const errors: string[] = [];
                         {['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan) && (
                           <div className="mt-3 border-t pt-3">
                             <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — BPKB {formData.jenisAgunan.replace('BPKB ', '')}</h4>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
+                              <Input type="text" placeholder="Nama pemilik sesuai identitas / BPKB" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+                            </div>
                             <div className="grid grid-cols-2 gap-3">
                               <div>
                                 <label className="block text-xs text-gray-500 mb-1">Merk / Model</label>
@@ -960,6 +970,10 @@ const errors: string[] = [];
                         {['Akta Tanah', 'Sertifikat Hak Milik (SHM)'].includes(formData.jenisAgunan) && (
                           <div className="mt-3 border-t pt-3">
                             <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — {formData.jenisAgunan}</h4>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
+                              <Input type="text" placeholder="Nama pemilik sesuai identitas / Sertifikat" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+                            </div>
                             <div className="grid grid-cols-2 gap-3">
                               <div>
                                 <label className="block text-xs text-gray-500 mb-1">No. Sertifikat</label>
@@ -985,6 +999,10 @@ const errors: string[] = [];
                         {formData.jenisAgunan === 'Simpanan' && (
                           <div className="mt-3 border-t pt-3">
                             <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — Simpanan</h4>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
+                              <Input type="text" placeholder="Nama pemilik sesuai identitas / Rekening Simpanan" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+                            </div>
                             <div className="grid grid-cols-2 gap-3">
                               <div>
                                 <label className="block text-xs text-gray-500 mb-1">No. Rekening Simpanan</label>
@@ -998,6 +1016,10 @@ const errors: string[] = [];
                         {formData.jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)' && (
                           <div className="mt-3 border-t pt-3">
                             <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — Simpanan Sukarela Berjangka (Sisujang)</h4>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
+                              <Input type="text" placeholder="Nama pemilik sesuai identitas / Rekening Sukarela" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+                            </div>
                             <div className="grid grid-cols-2 gap-3">
                               <div>
                                 <label className="block text-xs text-gray-500 mb-1">No. Rekening Simpanan</label>
@@ -1015,6 +1037,10 @@ const errors: string[] = [];
                         {formData.jenisAgunan === 'Pendiri' && (
                           <div className="mt-3 border-t pt-3">
                             <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — Simpanan Pokok (Pendiri)</h4>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
+                              <Input type="text" placeholder="Nama pemilik sesuai identitas / Simpanan Pokok" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+                            </div>
                             <div className="grid grid-cols-2 gap-3">
                               <div className="col-span-2">
                                 <label className="block text-xs text-gray-500 mb-1">Bukti / Keterangan Simpanan Pokok</label>

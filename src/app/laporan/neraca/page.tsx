@@ -29,6 +29,15 @@ function convertExcelDate(v: unknown): string {
 }
 
 // ── Format helpers ────────────────────────────────────────────────
+function parseNumber(v: unknown): number {
+  if (typeof v === 'number') return v;
+  if (typeof v === 'string') {
+    const n = parseFloat(v.replace(/[^0-9.-]/g, ''));
+    return isNaN(n) ? 0 : n;
+  }
+  return 0;
+}
+
 function fmtRupiah(n: number): string {
   return n.toLocaleString('id-ID');
 }

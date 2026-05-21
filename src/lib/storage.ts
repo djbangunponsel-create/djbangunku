@@ -258,5 +258,10 @@ export function healthCheck(): { key: string; version: number; recordCount: numb
   });
 }
 
+/** Read all anggota records */
+export function readAllAnggota<T extends { NAMA_ANGGOTA?: string; nama?: string; No_Anggota?: string; noAnggota?: string } = any>(): T[] {
+  return readStored<T[]>(KEYS.ANGGOTA, []);
+}
+
 // ── Version export (other modules can Simport this for comparisons) ─
 export const STORAGE_VERSION = SCHEMA_VERSION;

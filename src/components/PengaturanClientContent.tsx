@@ -62,22 +62,20 @@ function toLocalKey(s: string) {
 }
 
 export default function PengaturanClientContent() {
-  const [settings, setSettings] = useState<KspSettings>(EMPTY_SETTINGS);
-  const [saved, setSaved] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  // Load from persistent storage on mount
-  useEffect(() => {
+  const [settings, setSettings] = useState<KspSettings>(() => {
     const stored = readStored<KspSettings | null>(KEYS.SETTINGS, null);
     if (stored) {
-      setSettings({
+      return {
         ...EMPTY_SETTINGS,
         ...stored,
         penjamin: stored.penjamin ?? [],
-      });
+      };
     }
-  }, []);
+    return EMPTY_SETTINGS;
+  });
+  const [saved, setSaved] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // ── Logo upload ──────────────────────────────────────────────
   const readLogoFile = useCallback(async (file: File) => {

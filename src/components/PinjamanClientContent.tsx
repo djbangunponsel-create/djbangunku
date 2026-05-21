@@ -181,6 +181,7 @@ export default function PinjamanClientContent() {
     legalisasiNotaris: 'Tidak' as 'Ya' | 'Tidak',
     iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
     masaBpjstk: '1',
+    opsiSwk: '1%' as '1%' | 'flat' | '',
   });
 
   // Hitung potongan otomatis (total 5%)
@@ -198,6 +199,20 @@ export default function PinjamanClientContent() {
     : 0;
 
   const netto = jumlahNum - administrasi - danaResiko - danaSosial - insentifPJ - biayaMaterai - biayaNotaris - biayaBpjstk;
+
+  // Simpanan Wajib Kapitalisasi (SWK)
+  const nilaiSwk = formData.opsiSwk === '1%'
+    ? Math.round(jumlahNum * 0.01)
+    : formData.opsiSwk === 'flat'
+      ? 25000
+      : 0;
+
+  // Rincian angsuran per bulan
+  const tenorNum = parseInt(formData.tenor) || 0;
+  const bungaNum = parseFloat(formData.bunga) || 0;
+  const angsuranPokok = tenorNum > 0 ? Math.round(jumlahNum / tenorNum) : 0;
+  const angsuranBunga = Math.round(jumlahNum * bungaNum / 100);
+  const totalAngsuranPerBulan = angsuranPokok + angsuranBunga + nilaiSwk;
 
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
@@ -268,6 +283,7 @@ export default function PinjamanClientContent() {
       legalisasiNotaris: 'Tidak' as 'Ya' | 'Tidak',
       iuranBpjstk: 'Tidak' as 'Ya' | 'Tidak',
       masaBpjstk: '1',
+      opsiSwk: '1%' as '1%' | 'flat' | '',
     });
     setMemberSearch('');
   };
@@ -846,6 +862,46 @@ const errors: string[] = [];
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                   <label className="block text-sm font-medium text-blue-700 mb-1">Total Diterima Anggota</label>
                   <Input type="text" value={formatNumberWithSeparator(netto)} readOnly className="bg-white font-bold text-blue-700" />
+                </div>
+
+                {/* ───────────── Opsi Simpanan Wajib Kapitalisasi (SWK) + Rincian Angsuran ───────────── */}
+                <div className="border-t pt-3 mt-2">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Simpanan Wajib Kapitalisasi (SWK)</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Opsi SWK</label>
+                      <select
+                        value={formData.opsiSwk}
+                        onChange={(e) => setFormData({ ...formData, opsiSwk: e.target.value as '1%' | 'flat' | '' })}
+                        className="w-full px-3 py-2 border"
+                      >
+                        <option value="">Pilih Opsi SWK</option>
+                        <option value="1%">1% dari Besar Pinjaman</option>
+                        <option value="flat">Flat Rp 25.000</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Nominal SWK</label>
+                      <Input type="text" value={formatNumberWithSeparator(nilaiSwk)} readOnly className="bg-gray-50" />
+                    </div>
+                  </div>
+
+                  <div className="mt-3 border-t pt-3">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">RINCIAN ANGSURAN PER BULAN</h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="bg-gray-50 px-3 py-2 rounded">Angsuran Pokok / Bulan</div>
+                      <div className="bg-gray-50 px-3 py-2 rounded text-right font-medium">Rp {formatNumberWithSeparator(angsuranPokok)}</div>
+
+                      <div className="bg-gray-50 px-3 py-2 rounded">Angsuran Bunga / Bulan</div>
+                      <div className="bg-gray-50 px-3 py-2 rounded text-right font-medium">Rp {formatNumberWithSeparator(angsuranBunga)}</div>
+
+                      <div className="bg-gray-50 px-3 py-2 rounded">Simpanan Wajib Kapitalisasi (SWK) / Bulan</div>
+                      <div className="bg-gray-50 px-3 py-2 rounded text-right font-medium">Rp {formatNumberWithSeparator(nilaiSwk)}</div>
+
+                      <div className="bg-blue-50 border border-blue-200 px-3 py-2 rounded font-bold text-blue-700">TOTAL ANGSURAN PER BULAN</div>
+                      <div className="bg-blue-50 border border-blue-200 px-3 py-2 rounded text-right font-bold text-blue-700">Rp {formatNumberWithSeparator(totalAngsuranPerBulan)}</div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4">

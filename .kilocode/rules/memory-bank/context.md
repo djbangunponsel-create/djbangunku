@@ -53,6 +53,9 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - [x] Iuran BPJSTK PBPU (Ya/Tidak + Masa Iuran bulan 1-12 × Rp 20.000)
     - [x] Rumus Total Diterima Anggota diperbarui: kurangi semua biaya baru secara real-time
     - [x] Semua field baru tersimpan ke localStorage via Pinjaman interface dan handleSubmit
+  - [x] **Opsi SWK + Rincian Angsuran Per Bulan** di bawah Total Diterima:
+    - [x] Dropdown Opsi SWK: 1% dari Besar Pinjaman atau Flat Rp 25.000; nominal otomatis tampil di kotak read-only
+    - [x] Grid RINCIAN ANGSURAN PER BULAN: Angsuran Pokok, Angsuran Bunga, SWK, TOTAL ANGSURAN (bold biru) — semua diformat titik ribuan
 - [x] **UPDATE DASHBOARD**: Dashboard sudah terhubung dengan data localStorage ksp_simpanan_data dan ksp_pinjam_data
   - [x] Total Simpanan otomatis terupdate dari localStorage
   - [x] Total Pinjaman otomatis terupdate dari localStorage
@@ -120,7 +123,18 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | 2026-05-20 | Pinjaman form: added Dana Sosial (1%), Insentif Penanggung Jawab (1%), Nama Penanggung Jawab field - total potongan now 5%, all saved to database
 |  | 2026-05-20 | Removed Status field from Tambah Pinjaman form - new loans automatically set to Aktif status
 |  | 2026-05-20 | Nama Penanggung Jawab changed to dropdown - filtered to specific No_Anggota (1,3,4,5,6,7,8,9,195) from Master_Anggota_KSP
-|  | 2026-05-21 | Fix build error src/components/PinjamanClientContent.tsx — removed spurious `</div>` on line 748 with no matching opener; `<div>` ↔ `</div>` balanced back to 70/70; typecheck and lint pass clean
+|  | 2026-05-21 | **Opsi Simpanan Wajib Kapitalisasi (SWK) + Rincian Angsuran Per Bulan** ditambahkan di bawah kotak biru "Total Diterima Anggota":
+    - **Opsi SWK** (formData.opsiSwk): dropdown "Pilih Opsi SWK / 1% dari Besar Pinjaman / Flat Rp 25.000"; nominal otomatis dihitung real-time: nilaiSwk = (opsiSwk === '1%') → Math.round(jumlahNum × 0.01) atau (opsiSwk === 'flat') → 25000
+    - **RINCIAN ANGSURAN PER BULAN** (read-only grid 2 kolom):
+      - Angsuran Pokok / Bulan = jumlahNum / tenor
+      - Angsuran Bunga / Bulan = jumlahNum × (bunga / 100)
+      - Simpanan Wajib Kapitalisasi (SWK) / Bulan = nilaiSwk
+      - **TOTAL ANGSURAN PER BULAN** (baris bold biru) = angsuranPokok + angsuranBunga + nilaiSwk
+    - Semua nominal diformat dengan formatNumberWithSeparator()
+    - Pinjaman interface diperluas dengan opsiSwk ('1%' | 'flat' | '')
+    - resetForm mereset opsiSwk ke '1%'
+    - Nama variabel internal dynamically renamed dari `totalAngsuran` → `totalAngsuranPerBulan` untuk menghindari bentrok dengan variabel yang ada
+    - typecheck + lint pass clean
 |  | 2026-05-21 | **Biaya Tambahan & Logika Otomatis** added to Tambah Pinjaman form (between Jenis Agunan and Total Diterima):
     - **Biaya Materai**: read-only, Rp 12.000 default; jadi Rp 24.000 jika Legalisasi Notaris = Ya
     - **Legalisasi Notaris**: Ya/Tidak dropdown — muncul HANYA jika Jenis Agunan ∈ {Akta Tanah, SHM, BPKB Roda 2/4/6-8}; auto-hide untuk Pendiri, Simpanan, Sisujang; Biaya Notaris Rp 400.000 jika Ya, Rp 0 jika Tidak

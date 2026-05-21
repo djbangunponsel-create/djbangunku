@@ -77,7 +77,7 @@ interface Simpanan {
   id: string;
   noAnggota: string;
   namaAnggota: string;
-  tipe: 'Pokok' | 'Wajib' | 'Sukarela';
+  tipe: 'Pokok' | 'Wajib' | 'Sibuhar' | 'Sisujang' | 'Simapan' | 'Sihat' | 'Sihar';
   jumlah: number;
   tanggalSetor: string;
   status: 'Aktif' | 'Ditarik';
@@ -204,7 +204,7 @@ export default function SimpananClientContent() {
   const [formData, setFormData] = useState({
     noAnggota: '',
     namaAnggota: '',
-    tipe: 'Pokok' as 'Pokok' | 'Wajib' | 'Sukarela',
+    tipe: 'Pokok' as 'Pokok' | 'Wajib' | 'Sibuhar' | 'Sisujang' | 'Simapan' | 'Sihat' | 'Sihar',
     jumlah: 0,
     tanggalSetor: today,
     status: 'Aktif' as 'Aktif' | 'Ditarik',
@@ -213,7 +213,7 @@ export default function SimpananClientContent() {
   const [editFormData, setEditFormData] = useState({
     noAnggota: '',
     namaAnggota: '',
-    tipe: 'Pokok' as 'Pokok' | 'Wajib' | 'Sukarela',
+    tipe: 'Pokok' as 'Pokok' | 'Wajib' | 'Sibuhar' | 'Sisujang' | 'Simapan' | 'Sihat' | 'Sihar',
     jumlah: 0,
     tanggalSetor: today,
     status: 'Aktif' as 'Aktif' | 'Ditarik',
@@ -248,10 +248,14 @@ export default function SimpananClientContent() {
   const goNext = () => { setCurrentPage((p) => Math.min(totalPages, p + 1)); };
 
   // ── Summary cards ────────────────────────────────────────────────
-  const totalPokok    = simpananData.filter((s) => s.tipe === 'Pokok').reduce((a, b) => a + b.jumlah, 0);
-  const totalWajib    = simpananData.filter((s) => s.tipe === 'Wajib').reduce((a, b) => a + b.jumlah, 0);
-  const totalSukarela = simpananData.filter((s) => s.tipe === 'Sukarela').reduce((a, b) => a + b.jumlah, 0);
-  const totalSemua    = simpananData.reduce((a, b) => a + b.jumlah, 0);
+  const totalPokok     = simpananData.filter((s) => s.tipe === 'Pokok').reduce((a, b) => a + b.jumlah, 0);
+  const totalWajib     = simpananData.filter((s) => s.tipe === 'Wajib').reduce((a, b) => a + b.jumlah, 0);
+  const totalSibuhar   = simpananData.filter((s) => s.tipe === 'Sibuhar').reduce((a, b) => a + b.jumlah, 0);
+  const totalSisujang  = simpananData.filter((s) => s.tipe === 'Sisujang').reduce((a, b) => a + b.jumlah, 0);
+  const totalSimapan   = simpananData.filter((s) => s.tipe === 'Simapan').reduce((a, b) => a + b.jumlah, 0);
+  const totalSihat     = simpananData.filter((s) => s.tipe === 'Sihat').reduce((a, b) => a + b.jumlah, 0);
+  const totalSihar     = simpananData.filter((s) => s.tipe === 'Sihar').reduce((a, b) => a + b.jumlah, 0);
+  const totalSemua     = simpananData.reduce((a, b) => a + b.jumlah, 0);
 
   // ── CRUD ─────────────────────────────────────────────────────────
   const handleSubmit = (e: React.FormEvent) => {
@@ -327,13 +331,15 @@ export default function SimpananClientContent() {
       const normalised = rows.map((r: Record<string, unknown>, idx: number) => {
         const no  = String(r.noAnggota ?? r.anggota ?? '').trim();
         const tipeVal = String(r.tipe ?? 'Pokok');
-        const tipe: Simpanan['tipe'] =
-          tipeVal === 'Wajib' || tipeVal === 'Sukarela' ? tipeVal : 'Pokok';
-        return {
-          id:             String(r.id ?? `IMPTR-${idx + 1}`),
-          noAnggota:      no,
-          namaAnggota:    anggotaLookup[no.toLowerCase()] ?? String(r.namaAnggota ?? r.anggota ?? ''),
-          tipe,
+        const validTipe: Simpanan['tipe'] = (() => {
+          const v = tipeVal as any;
+          return (v === 'Pokok' || v === 'Wajib' || v === 'Sibuhar' || v === 'Sisujang' || v === 'Simapan' || v === 'Sihat' || v === 'Sihar') ? v : 'Pokok';
+        })();
+         return {
+           id:             String(r.id ?? `IMPTR-${idx + 1}`),
+           noAnggota:      no,
+           namaAnggota:    anggotaLookup[no.toLowerCase()] ?? String(r.namaAnggota ?? r.anggota ?? ''),
+           tipe:           validTipe,
           jumlah:         parseNumber(r.jumlah),
           tanggalSetor:   convertExcelDate(r.tanggalSetor ?? r.tanggal ?? new Date()),
           status:         (r.status === 'Ditarik' ? 'Ditarik' : 'Aktif'),
@@ -395,7 +401,7 @@ export default function SimpananClientContent() {
           id:             String(r.id ?? `IMPTR-${idx + 1}`),
           noAnggota:      String(r.noAnggota ?? ''),
           namaAnggota:    String(r.namaAnggota ?? ''),
-          tipe:           (r.tipe === 'Wajib' || r.tipe === 'Sukarela') ? r.tipe : 'Pokok',
+          tipe:           (() => { const v = String(r.tipe ?? 'Pokok'); return (['Pokok','Wajib','Sibuhar','Sisujang','Simapan','Sihat','Sihar'] as const).includes(v as any) ? v as any : 'Pokok'; })(),
           jumlah:         typeof r.jumlah === 'number' ? r.jumlah : Number(r.jumlah) || 0,
           tanggalSetor:   convertExcelDate(r.tanggalSetor ?? r.tanggal ?? new Date()),
           status:         r.status === 'Ditarik' ? 'Ditarik' : 'Aktif',
@@ -473,10 +479,10 @@ export default function SimpananClientContent() {
         )}
 
         {/* ── Summary Cards ─────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Total Simpanan Pokok</CardTitle>
+              <CardTitle className="text-sm">SP — Simpanan Pokok</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-xl font-bold">Rp {fmtRupiah(totalPokok)}</div>
@@ -484,7 +490,7 @@ export default function SimpananClientContent() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Total Simpanan Wajib</CardTitle>
+              <CardTitle className="text-sm">SW — Simpanan Wajib</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-xl font-bold">Rp {fmtRupiah(totalWajib)}</div>
@@ -492,18 +498,50 @@ export default function SimpananClientContent() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Total Simpanan Sukarela</CardTitle>
+              <CardTitle className="text-sm">Sibuhar — Bunga Harian 3%</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp {fmtRupiah(totalSukarela)}</div>
+              <div className="text-xl font-bold">Rp {fmtRupiah(totalSibuhar)}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Total Semua Simpanan</CardTitle>
+              <CardTitle className="text-sm">Sisujang — Sukarela Berjangka</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold">Rp {fmtRupiah(totalSemua)}</div>
+              <div className="text-xl font-bold">Rp {fmtRupiah(totalSisujang)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Simapan — Masa Depan 5%</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold">Rp {fmtRupiah(totalSimapan)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Sihat — Hari Tua 6%</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold">Rp {fmtRupiah(totalSihat)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Sihar — Hari Raya 4%</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold">Rp {fmtRupiah(totalSihar)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Total Semua Simpanan</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold text-blue-700">Rp {fmtRupiah(totalSemua)}</div>
               <p className="text-xs text-gray-500">{simpananData.length} transaksi</p>
             </CardContent>
           </Card>
@@ -565,10 +603,15 @@ export default function SimpananClientContent() {
                       <TableCell className="text-xs">{item.noAnggota}</TableCell>
                       <TableCell className="text-xs">{item.namaAnggota || '-'}</TableCell>
                       <TableCell>
-                        <span className={`px-2 py-0.5 rounded-full text-[11px] ${
-                          item.tipe === 'Pokok'   ? 'bg-blue-100 text-blue-800'   :
-                          item.tipe === 'Wajib'   ? 'bg-amber-100 text-amber-800'  :
-                                                    'bg-emerald-100 text-emerald-800'
+                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                          item.tipe === 'Pokok'   ? 'bg-blue-100 text-blue-800'       :
+                          item.tipe === 'Wajib'   ? 'bg-amber-100 text-amber-800'      :
+                          item.tipe === 'Sibuhar' ? 'bg-teal-100 text-teal-800'        :
+                          item.tipe === 'Sisujang'? 'bg-purple-100 text-purple-800'    :
+                          item.tipe === 'Simapan' ? 'bg-rose-100 text-rose-800'        :
+                          item.tipe === 'Sihat'   ? 'bg-sky-100 text-sky-800'          :
+                          item.tipe === 'Sihar'   ? 'bg-lime-100 text-lime-800'        :
+                                                    'bg-gray-100 text-gray-800'
                         }`}>
                           {item.tipe}
                         </span>
@@ -647,19 +690,23 @@ export default function SimpananClientContent() {
                   placeholder="Nama akan muncul otomatis setelah No. Anggota diisi"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Simpanan *</label>
-                <select
-                  value={formData.tipe}
-                  onChange={(e) => setFormData({ ...formData, tipe: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  required
-                >
-                  <option value="Pokok">Pokok</option>
-                  <option value="Wajib">Wajib</option>
-                  <option value="Sukarela">Sukarela</option>
-                </select>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Simpanan *</label>
+                  <select
+                    value={formData.tipe}
+                    onChange={(e) => setFormData({ ...formData, tipe: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    required
+                  >
+                    <option value="Pokok">Simpanan Pokok (SP)</option>
+                    <option value="Wajib">Simpanan Wajib (SW)</option>
+                    <option value="Sibuhar">Simpanan Bunga Harian (Sibuhar) — 3% p.a.</option>
+                    <option value="Sisujang">Simpanan Sukarela Berjangka (Sisujang)</option>
+                    <option value="Simapan">Simpanan Masa Depan (Simapan) — 5% p.a.</option>
+                    <option value="Sihat">Simpanan Hari Tua (Sihat) — 6% p.a.</option>
+                    <option value="Sihar">Simpanan Hari Raya (Sihar) — 4% p.a.</option>
+                  </select>
+                </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Setoran (Rp) *</label>
                 <Input
@@ -723,19 +770,23 @@ export default function SimpananClientContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota</label>
                 <Input type="text" value={editData.namaAnggota} readOnly tabIndex={-1} className="bg-gray-50" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Simpanan *</label>
-                <select
-                  value={editData.tipe}
-                  onChange={(e) => setEditData({ ...editData, tipe: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  required
-                >
-                  <option value="Pokok">Pokok</option>
-                  <option value="Wajib">Wajib</option>
-                  <option value="Sukarela">Sukarela</option>
-                </select>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Simpanan *</label>
+                  <select
+                    value={editData.tipe}
+                    onChange={(e) => setEditData({ ...editData, tipe: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    required
+                  >
+                    <option value="Pokok">Simpanan Pokok (SP)</option>
+                    <option value="Wajib">Simpanan Wajib (SW)</option>
+                    <option value="Sibuhar">Simpanan Bunga Harian (Sibuhar) — 3% p.a.</option>
+                    <option value="Sisujang">Simpanan Sukarela Berjangka (Sisujang)</option>
+                    <option value="Simapan">Simpanan Masa Depan (Simapan) — 5% p.a.</option>
+                    <option value="Sihat">Simpanan Hari Tua (Sihat) — 6% p.a.</option>
+                    <option value="Sihar">Simpanan Hari Raya (Sihar) — 4% p.a.</option>
+                  </select>
+                </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah (Rp) *</label>
                 <Input

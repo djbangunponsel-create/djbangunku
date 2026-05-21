@@ -22,11 +22,11 @@ interface KspSettings {
 
 function readKspSettings(): KspSettings {
   try {
-    const raw = window.localStorage.getItem(KEYS.SETTINGS);
-    if (!raw) {
+    const data = readStored<KspSettings | null>(KEYS.SETTINGS, null);
+    if (!data) {
       return { logo: '', namaKsp: 'KSP Mulia Dana Sejahtera', alamat: 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala', telepon: '', ketuaKoperasi: '', sekretaris: '', bendahara: '', managerOperasional: '', kasir: '', admin: '', penjamin: [] };
     }
-    return JSON.parse(raw) as KspSettings;
+    return data;
   } catch {
     return { logo: '', namaKsp: 'KSP Mulia Dana Sejahtera', alamat: 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala', telepon: '', ketuaKoperasi: '', sekretaris: '', bendahara: '', managerOperasional: '', kasir: '', admin: '', penjamin: [] };
   }

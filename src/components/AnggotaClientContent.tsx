@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import { readStored, writeStored, KEYS } from '@/lib/storage';
 
 // ── Date helpers ─────────────────────────────────────────────────
 // Excel stores dates as serial numbers (days since 1899-12-30).
@@ -77,11 +78,7 @@ interface Anggota {
 
 // ── Simpanan helpers ────────────────────────────────────────────────
 function readSimpananRows(): Record<string, unknown>[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = window.localStorage.getItem('ksp_simpan_data');
-    return raw ? (JSON.parse(raw) as Record<string, unknown>[]) : [];
-  } catch { return []; }
+  return readStored<Record<string, unknown>[]>(KEYS.SIMPAN, []);
 }
 
 type SimpKey = 'Pokok' | 'Wajib' | 'Sibuhar' | 'Sisujang' | 'Simapan' | 'Sihat' | 'Sihar';
@@ -122,18 +119,17 @@ export default function AnggotaClientContent() {
   const [editData, setEditData] = useState<Anggota | null>(null);
   
   useEffect(() => {
-    const saved = window.localStorage.getItem('ksp_anggota_data');
-    if (saved) {
+    const saved = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
+    if (saved && saved.length > 0) {
       try {
-        const parsed = JSON.parse(saved) as Record<string, unknown>[];
-        const normalised = parsed.map(normaliseRow) as unknown as Anggota[];
+        const normalised = saved.map(normaliseRow) as unknown as Anggota[];
         setAnggotaData(normalised);
       } catch { /* ignore corrupt data */ }
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem('ksp_anggota_data', JSON.stringify(anggotaData));
+    writeStored(KEYS.ANGGOTA, anggotaData);
   }, [anggotaData]);
   
   const [formData, setFormData] = useState({

@@ -207,19 +207,19 @@ export default function PinjamanClientContent() {
       const cleaned = saved.filter((p) => !p.id.startsWith('IMPTR-'));
       if (cleaned.length !== saved.length) {
         setPinjamanData(cleaned);
-        window.localStorage.setItem('ksp_pinjam_data', JSON.stringify(cleaned));
+        writeStored(KEYS.PINJAM, cleaned);
       } else {
         setPinjamanData(saved);
       }
     } else {
       // Jika data corrupt atau bukan array, reset menjadi array kosong yang aman
       setPinjamanData([]);
-      window.localStorage.setItem('ksp_pinjam_data', JSON.stringify([]));
+      writeStored(KEYS.PINJAM, []);
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem('ksp_pinjam_data', JSON.stringify(pinjamanData));
+    writeStored(KEYS.PINJAM, pinjamanData);
   }, [pinjamanData]);
 
   const [formData, setFormData] = useState({

@@ -108,8 +108,8 @@ const _kspSettingsDefault: KspSettings = {
 
 function _readKspSettings(): KspSettings {
   try {
-    const raw = window.localStorage.getItem(KEYS.SETTINGS);
-    return raw ? (JSON.parse(raw) as KspSettings) : _kspSettingsDefault;
+    const data = readStored<KspSettings>(KEYS.SETTINGS, _kspSettingsDefault);
+    return data;
   } catch { return _kspSettingsDefault; }
 }
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { KEYS, readStored } from "@/lib/storage";
 import {
   Users, Wallet, FileText, BarChart3,
   CreditCard, PiggyBank, TrendingUp,
@@ -47,15 +48,6 @@ const yyyyMmKeys = Array.from({ length: 6 }, (_, i) => {
   const d = new Date(_now0.getFullYear(), _now0.getMonth() - 5 + i, 1);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 });
-
-// ── localStorage reader ────────────────────────────────────────
-function readStored<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch { return fallback; }
-}
 
 // ── Parse YYYY-MM-DD  (tolerates "tidak ada data" or empty) ───
 function parseMonthISO(iso: unknown): string | null {

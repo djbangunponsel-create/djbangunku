@@ -1,5 +1,6 @@
 'use client';
 
+import { KEYS, readStored } from '@/lib/storage';
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,15 +36,6 @@ function formatDateDDMMYYYY(v: unknown): string {
   return `${String(d).padStart(2, '0')}-${String(m).padStart(2, '0')}-${y}`;
 };
 
-// ── Read localStorage helper ───────────────────────────────────────
-function readStored<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch { return fallback; }
-}
-
 // ── Sanitize currency/number string from Excel ────────────────────
 // Accepts: "Rp 50.000", "50,000", "50 000", "50000", 50000, 50.5
 // Returns: pure Number (50000, 50000, 50000, 50000, 50000, 50.5)
@@ -61,7 +53,7 @@ function parseNumber(v: unknown): number {
 
 // ── Read all members from localStorage ────────────────────────────
 function readAnggotaMap(): Record<string, string> {
-  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const rows = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
   const map: Record<string, string> = {};
   const safeRows = Array.isArray(rows) ? rows : [];
   for (const row of safeRows) {

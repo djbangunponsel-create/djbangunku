@@ -13,8 +13,9 @@ import { readStored, writeStored, KEYS } from '@/lib/storage';
 // ── Read all members from localStorage ────────────────────────────
 function readAnggotaMap(): Record<string, string> {
   const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const safeRows = Array.isArray(rows) ? rows : [];
   const map: Record<string, string> = {};
-  for (const row of rows) {
+  for (const row of safeRows) {
     const nama = String(row.NAMA_ANGGOTA ?? '');
     const no = String(row.No_Anggota ?? '');
     if (no && nama) map[no.toLowerCase()] = nama;
@@ -25,8 +26,9 @@ function readAnggotaMap(): Record<string, string> {
 // ── Read name-to-no lookup for Excel import ─────────────────────────
 function readAnggotaNameToNo(): Record<string, string> {
   const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const safeRows = Array.isArray(rows) ? rows : [];
   const map: Record<string, string> = {};
-  for (const row of rows) {
+  for (const row of safeRows) {
     const nama = String(row.NAMA_ANGGOTA ?? '').toLowerCase().trim();
     const no = String(row.No_Anggota ?? '');
     if (nama && no) map[nama] = no;
@@ -86,7 +88,8 @@ function parseFormattedNumber(v: string): number {
 // ── Read all members for autocomplete ─────────────────────────────
 function readAllAnggota(): { no: string; nama: string }[] {
   const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
-  return rows.map((r) => ({
+  const safeRows = Array.isArray(rows) ? rows : [];
+  return safeRows.map((r) => ({
     no: String(r.No_Anggota ?? ''),
     nama: String(r.NAMA_ANGGOTA ?? ''),
   })).filter((a) => a.no && a.nama);
@@ -108,6 +111,7 @@ const SIMPANAN_COLLATERAL_TYPES = new Set([
 function computeSaldoTersedia(anggotaNo: string, jenisAgunan: string): number {
   if (!anggotaNo) return 0;
   const allRows = readSimpananList();
+  if (!Array.isArray(allRows)) return 0;
   const isSisujang = jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)';
   return allRows.reduce((total, row) => {
     const no   = String(row.noAnggota ?? row.No_Anggota ?? '').toLowerCase();

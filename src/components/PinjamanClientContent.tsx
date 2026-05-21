@@ -251,19 +251,37 @@ export default function PinjamanClientContent() {
     aktaLokasi: '',
     simpananNoRekening: '',
     simpananMasaBerjangka: '',
+    // ── Akta/SHM calculator ──
+    aktaLuasTanahCalc: '',
+    aktaHargaTanah: '',
+    aktaLuasBangunanCalc: '',
+    aktaHargaBangunan: '',
   });
 
-  // Nilai dasar pinjaman (diperlukan Agunan & semua potongan)
+   // Nilai dasar pinjaman (diperlukan Agunan & semua potongan)
   const jumlahNum = parseFormattedNumber(formData.jumlah);
 
-  // ── Nilai Agunan (pasar diisi manual, likuidasi dihitung otomatis) ───
-  const nilaiPasarAgunan    = parseFormattedNumber(formData.nilaiPasar);
+  // ── Nilai Pasar Agunan ──────────────────────────────────────────
+  // Simpanan tipe agunan (pre-compute flags)
+  const isAktaShm = ['Akta Tanah', 'Sertifikat Hak Milik (SHM)'].includes(formData.jenisAgunan);
+  const isPendiri = formData.jenisAgunan === 'Pendiri';
+
+  const aktaLTCalc = parseFormattedNumber(formData.aktaLuasTanahCalc);
+  const aktaHTCalc = parseFormattedNumber(formData.aktaHargaTanah);
+  const aktaLBCalc = parseFormattedNumber(formData.aktaLuasBangunanCalc);
+  const aktaHBCalc = parseFormattedNumber(formData.aktaHargaBangunan);
+
+  // Nilai Pasar Agunan: Akta/SHM → from calculator, else → manual
+ const nilaiPasarManual  = parseFormattedNumber(formData.nilaiPasar);
+  const nilaiPasarAgunan  = isAktaShm
+    ? Math.round(aktaLTCalc * aktaHTCalc + aktaLBCalc * aktaHBCalc)
+    : nilaiPasarManual;
   const isSisujang          = formData.jenisAgunan === 'Simpanan Sukarela Berjangka (Sisujang)';
   const AGUNAN_PCT_LIKUIDASI = isSisujang
     ? 5
-    : formData.jenisAgunan === 'Pendiri' || formData.jenisAgunan === 'Simpanan'
+    : isPendiri || formData.jenisAgunan === 'Simpanan'
       ? 100
-      : ['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan)
+      : ['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan!)
         ? 70
         : 80;
   const nilaiLikuidasiAgunan = Math.round(nilaiPasarAgunan * AGUNAN_PCT_LIKUIDASI / 100);
@@ -274,6 +292,9 @@ export default function PinjamanClientContent() {
   const saldoTersedia    = isSimpananAgunan && formData.anggotaNo
     ? computeSaldoTersedia(formData.anggotaNo, formData.jenisAgunan)
     : 0;
+
+  // ── Plafond warning ─────────────────────────────────────────────
+  const plafondMelebihi = jumlahNum > 0 && jumlahNum > nilaiPasarAgunan;
 
   // Hitung potongan otomatis
   // SISUJANG: hanya administrasi 2%
@@ -437,6 +458,11 @@ export default function PinjamanClientContent() {
       aktaLokasi: '',
       simpananNoRekening: '',
       simpananMasaBerjangka: '',
+      // Akta/SHM calculator
+      aktaLuasTanahCalc: '',
+      aktaHargaTanah: '',
+      aktaLuasBangunanCalc: '',
+      aktaHargaBangunan: '',
     });
     setMemberSearch('');
   };
@@ -985,15 +1011,16 @@ const errors: string[] = [];
                       <>
                         {/* Nilai Agunan - diisi manual */}
                         <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs text-gray-500 mb-1">Nilai Pasar Agunan (Rp)</label>
-                            <Input
-                              type="text"
-                              placeholder="Contoh: 150.000.000"
-                              value={formatNumberWithSeparator(nilaiPasarAgunan)}
-                              onChange={(e) => setFormData({ ...formData, nilaiPasar: e.target.value.replace(/[^\d]/g, '') })}
-                              className="bg-white"
-                            />
+                           <div>
+                             <label className="block text-xs text-gray-500 mb-1">Nilai Pasar Agunan (Rp){isAktaShm && ' — dari kalkulator'}</label>
+                             <Input
+                               type="text"
+                               placeholder="Contoh: 150.000.000"
+                               value={formatNumberWithSeparator(nilaiPasarAgunan)}
+                               onChange={(e) => setFormData({ ...formData, nilaiPasar: e.target.value.replace(/[^\d]/g, '') })}
+                               readOnly={isAktaShm}
+                               className={isAktaShm ? 'bg-gray-50' : 'bg-white'}
+                             />
                           </div>
                           <div>
                             <label className="block text-xs text-gray-500 mb-1">Nilai Likuidasi Agunan (Rp) — {AGUNAN_PCT_LIKUIDASI}% dari Nilai Pasar</label>
@@ -1023,6 +1050,15 @@ const errors: string[] = [];
                             )}
                           </div>
                         </div>
+
+                        {/* ── Plafond warning ── */}
+                        {plafondMelebihi && (
+                          <div className="mt-2 px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg">
+                            <p className="text-xs font-semibold text-yellow-800">
+                              ⚠ Peringatan: Nilai pinjaman Rp {formatNumberWithSeparator(jumlahNum)} melebihi nilai pasar agunan jaminan Rp {formatNumberWithSeparator(nilaiPasarAgunan)}.
+                            </p>
+                          </div>
+                        )}
 
                         {/* Detail khusus BPKB */}
                         {['BPKB Roda 2', 'BPKB Roda 4', 'BPKB Roda 6/8'].includes(formData.jenisAgunan) && (
@@ -1073,22 +1109,75 @@ const errors: string[] = [];
                         {['Akta Tanah', 'Sertifikat Hak Milik (SHM)'].includes(formData.jenisAgunan) && (
                           <div className="mt-3 border-t pt-3">
                             <h4 className="text-sm font-medium text-gray-700 mb-2">Detail Agunan — {formData.jenisAgunan}</h4>
-                            <div>
-                              <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
-                              <Input type="text" placeholder="Nama pemilik sesuai identitas / Sertifikat" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+
+                            {/* ── Kalkulator Nilai Pasar Agunan ── */}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                              <p className="text-xs font-semibold text-blue-700 mb-2">Kalkulator Nilai Pasar Agunan</p>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-[11px] font-medium text-gray-600 mb-1">Luas Tanah (m²)</label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    placeholder="Contoh: 100"
+                                    value={formData.aktaLuasTanahCalc}
+                                    onChange={(e) => setFormData({ ...formData, aktaLuasTanahCalc: e.target.value })}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-medium text-gray-600 mb-1">Harga Tanah / m² (Rp)</label>
+                                  <Input
+                                    type="text"
+                                    placeholder="Contoh: 500.000"
+                                    value={formatNumberWithSeparator(parseFormattedNumber(formData.aktaHargaTanah))}
+                                    onChange={(e) => setFormData({ ...formData, aktaHargaTanah: e.target.value.replace(/[^\d]/g, '') })}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-medium text-gray-600 mb-1">Luas Bangunan (m²)</label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    placeholder="Contoh: 50"
+                                    value={formData.aktaLuasBangunanCalc}
+                                    onChange={(e) => setFormData({ ...formData, aktaLuasBangunanCalc: e.target.value })}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-medium text-gray-600 mb-1">Harga Bangunan / m² (Rp)</label>
+                                  <Input
+                                    type="text"
+                                    placeholder="Contoh: 2.000.000"
+                                    value={formatNumberWithSeparator(parseFormattedNumber(formData.aktaHargaBangunan))}
+                                    onChange={(e) => setFormData({ ...formData, aktaHargaBangunan: e.target.value.replace(/[^\d]/g, '') })}
+                                  />
+                                </div>
+                              </div>
+                              {/* Hasil kalkulator — read only */}
+                              <div className="mt-3 pt-2 border-t border-blue-200">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-semibold text-blue-700">Nilai Pasar Agunan (Rp)</span>
+                                  <span className="text-base font-bold text-blue-800">
+                                    Rp {formatNumberWithSeparator(Math.round(aktaLTCalc * aktaHTCalc + aktaLBCalc * aktaHBCalc))}
+                                  </span>
+                                </div>
+                                <p className="text-[10px] text-blue-500 mt-0.5">
+                                  Rumus: (Luas Tanah × Harga/m² tanah) + (Luas Bangunan × Harga/m² bangunan)
+                                </p>
+                              </div>
                             </div>
+
+                            {/* Nama + Sertifikat + lokasi */}
                             <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Nama Pemilik Agunan</label>
+                                <Input type="text" placeholder="Nama pemilik sesuai identitas / Sertifikat" value={formData.pemilikAgunan} onChange={(e) => setFormData({ ...formData, pemilikAgunan: e.target.value })} />
+                              </div>
                               <div>
                                 <label className="block text-xs text-gray-500 mb-1">No. Sertifikat</label>
                                 <Input type="text" placeholder="No. Sertifikat tanah" value={formData.aktaNoSertifikat} onChange={(e) => setFormData({ ...formData, aktaNoSertifikat: e.target.value })} />
-                              </div>
-                              <div>
-                                <label className="block text-xs text-gray-500 mb-1">Luas Tanah (m²)</label>
-                                <Input type="text" placeholder="Contoh: 100" value={formData.aktaLuasTanah} onChange={(e) => setFormData({ ...formData, aktaLuasTanah: e.target.value })} />
-                              </div>
-                              <div>
-                                <label className="block text-xs text-gray-500 mb-1">Luas Bangunan (m²)</label>
-                                <Input type="text" placeholder="Contoh: 50" value={formData.aktaLuasBangunan} onChange={(e) => setFormData({ ...formData, aktaLuasBangunan: e.target.value })} />
                               </div>
                               <div>
                                 <label className="block text-xs text-gray-500 mb-1">Lokasi / Desa</label>

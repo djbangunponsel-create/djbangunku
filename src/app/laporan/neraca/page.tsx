@@ -60,21 +60,31 @@ function yearEndDateStr(yearNum: number): string {
   return `${yearNum}${YTD_CUTOFF}`;
 }
 
+// ── 7-profit simpanan product types ──────────────────────────────
+type SimpKey = 'Pokok' | 'Wajib' | 'Sibuhar' | 'Sisujang' | 'Simapan' | 'Sihat' | 'Sihar';
+
+const SIMPANA_PRODUCT_TYPES: readonly SimpKey[] = [
+  'Pokok', 'Wajib', 'Sibuhar', 'Sisujang', 'Simapan', 'Sihat', 'Sihar',
+];
+
+function emptySimpBucket(): Record<SimpKey, number> {
+  return { Pokok: 0, Wajib: 0, Sibuhar: 0, Sisujang: 0, Simapan: 0, Sihat: 0, Sihar: 0 };
+}
+
 // ── Sub-components ────────────────────────────────────────────────
 
-function SectionRow3({ label, currYear, prevYear, indent = 'pl-4', highlight = false, total = false, sub }: {
-  label: string; currYear: number; prevYear: number; indent?: string;
-  highlight?: boolean; total?: boolean; sub?: boolean;
+function SectionRow({ label, currYear, prevYear, indent = 'pl-4', sub = false }: {
+  label: string; currYear: number; prevYear: number; indent?: string; sub?: boolean;
 }) {
   return (
-    <tr className={highlight ? (total ? 'bg-blue-50' : 'bg-gray-50') : ''}>
-      <td className={`px-6 py-3 whitespace-nowrap text-sm ${indent} ${total ? 'font-bold text-lg' : sub ? 'font-medium' : 'text-gray-700'}`}>
+    <tr>
+      <td className={`px-6 py-2 whitespace-nowrap text-sm ${indent} ${sub ? 'font-medium text-gray-700' : 'text-gray-900'}`}>
         {label}
       </td>
-      <td className="px-6 py-3 whitespace-nowrap text-sm text-right font-medium">
+      <td className="px-6 py-2 whitespace-nowrap text-sm text-right font-medium">
         {fmtRupiah(currYear)}
       </td>
-      <td className="px-6 py-3 whitespace-nowrap text-sm text-right font-medium">
+      <td className="px-6 py-2 whitespace-nowrap text-sm text-right font-medium">
         {fmtRupiah(prevYear)}
       </td>
     </tr>
@@ -83,48 +93,38 @@ function SectionRow3({ label, currYear, prevYear, indent = 'pl-4', highlight = f
 
 function SubHeaderRow({ label, indent = 'pl-8' }: { label: string; indent?: string }) {
   return (
-    <tr>
-      <td className={`px-6 py-3 whitespace-nowrap text-sm ${indent} text-gray-600`} colSpan={3}>
+    <tr className="bg-gray-50/60">
+      <td className={`px-6 py-3 whitespace-nowrap text-xs font-semibold text-gray-600 uppercase ${indent}`} colSpan={3}>
         {label}
       </td>
     </tr>
   );
 }
 
-function TotalRow3({ label, currYear, prevYear, indent = 'pl-8', isAktiva = false, highlight = false }: {
-  label: string; currYear: number; prevYear: number; indent?: string;
-  isAktiva?: boolean; highlight?: boolean;
+function TotalPairRow({ label, curr, prev, indent = 'pl-8', highlight = false, isLiabilitas = false }: {
+  label: string; curr: number; prev: number; indent?: string; highlight?: boolean; isLiabilitas?: boolean;
 }) {
   return (
-    <tr className={highlight ? (isAktiva ? 'bg-blue-50' : 'bg-gray-50') : ''}>
-      <td className={`px-6 py-3 whitespace-nowrap text-sm ${indent} font-medium`}>{label}</td>
-      <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
-        {fmtRupiah(currYear)}
-      </td>
-      <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
-        {fmtRupiah(prevYear)}
-      </td>
+    <tr className={highlight ? (isLiabilitas ? 'bg-blue-50' : 'bg-gray-50') : ''}>
+      <td className={`px-6 py-2.5 whitespace-nowrap text-sm font-semibold ${indent}`}>{label}</td>
+      <td className="px-6 py-2.5 whitespace-nowrap text-right text-sm font-semibold">{fmtRupiah(curr)}</td>
+      <td className="px-6 py-2.5 whitespace-nowrap text-right text-sm font-semibold">{fmtRupiah(prev)}</td>
     </tr>
   );
 }
 
-function GrandTotalRow3({ label, currYear, prevYear }: { label: string; currYear: number; prevYear: number }) {
+function GrandTotalRow({ label, curr, prev }: { label: string; curr: number; prev: number }) {
   return (
     <tr className="bg-blue-50">
       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-lg">{label}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-lg">
-        {fmtRupiah(currYear)}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-lg">
-        {fmtRupiah(prevYear)}
-      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-lg">{fmtRupiah(curr)}</td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-lg">{fmtRupiah(prev)}</td>
     </tr>
   );
 }
 
-// ── Main page ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
 export default function NeracaPage() {
-  // Dynamic year labels from system clock — auto-adjust every new year
   const yearConfig = useMemo(() => {
     const now     = new Date();
     const curYear = now.getFullYear();
@@ -132,20 +132,18 @@ export default function NeracaPage() {
     return {
       currentYear:  curYear,
       prevYear:     prvYear,
-      prevYearEnd:  yearEndDateStr(prvYear),   // "YYYY-12-31" — prior year-end position
-      currentYtd:   yearEndDateStr(curYear),  // "YYYY-12-31" — YTD end of current year
+      prevYearEnd:  yearEndDateStr(prvYear),
+      currentYtd:   yearEndDateStr(curYear),
     };
   }, []);
 
   const simpananData = useState<Record<string, unknown>[]>(() => {
-    return readStored<Record<string, unknown>[]>('ksp_simpanan_data', []);
+    return readStored<Record<string, unknown>[]>('ksp_simpan_data', []);
   })[0];
 
-  // Refresh on storage event (cross-tab)
   useEffect(() => {
     const handler = () => {
-      const saved = readStored<Record<string, unknown>[]>('ksp_simpanan_data', []);
-      // We can't update useState from callback; store updates happen via setSimpananData
+      const saved = readStored<Record<string, unknown>[]>('ksp_simpan_data', []);
     };
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
@@ -156,26 +154,29 @@ export default function NeracaPage() {
     []
   );
 
-  // ── Year-scoped accumulator helpers ─────────────────────────────
-  // Returns cumulative Pokok / Wajib / Sukarela / All (inflow) from KSP founding
-  // up to and including `yearNumber` (which means all tx where tanggal <= YYYY-12-31).
-  function accumulateSimpananYE(simpananRows: Record<string, unknown>[], yearNumber: number) {
+  // ── Year-scoped accumulator: all 7 products ─────────────────────
+  function accumulateSimpananYE(
+    simpananRows: Record<string, unknown>[],
+    yearNumber: number,
+  ): { p: SimpKey; v: Record<SimpKey, number> } {
     const cutoff = yearEndDateStr(yearNumber);
-    let p = 0, w = 0, s = 0;
+    const bucket = emptySimpBucket();
     for (const r of simpananRows) {
       if (!(r.tanggalSetor ?? r.tanggal)) continue;
       const d = convertExcelDate(r.tanggalSetor ?? r.tanggal);
       if (d === '' || d > cutoff) continue;
       const amt = parseNumber(r.jumlah);
-      const tipe = String(r.tipe ?? '');
-      if (tipe === 'Pokok')      p += amt;
-      else if (tipe === 'Wajib') w += amt;
-      else                       s += amt;
+      const tipe = String(r.tipe ?? '') as SimpKey;
+      if (SIMPANA_PRODUCT_TYPES.includes(tipe) && bucket[tipe] !== undefined) {
+        bucket[tipe] += amt;
+      }
     }
-    return { pokok: p, wajib: w, sukarela: s, semua: p + w + s };
+    return {
+      p: 'Pokok',
+      v: bucket,
+    };
   }
 
-  // Returns cumulative pinjaman outstanding sum from KSP founding up to yearNumber YTD
   function accumulatePinjamanYE(pinjamanRows: Record<string, unknown>[], yearNumber: number) {
     const cutoff = yearEndDateStr(yearNumber);
     let total = 0;
@@ -188,68 +189,94 @@ export default function NeracaPage() {
     return total;
   }
 
-  // ── Accumulate per year ─────────────────────────────────────────
-  // Tahun Ini   — cumulative from KSP founding up to YTD (YYYY-12-31)
-  const currY = useMemo(() => accumulateSimpananYE(simpananData, yearConfig.currentYear),   [simpananData, yearConfig.currentYear]);
-  // Tahun Sebelumnya — cumulative up to prior year-end (prior to YYYY-01-01)
-  const prevY = useMemo(() => accumulateSimpananYE(simpananData, yearConfig.prevYear),        [simpananData, yearConfig.prevYear]);
+  // ── Per-year derived values ─────────────────────────────────────
+  const currYE = useMemo(() => accumulateSimpananYE(simpananData, yearConfig.currentYear),   [simpananData, yearConfig.currentYear]);
+  const prevYE = useMemo(() => accumulateSimpananYE(simpananData, yearConfig.prevYear),        [simpananData, yearConfig.prevYear]);
 
-  // Pinjaman / Piutang
   const currPinjaman = useMemo(() => accumulatePinjamanYE(pinjamanData, yearConfig.currentYear), [pinjamanData, yearConfig.currentYear]);
   const prevPinjaman = useMemo(() => accumulatePinjamanYE(pinjamanData, yearConfig.prevYear),   [pinjamanData, yearConfig.prevYear]);
 
-  // ── AKTIVA row helpers ──────────────────────────────────────────
-  function aktivaLancarYE(simp: ReturnType<typeof accumulateSimpananYE>, pinj: number) {
-    return simp.semua + pinj; // Kas(Pokok+Wajib+Sukarela) + Piutang Pinjaman Anggota
-  }
+  // Shorthand
+  const c = currYE.v;
+  const p = prevYE.v;
 
-  // ── PASIVA row helpers ──────────────────────────────────────────
-  function ekuitasYE(simp: ReturnType<typeof accumulateSimpananYE>) {
-    return simp.pokok + simp.wajib + simp.sukarela;
-  }
-
-  // ── Year-scope label for display ────────────────────────────────
-  const yLabelCurr = yearConfig.currentYear;
-  const yLabelPrev = yearConfig.prevYear;
-
-  // ── Current Year (Tahun Ini) derived values ────────────────────
-  const currKas   = currY.semua;
+  // ── Aktiva ─────────────────────────────────────────────────────
+  const currKas           = c.Pokok + c.Wajib + c.Sibuhar + c.Sisujang + c.Simapan + c.Sihat + c.Sihar;
+  const prevKas           = p.Pokok + p.Wajib + p.Sibuhar + p.Sisujang + p.Simapan + p.Sihat + p.Sihar;
   const currPiutang = currPinjaman;
-  const currAktivaLancar = aktivaLancarYE(currY, currPiutang);
-  const currAktivaTidakLancar = 0;
-  const currTotalAktiva = currAktivaLancar + currAktivaTidakLancar;
-
-  const currSimpananPokok = currY.pokok;
-  const currSimpananWajib = currY.wajib;
-  const currEkuitas       = ekuitasYE(currY);
-  const currSimpananSukarela = currY.sukarela;
-  const currTotalPasiva    = currEkuitas;
-
-  // ── Previous Year (Tahun Sebelumnya) derived values ────────────
-  const prevKas   = prevY.semua;
   const prevPiutang = prevPinjaman;
-  const prevAktivaLancar = aktivaLancarYE(prevY, prevPiutang);
+  const currAktivaLancar      = currKas + currPiutang;
+  const prevAktivaLancar      = prevKas + prevPiutang;
+  const currAktivaTidakLancar = 0;
   const prevAktivaTidakLancar = 0;
-  const prevTotalAktiva = prevAktivaLancar + prevAktivaTidakLancar;
+  const currTotalAktiva       = currAktivaLancar + currAktivaTidakLancar;
+  const prevTotalAktiva       = prevAktivaLancar + prevAktivaTidakLancar;
 
-  const prevSimpananPokok = prevY.pokok;
-  const prevSimpananWajib = prevY.wajib;
-  const prevEkuitas       = ekuitasYE(prevY);
-  const prevSimpananSukarela = prevY.sukarela;
-  const prevTotalPasiva    = prevEkuitas;
+  // ── Kewajiban — SAK ETAP mapping ───────────────────────────────
+  // Kewajiban Jangka Pendek  (Simpanan Lancar)
+  const cKJP_Pokok  = c.Pokok;
+  const cKJP_Wajib  = c.Wajib;
+  const cKJP_Sibuhar = c.Sibuhar;
+  const cKJP_Sihar   = c.Sihar;
+  const cKJP_SubTotal = cKJP_Pokok + cKJP_Wajib + cKJP_Sibuhar + cKJP_Sihar;
 
-  // ── Balance summary ─────────────────────────────────────────────
+  const pKJP_Pokok  = p.Pokok;
+  const pKJP_Wajib  = p.Wajib;
+  const pKJP_Sibuhar = p.Sibuhar;
+  const pKJP_Sihar   = p.Sihar;
+  const pKJP_SubTotal = pKJP_Pokok + pKJP_Wajib + pKJP_Sibuhar + pKJP_Sihar;
+
+  // Kewajiban Jangka Panjang (Simpanan Berjangka)
+  //   In KSP these funds are locked/withdrawable only at maturity,
+  //   therefore they count as long-term.
+  const cKJP_Panjang_Sisujang = c.Sisujang;
+  const cKJP_Panjang_Simapan  = c.Simapan;
+  const cKJP_Panjang_Sihat    = c.Sihat;
+  const cKJP_Panjang_SubTotal = cKJP_Panjang_Sisujang + cKJP_Panjang_Simapan + cKJP_Panjang_Sihat;
+
+  const pKJP_Panjang_Sisujang = p.Sisujang;
+  const pKJP_Panjang_Simapan  = p.Simapan;
+  const pKJP_Panjang_Sihat    = p.Sihat;
+  const pKJP_Panjang_SubTotal = pKJP_Panjang_Sisujang + pKJP_Panjang_Simapan + pKJP_Panjang_Sihat;
+
+  // Total Kewajiban (Lancar + Jangka Panjang)
+  // → feeds into Grand Total Kewajiban dan Ekuitas (SAK EP / Neraca)
+  const cTotalKewajiban     = cKJP_SubTotal + cKJP_Panjang_SubTotal;
+  const pTotalKewajiban     = pKJP_SubTotal + pKJP_Panjang_SubTotal;
+
+  // ── Ekuitas ─────────────────────────────────────────────────────
+  // Modal Anggota = Pokok (dipindah dari Kewajiban Jangka Pendek ke
+  // Ekuitas sesuai SAK Koperasi — Pokok adalah modal tetap anggota)
+  // Siswa: Wajib = Modal Anggota Diperlukan;
+  //        all other types remain in Kewajiban above.
+  // Volume sewa (Sibuhar, Sihar, Sisujang, Simapan, Sihat) tetap di Kewajiban.
+  const cModalAnggotaTetap     = c.Pokok;   // SP
+  const cModalAnggotaDiperlukan = c.Wajib;  // SW
+  const cTotalEkuitas           = cModalAnggotaTetap + cModalAnggotaDiperlukan; // Modal SDM yang termanfaatkan → dihitung
+
+  const pModalAnggotaTetap     = p.Pokok;
+  const pModalAnggotaDiperlukan = p.Wajib;
+  const pTotalEkuitas           = pModalAnggotaTetap + pModalAnggotaDiperlukan;
+
+  // ── Pasiva Total ───────────────────────────────────────────────
+  // Kewajiban (Lancar + Jangka Panjang) + Ekuitas = Total Kewajiban dan Ekuitas
+  const cTotalKewajibanDanEkuitas = cTotalKewajiban + cTotalEkuitas;
+  const pTotalKewajibanDanEkuitas = pTotalKewajiban + pTotalEkuitas;
+
+  const currTotalPasiva = cTotalKewajibanDanEkuitas;
+  const prevTotalPasiva = pTotalKewajibanDanEkuitas;
+
+  // ── Balance check ──────────────────────────────────────────────
   const isBalancedCurr = Math.abs(currTotalAktiva - currTotalPasiva) < 1;
   const isBalancedPrev = Math.abs(prevTotalAktiva - prevTotalPasiva) < 1;
 
-  // ── Balance label strings (computed before JSX) ─────────────────
   const currBalanceStr = isBalancedCurr
-    ? `✓ ${yLabelCurr} SEIMBANG — AKTIVA ${fmtRupiah(currTotalAktiva)} = PASIVA ${fmtRupiah(currTotalPasiva)}`
-    : `⚠ ${yLabelCurr} Selisih ${fmtRupiah(Math.abs(currTotalAktiva - currTotalPasiva))} — AKTIVA: ${fmtRupiah(currTotalAktiva)}, PASIVA: ${fmtRupiah(currTotalPasiva)}`;
+    ? `✓ ${yearConfig.currentYear} SEIMBANG — AKTIVA ${fmtRupiah(currTotalAktiva)} = KEWAJIBAN+EKUITAS ${fmtRupiah(currTotalPasiva)}`
+    : `⚠ ${yearConfig.currentYear} Selisih ${fmtRupiah(Math.abs(currTotalAktiva - currTotalPasiva))} — AKTIVA: ${fmtRupiah(currTotalAktiva)}, KEWAJIBAN+EKUITAS: ${fmtRupiah(currTotalPasiva)}`;
 
   const prevBalanceStr = isBalancedPrev
-    ? `✓ ${yLabelPrev} SEIMBANG — AKTIVA ${fmtRupiah(prevTotalAktiva)} = PASIVA ${fmtRupiah(prevTotalPasiva)}`
-    : `⚠ ${yLabelPrev} Selisih ${fmtRupiah(Math.abs(prevTotalAktiva - prevTotalPasiva))} — AKTIVA: ${fmtRupiah(prevTotalAktiva)}, PASIVA: ${fmtRupiah(prevTotalPasiva)}`;
+    ? `✓ ${yearConfig.prevYear} SEIMBANG — AKTIVA ${fmtRupiah(prevTotalAktiva)} = KEWAJIBAN+EKUITAS ${fmtRupiah(prevTotalPasiva)}`
+    : `⚠ ${yearConfig.prevYear} Selisih ${fmtRupiah(Math.abs(prevTotalAktiva - prevTotalPasiva))} — AKTIVA: ${fmtRupiah(prevTotalAktiva)}, KEWAJIBAN+EKUITAS: ${fmtRupiah(prevTotalPasiva)}`;
 
   return (
     <div className="min-h-screen">
@@ -295,15 +322,9 @@ export default function NeracaPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        KETERANGAN
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                        {yLabelCurr}
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {yLabelPrev}
-                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KETERANGAN</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">{yearConfig.currentYear}</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{yearConfig.prevYear}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -317,44 +338,46 @@ export default function NeracaPage() {
 
                     <SubHeaderRow label="Aktiva Lancar" indent="pl-8" />
 
-                    <SectionRow3
+                    <SectionRow
                       label="Kas"
                       currYear={currKas}
                       prevYear={prevKas}
                       indent="pl-10"
                       sub
                     />
-                    <SectionRow3
+                    <SectionRow
                       label="Piutang Pinjaman Anggota"
                       currYear={currPiutang}
                       prevYear={prevPiutang}
                       indent="pl-10"
                       sub
                     />
-                    <SectionRow3 label="Piutang Bunga" currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Persediaan"      currYear={0} prevYear={0} indent="pl-10" sub />
-                    <TotalRow3
+                    <SectionRow label="Piutang Bunga" currYear={0} prevYear={0} indent="pl-10" sub />
+                    <SectionRow label="Persediaan"      currYear={0} prevYear={0} indent="pl-10" sub />
+                    <TotalPairRow
                       label="Jumlah Aktiva Lancar"
-                      currYear={currAktivaLancar}
-                      prevYear={prevAktivaLancar}
+                      curr={currAktivaLancar}
+                      prev={prevAktivaLancar}
+                      indent="pl-8"
                       highlight
-                      isAktiva
+                      isLiabilitas={false}
                     />
 
                     <SubHeaderRow label="Aktiva Tidak Lancar" indent="pl-8" />
-                    <SectionRow3 label="Investasi Jangka Panjang" currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Aset Tetap (netto)"        currYear={0} prevYear={0} indent="pl-10" sub />
-                    <TotalRow3
+                    <SectionRow label="Investasi Jangka Panjang" currYear={0} prevYear={0} indent="pl-10" sub />
+                    <SectionRow label="Aset Tetap (netto)"        currYear={0} prevYear={0} indent="pl-10" sub />
+                    <TotalPairRow
                       label="Jumlah Aktiva Tidak Lancar"
-                      currYear={0} prevYear={0}
+                      curr={0} prev={0}
+                      indent="pl-8"
                       highlight
-                      isAktiva
+                      isLiabilitas={false}
                     />
 
-                    <GrandTotalRow3
+                    <GrandTotalRow
                       label="JUMLAH AKTIVA"
-                      currYear={currTotalAktiva}
-                      prevYear={prevTotalAktiva}
+                      curr={currTotalAktiva}
+                      prev={prevTotalAktiva}
                     />
 
                     {/* ══════ KEWAJIBAN DAN EKUITAS ══════ */}
@@ -364,61 +387,131 @@ export default function NeracaPage() {
                       <td className="whitespace-nowrap text-sm text-gray-900"></td>
                     </tr>
 
-                    <SubHeaderRow label="Kewajiban Jangka Pendek" indent="pl-8" />
-                    <SectionRow3 label="Utang Jangka Pendek" currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Utang Bunga"         currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Cadangan Korto"      currYear={0} prevYear={0} indent="pl-10" sub />
-                    <TotalRow3
+                    {/* ════ KEWAJIBAN JANGKA PENDEK — Simpanan Lancar ════ */}
+                    <tr>
+                      <td className="px-6 py-2.5 text-sm font-bold text-orange-700 pl-8" colSpan={3}>
+                        Kewajiban Jangka Pendek (Simpanan Lancar)
+                      </td>
+                    </tr>
+                    <SectionRow
+                      label="Simpanan Pokok (SP)"
+                      currYear={cKJP_Pokok}
+                      prevYear={pKJP_Pokok}
+                      indent="pl-10"
+                      sub
+                    />
+                    <SectionRow
+                      label="Simpanan Wajib (SW)"
+                      currYear={cKJP_Wajib}
+                      prevYear={pKJP_Wajib}
+                      indent="pl-10"
+                      sub
+                    />
+                    <SectionRow
+                      label="Simpanan Bunga Harian (Sibuhar)"
+                      currYear={cKJP_Sibuhar}
+                      prevYear={pKJP_Sibuhar}
+                      indent="pl-10"
+                      sub
+                    />
+                    <SectionRow
+                      label="Simpanan Hari Raya (Sihar)"
+                      currYear={cKJP_Sihar}
+                      prevYear={pKJP_Sihar}
+                      indent="pl-10"
+                      sub
+                    />
+                    <TotalPairRow
                       label="Jumlah Kewajiban Jangka Pendek"
-                      currYear={0} prevYear={0}
+                      curr={cKJP_SubTotal}
+                      prev={pKJP_SubTotal}
+                      indent="pl-8"
                       highlight
+                      isLiabilitas
                     />
 
-                    <SubHeaderRow label="Kewajiban Jangka Panjang" indent="pl-8" />
-                    <SectionRow3 label="Utang Jangka Panjang" currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Imbalan Kerja"        currYear={0} prevYear={0} indent="pl-10" sub />
-                    <TotalRow3
+                    {/* ════ KEWAJIBAN JANGKA PANJANG — Simpanan Berjangka ════ */}
+                    <tr>
+                      <td className="px-6 py-2.5 text-sm font-bold text-orange-700 pl-8" colSpan={3}>
+                        Kewajiban Jangka Panjang (Simpanan Berjangka)
+                      </td>
+                    </tr>
+                    <SectionRow
+                      label="Simpanan Sukarela Berjangka (Sisujang)"
+                      currYear={cKJP_Panjang_Sisujang}
+                      prevYear={pKJP_Panjang_Sisujang}
+                      indent="pl-10"
+                      sub
+                    />
+                    <SectionRow
+                      label="Simpanan Masa Depan (Simapan)"
+                      currYear={cKJP_Panjang_Simapan}
+                      prevYear={pKJP_Panjang_Simapan}
+                      indent="pl-10"
+                      sub
+                    />
+                    <SectionRow
+                      label="Simpanan Hari Tua (Sihat)"
+                      currYear={cKJP_Panjang_Sihat}
+                      prevYear={pKJP_Panjang_Sihat}
+                      indent="pl-10"
+                      sub
+                    />
+                    <TotalPairRow
                       label="Jumlah Kewajiban Jangka Panjang"
-                      currYear={0} prevYear={0}
+                      curr={cKJP_Panjang_SubTotal}
+                      prev={pKJP_Panjang_SubTotal}
+                      indent="pl-8"
                       highlight
+                      isLiabilitas
                     />
 
-                    <SubHeaderRow label="Ekuitas" indent="pl-8" />
-                    <SectionRow3
-                      label="Simpanan Pokok/Modal Tetap"
-                      currYear={currSimpananPokok}
-                      prevYear={prevSimpananPokok}
+                    {/* ════ TOTAL KEWAJIBAN ════ */}
+                    <TotalPairRow
+                      label="TOTAL KEWAJIBAN (Lancar + Berjangka)"
+                      curr={cTotalKewajiban}
+                      prev={pTotalKewajiban}
+                      indent="pl-8"
+                      highlight
+                      isLiabilitas
+                    />
+
+                    {/* ════ EKUITAS ════ */}
+                    <tr>
+                      <td className="px-6 py-2.5 text-sm font-bold text-blue-700 pl-8" colSpan={3}>
+                        Ekuitas (SAK ETAP / SAK EP Koperasi)
+                      </td>
+                    </tr>
+                    <SectionRow
+                      label="Modal Anggota Tetap — Simpanan Pokok (SP)"
+                      currYear={cModalAnggotaTetap}
+                      prevYear={pModalAnggotaTetap}
                       indent="pl-10"
                       sub
                     />
-                    <SectionRow3
-                      label="Simpanan Wajib/Modal Tambahan"
-                      currYear={currSimpananWajib}
-                      prevYear={prevSimpananWajib}
+                    <SectionRow
+                      label="Modal Anggota Diperlukan — Simpanan Wajib (SW)"
+                      currYear={cModalAnggotaDiperlukan}
+                      prevYear={pModalAnggotaDiperlukan}
                       indent="pl-10"
                       sub
                     />
-                    <SectionRow3
-                      label="Simpanan Sukarela"
-                      currYear={currSimpananSukarela}
-                      prevYear={prevSimpananSukarela}
-                      indent="pl-10"
-                      sub
-                    />
-                    <SectionRow3 label="Cadangan Umum"  currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Cadangan Bakan" currYear={0} prevYear={0} indent="pl-10" sub />
-                    <SectionRow3 label="Hibah"           currYear={0} prevYear={0} indent="pl-10" sub />
-                    <TotalRow3
+                    <SectionRow label="Cadangan Umum"    currYear={0} prevYear={0} indent="pl-10" sub />
+                    <SectionRow label="Cadangan Bakan"   currYear={0} prevYear={0} indent="pl-10" sub />
+                    <SectionRow label="Hibah"             currYear={0} prevYear={0} indent="pl-10" sub />
+                    <TotalPairRow
                       label="Jumlah Ekuitas"
-                      currYear={currEkuitas}
-                      prevYear={prevEkuitas}
+                      curr={cTotalEkuitas}
+                      prev={pTotalEkuitas}
+                      indent="pl-8"
                       highlight
                     />
 
-                    <GrandTotalRow3
+                    {/* ════ GRAND TOTAL KEWAJIBAN DAN EKUITAS ════ */}
+                    <GrandTotalRow
                       label="JUMLAH KEWAJIBAN DAN EKUITAS"
-                      currYear={currTotalPasiva}
-                      prevYear={prevTotalPasiva}
+                      curr={cTotalKewajibanDanEkuitas}
+                      prev={pTotalKewajibanDanEkuitas}
                     />
 
                     {/* ── Balance check rows ── */}
@@ -438,8 +531,8 @@ export default function NeracaPage() {
               </div>
 
               <div className="mt-4 text-xs text-gray-500 space-y-1">
-                <p><strong>Sumber data:</strong> <code>ksp_simpanan_data</code> dan <code>ksp_pinjam_data</code> (localStorage) — semua nilai akumulatif dari awal berdiri sampai batas tahun yang ditampilkan. Tidak ada hardcoded tahun; tahun otomatis diambil dari sistem.</p>
-                <p><strong>Catatan:</strong> Laporan posisi keuangan disusun sesuai standar akuntansi koperasi. Kas dihitung dari seluruh uang masuk anggota (Pokok + Wajib + Sukarela). Simpanan seluruh tipe masuk ke Ekuitas.</p>
+                <p><strong>Sumber data:</strong> <code>ksp_simpan_data</code> dan <code>ksp_pinjam_data</code> (localStorage) — semua nilai akumulatif dari awal berdiri sampai batas tahun yang ditampilkan. Tidak ada hardcoded tahun; tahun otomatis diambil dari sistem.</p>
+                <p><strong>Struktur Kewajiban — SAK ETAP / SAK EP Koperasi:</strong> Kewajiban Jangka Pendek (SP, SW, Sibuhar, Sihar) adalah simpanan lancar yang bisa diambil sewaktu-waktu. Kewajiban Jangka Panjang (Sisujang, Simapan, Sihat) adalah simpanan yang terikat masa berjangka. Ekuitas mencakup Modal Anggota Tetap (SP) dan Diperlukan (SW). Total Kewajiban (Lancar + Berjangka) + Ekuitas = Total Kewajiban dan Ekuitas, yang harus seimbang dengan Jumlah Aktiva.</p>
               </div>
             </div>
           </CardContent>

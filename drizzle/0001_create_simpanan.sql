@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS simpanan (
+-- Simpanan table (renamed from simpanan to Transaksi_Simpanan)
+CREATE TABLE IF NOT EXISTS Transaksi_Simpanan (
     id TEXT PRIMARY KEY NOT NULL,
     no_anggota TEXT NOT NULL,
     nama_anggota TEXT NOT NULL,
@@ -8,5 +9,5 @@ CREATE TABLE IF NOT EXISTS simpanan (
     status TEXT NOT NULL DEFAULT 'Aktif',
     created_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_simpanan_tipe ON simpanan(tipe);
-CREATE INDEX IF NOT EXISTS idx_simpanan_no_anggota ON simpanan(no_anggota);
+CREATE INDEX IF NOT EXISTS idx_simpanan_tipe ON Transaksi_Simpanan(tipe);
+CREATE INDEX IF NOT EXISTS idx_simpanan_no_anggota ON Transaksi_Simpanan(no_anggota);

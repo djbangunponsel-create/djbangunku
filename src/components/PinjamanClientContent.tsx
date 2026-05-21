@@ -8,15 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import KwitansiPinjaman from '@/components/KwitansiPinjaman';
 import { PlusCircle, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil, Trash2, Search } from 'lucide-react';
 import Link from 'next/link';
-
-// ── Read localStorage helper ───────────────────────────────────────
-function readStored<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch { return fallback; }
-}
+import { readStored, writeStored, KEYS } from '@/lib/storage';
 
 // ── Read all members from localStorage ────────────────────────────
 function readAnggotaMap(): Record<string, string> {

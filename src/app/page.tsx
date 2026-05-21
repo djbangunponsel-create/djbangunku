@@ -240,7 +240,7 @@ export default function Home() {
   const anggotaRows = readStored<Record<string, unknown>[]>(
     "ksp_anggota_data", [],
   );
-  const totalAnggota = anggotaRows.length;
+  const totalAnggota = Array.isArray(anggotaRows) ? anggotaRows.length : 0;
 
   // ── LocalStorage: Simpanan ───────────────────────────────────────
   // Storage key is ksp_simpan_data (single source, used by SimpananClientContent)
@@ -306,22 +306,22 @@ export default function Home() {
             1. SUMMARY STAT CARDS
             ============================================================ */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <StatCard
-            label="Total Simpanan"
-            value={fmt(totalSimpanan)}
-            valuePre="Rp "
-            sub={`${simpananRows.length} transaksi`}
-            gradient="bg-gradient-to-br from-[#065F46] via-[#059669] to-[#34D399]"
-            icon={Wallet}
-          />
-          <StatCard
-            label="Total Pinjaman"
-            value={fmt(totalPinjaman)}
-            valuePre="Rp "
-            sub={`${pinjamanRows.length} pinjaman`}
-            gradient="bg-gradient-to-br from-[#9A3412] via-[#EA580C] to-[#FB923C]"
-            icon={CreditCard}
-          />
+<StatCard
+             label="Total Simpanan"
+             value={fmt(totalSimpanan)}
+             valuePre="Rp "
+             sub={`${Array.isArray(simpananRows) ? simpananRows.length : 0} transaksi`}
+             gradient="bg-gradient-to-br from-[#065F46] via-[#059669] to-[#34D399]"
+             icon={Wallet}
+           />
+           <StatCard
+             label="Total Pinjaman"
+             value={fmt(totalPinjaman)}
+             valuePre="Rp "
+             sub={`${Array.isArray(pinjamanRows) ? pinjamanRows.length : 0} pinjaman`}
+             gradient="bg-gradient-to-br from-[#9A3412] via-[#EA580C] to-[#FB923C]"
+             icon={CreditCard}
+           />
           <StatCard
             label="Total Anggota"
             value={totalAnggota.toLocaleString("id-ID")}
@@ -365,11 +365,11 @@ export default function Home() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-sm font-bold text-gray-900">Tren Simpanan vs Pinjaman</h2>
-                <p className="text-xs text-gray-500">
-                  {simpananRows.length === 0 && pinjamanRows.length === 0
-                    ? "Belum ada data transaksi — grafik akan terisi otomatis setelah transaksi diinput"
-                    : `${simpananRows.length} transaksi simpanan · ${pinjamanRows.length} pinjaman`}
-                </p>
+<p className="text-xs text-gray-500">
+                   {Array.isArray(simpananRows) && simpananRows.length === 0 && Array.isArray(pinjamanRows) && pinjamanRows.length === 0
+                     ? "Belum ada data transaksi — grafik akan terisi otomatis setelah transaksi diinput"
+                     : `${Array.isArray(simpananRows) ? simpananRows.length : 0} transaksi simpanan · ${Array.isArray(pinjamanRows) ? pinjamanRows.length : 0} pinjaman`}
+                 </p>
               </div>
               <div className="flex items-center gap-1.5 text-[11px]">
                 <span className="flex items-center gap-1 text-emerald-600">
@@ -384,7 +384,7 @@ export default function Home() {
             </div>
 
             {/* When no data yet, show an elegant "all-zero" flat chart */}
-            {simpananRows.length === 0 && pinjamanRows.length === 0 ? (
+            {(Array.isArray(simpananRows) ? simpananRows.length : 0) === 0 && (Array.isArray(pinjamanRows) ? pinjamanRows.length : 0) === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
               <BarChart
                 savings={monthlySimpanan}
@@ -413,7 +413,7 @@ export default function Home() {
               </Link>
             </div>
 
-            {simpananRows.length === 0 ? (
+            {(Array.isArray(simpananRows) ? simpananRows.length : 0) === 0 ? (
               <div className="flex flex-col items-center py-8 text-gray-400">
                 <EmptyPulse />
                 <p className="text-xs mt-2">Belum ada transaksi simpanan</p>
@@ -421,14 +421,14 @@ export default function Home() {
                   Data akan muncul di sini setelah transaksi diinput
                 </p>
               </div>
-            ) : (
-              <ul className="space-y-3">
-                {[...simpananRows]
-                  .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
-                    String(b.tanggal ?? "").localeCompare(String(a.tanggal ?? ""))
-                  )
-                  .slice(0, 5)
-                  .map((row: Record<string, unknown>, i: number) => (
+) : (
+               <ul className="space-y-3">
+                 {[...(Array.isArray(simpananRows) ? simpananRows : [])]
+                   .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
+                     String(b.tanggal ?? "").localeCompare(String(a.tanggal ?? ""))
+                   )
+                   .slice(0, 5)
+                   .map((row: Record<string, unknown>, i: number) => (
                     <li key={i} className="flex items-start gap-3">
                       <div className="mt-0.5 p-1.5 rounded-lg text-emerald-600 bg-emerald-50">
                         <Wallet className="h-3.5 w-3.5" />
@@ -477,8 +477,8 @@ export default function Home() {
                       <p className="text-xs font-semibold text-emerald-600">
                         Rp {fmt(monthlySimpanan[i])}
                       </p>
-                      <p className="text-[9px] text-gray-400">
-                        {simpananRows.filter((r: Record<string, unknown>) =>
+<p className="text-[9px] text-gray-400">
+                        {(Array.isArray(simpananRows) ? simpananRows : []).filter((r: Record<string, unknown>) =>
                           parseMonthISO(r.tanggalSetor as string) === yyyyMmKeys[i]
                         ).length} transaksi
                       </p>
@@ -489,8 +489,8 @@ export default function Home() {
                       <p className="text-xs font-semibold text-orange-600">
                         Rp {fmt(monthlyPinjaman[i])}
                       </p>
-                      <p className="text-[9px] text-gray-400">
-                        {pinjamanRows.filter((r: Record<string, unknown>) =>
+<p className="text-[9px] text-gray-400">
+                        {(Array.isArray(pinjamanRows) ? pinjamanRows : []).filter((r: Record<string, unknown>) =>
                           parseMonthISO(r.tanggal as string) === yyyyMmKeys[i]
                         ).length} pinjaman
                       </p>
@@ -502,7 +502,7 @@ export default function Home() {
           </div>
 
           {/* Zero-state hint at bottom of monthly strip */}
-          {simpananRows.length === 0 && pinjamanRows.length === 0 && (
+          {(Array.isArray(simpananRows) ? simpananRows.length : 0) === 0 && (Array.isArray(pinjamanRows) ? pinjamanRows.length : 0) === 0 && (
             <p className="mt-3 text-center text-[10px] text-gray-400">
               Semua nilai di atas menampilkan Rp 0.
               Data akan terisi otomatis setelah Anda menambahkan transaksi simpanan dan pinjaman.

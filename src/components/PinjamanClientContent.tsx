@@ -10,9 +10,9 @@ import { PlusCircle, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, 
 import Link from 'next/link';
 import { readStored, writeStored, KEYS } from '@/lib/storage';
 
-// ── Read all members from localStorage ────────────────────────────
+// ── Read map of member No_Anggota -> NAMA_ANGGOTA ───────────────────
 function readAnggotaMap(): Record<string, string> {
-  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const rows = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
   const safeRows = Array.isArray(rows) ? rows : [];
   const map: Record<string, string> = {};
   for (const row of safeRows) {
@@ -25,7 +25,7 @@ function readAnggotaMap(): Record<string, string> {
 
 // ── Read name-to-no lookup for Excel import ─────────────────────────
 function readAnggotaNameToNo(): Record<string, string> {
-  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const rows = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
   const safeRows = Array.isArray(rows) ? rows : [];
   const map: Record<string, string> = {};
   for (const row of safeRows) {
@@ -87,7 +87,7 @@ function parseFormattedNumber(v: string): number {
 
 // ── Read all members for autocomplete ─────────────────────────────
 function readAllAnggota(): { no: string; nama: string }[] {
-  const rows = readStored<Record<string, unknown>[]>('ksp_anggota_data', []);
+  const rows = readStored<Record<string, unknown>[]>(KEYS.ANGGOTA, []);
   const safeRows = Array.isArray(rows) ? rows : [];
   return safeRows.map((r) => ({
     no: String(r.No_Anggota ?? ''),
@@ -97,7 +97,7 @@ function readAllAnggota(): { no: string; nama: string }[] {
 
 // ── Read all simpanan rows from localStorage ────────────────────────
 function readSimpananList(): Record<string, unknown>[] {
-  return readStored<Record<string, unknown>[]>('ksp_simpan_data', []);
+  return readStored<Record<string, unknown>[]>(KEYS.SIMPAN, []);
 }
 
 // ── All product types included in "Simpanan" collateral ──────────────

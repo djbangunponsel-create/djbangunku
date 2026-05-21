@@ -58,7 +58,7 @@ function readAnggotaMap(): Record<string, string> {
   const safeRows = Array.isArray(rows) ? rows : [];
   for (const row of safeRows) {
     const no = String(row.No_Anggota ?? '');
-    const nama = String(row.NAMA_ANGGOTA ?? '');
+    const nama = String(row.NAMA ?? '');
     if (no && nama) map[no.toLowerCase()] = nama;
   }
   return map;

@@ -50,14 +50,19 @@ function normaliseRow(row: Record<string, unknown>): Record<string, unknown> {
   r.Tanggal_Masuk  = convertExcelDate(r.Tanggal_Masuk);
   // Guarantee No_Anggota is always a string (never null/undefined)
   r.No_Anggota = String(r.No_Anggota ?? "");
+  // Normalise NAMA field - support both NAMA and NAMA_ANGGOTA for backward compatibility
+  if (!r.NAMA && r.NAMA_ANGGOTA) r.NAMA = r.NAMA_ANGGOTA;
+  // Normalise Jenis_Kelamin - convert L/P to Laki-laki/Perempuan
+  if (r.Jenis_Kelamin === 'L') r.Jenis_Kelamin = 'Laki-laki';
+  if (r.Jenis_Kelamin === 'P') r.Jenis_Kelamin = 'Perempuan';
   return r;
 }
 // ───────────────────────────────────────────────────────────────────
 
 interface Anggota {
   No_Anggota: string
-  NAMA_ANGGOTA: string
-  Jenis_Kelamin: "Laki-laki" | "Perempuan"
+  NAMA: string
+  Jenis_Kelamin: string
   Agama: string
   NIK: string
   Tempat_Lahir: string
@@ -134,8 +139,8 @@ export default function AnggotaClientContent() {
   
   const [formData, setFormData] = useState({
     No_Anggota: '',
-    NAMA_ANGGOTA: '',
-    Jenis_Kelamin: 'Laki-laki' as "Laki-laki" | "Perempuan",
+    NAMA: '',
+    Jenis_Kelamin: 'Laki-laki',
     Agama: '',
     NIK: '',
     Tempat_Lahir: '',
@@ -158,7 +163,7 @@ export default function AnggotaClientContent() {
 
   const filteredData = (anggotaData ?? [])
     .filter((a) => {
-      const nama  = String(a.NAMA_ANGGOTA  ?? "").toLowerCase();
+      const nama  = String(a.NAMA ?? "").toLowerCase();
       const noAng = String(a.No_Anggota     ?? "");
       return (
         q === "" ||
@@ -179,10 +184,10 @@ export default function AnggotaClientContent() {
   };
 
   const resetForm = () => {
-    setFormData({
-      No_Anggota: '',
-      NAMA_ANGGOTA: '',
-      Jenis_Kelamin: 'Laki-laki',
+setFormData({
+       No_Anggota: '',
+       NAMA: '',
+       Jenis_Kelamin: 'Laki-laki',
       Agama: '',
       NIK: '',
       Tempat_Lahir: '',
@@ -298,10 +303,10 @@ export default function AnggotaClientContent() {
       return String(maxN + 1);
     })();
     const todayStr = new Date().toISOString().slice(0, 10);
-    setFormData({
-      No_Anggota: nextNo,
-      NAMA_ANGGOTA: "",
-      Jenis_Kelamin: "Laki-laki",
+setFormData({
+       No_Anggota: nextNo,
+       NAMA: "",
+       Jenis_Kelamin: "Laki-laki",
       Agama: "",
       NIK: "",
       Tempat_Lahir: "",
@@ -400,7 +405,7 @@ export default function AnggotaClientContent() {
                     paginatedData.map((anggota, idx) => (
                       <tr key={`${anggota.No_Anggota ?? ""}-${idx}`} className="hover:bg-gray-50">
                         <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">{anggota.No_Anggota}</td>
-                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.NAMA_ANGGOTA}</td>
+                        <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.NAMA}</td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.Jenis_Kelamin === "Laki-laki" ? "L" : "P"}</td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.NIK}</td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm">{anggota.TELEPON}</td>
@@ -484,7 +489,7 @@ export default function AnggotaClientContent() {
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota *</label>
-                  <Input type="text" value={formData.NAMA_ANGGOTA} onChange={(e) => setFormData({...formData, NAMA_ANGGOTA: e.target.value})} required />
+                  <Input type="text" value={formData.NAMA} onChange={(e) => setFormData({...formData, NAMA: e.target.value})} required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">NIK (16 digit) *</label>
@@ -606,7 +611,7 @@ export default function AnggotaClientContent() {
                   Pilih file Excel (.xlsx, .xls, .csv) yang berisi data anggota
                 </p>
                 <p className="text-xs text-gray-400 mb-4">
-                  Kolom yang dibutuhkan: No_Anggota, NAMA_ANGGOTA, Jenis_Kelamin, Agama, NIK, Tempat_Lahir, Tanggal_Lahir, TELEPON, Alamat, Tanggal_Masuk, Status_Perkawinan, Nama_Pasangan, Jumlah_Anak, Nama_Ibu_Kandung, Nama_Saudara, No_HP_Saudara, Hubungan_Saudara, Pekerjaan, PENGHASILAN_per_Bulan
+                  Kolom yang dibutuhkan: No_Anggota, NAMA, Jenis_Kelamin, Agama, NIK, Tempat_Lahir, Tanggal_Lahir, TELEPON, Alamat, Tanggal_Masuk, Status_Perkawinan, Nama_Pasangan, Jumlah_Anak, Nama_Ibu_Kandung, Nama_Saudara, No_HP_Saudara, Hubungan_Saudara, Pekerjaan, PENGHASILAN_per_Bulan
                 </p>
                 <input
                   ref={fileInputRef}
@@ -658,7 +663,7 @@ export default function AnggotaClientContent() {
         return (
         <tr key={idx}>
           <td className="px-2 py-1">{r.No_Anggota || '-'}</td>
-          <td className="px-2 py-1">{r.NAMA_ANGGOTA || '-'}</td>
+          <td className="px-2 py-1">{r.NAMA || '-'}</td>
           <td className="px-2 py-1">{r.NIK || '-'}</td>
           <td className="px-2 py-1">{r.TELEPON || '-'}</td>
         </tr>
@@ -713,7 +718,7 @@ export default function AnggotaClientContent() {
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Nama Lengkap</p>
-                <p className="text-sm text-gray-900">{selectedAnggota.NAMA_ANGGOTA}</p>
+                <p className="text-sm text-gray-900">{selectedAnggota.NAMA}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase">Jenis Kelamin</p>
@@ -861,7 +866,7 @@ export default function AnggotaClientContent() {
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota *</label>
-                  <Input type="text" value={editData.NAMA_ANGGOTA} onChange={(e) => setEditData({...editData, NAMA_ANGGOTA: e.target.value})} required />
+                  <Input type="text" value={editData.NAMA} onChange={(e) => setEditData({...editData, NAMA: e.target.value})} required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">NIK (16 digit) *</label>

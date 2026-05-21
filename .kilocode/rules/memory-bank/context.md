@@ -160,9 +160,10 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - Pinjaman interface diperluas dengan 5 field optional: biayaMaterai, biayaNotaris, biayaBpjstk, legalisasiNotaris, iuranBpjstk, masaBpjstk
     - handleSubmit dan resetForm diperbarui untuk menyimpan dan mereset field baru
     - typecheck + lint pass clean
-|  | 2026-05-21 | **Detail Agunan** ditambahkan di bawah dropdown Jenis Agunan (sebelum Biaya Tambahan):
-    - lookup object `agunanValues` dengan 8 jenis agunan: nilai pasar dan nilai likuidasi masing-masing
-    - Menampilkan 2 kolom read-only: **Nilai Pasar Agunan** dan **Nilai Likuidasi Agunan** dengan format thousand-separator
-    - Kotak **Kecukupan Agunan**: jika `jumlahNum <= nilaiPasarAgunan` → hijau ACCEPTED; jika tidak → merah DITOLAK dengan pesan detail beserta perbandingan nominal
-    - `agunanMencukupi` = boolean, `nilaiPasarAgunan` / `nilaiLikuidasiAgunan` ditambahkan ke interface Pinjaman + disimpan di handleSubmit
-    - typecheck + lint pass clean
+|  | 2026-05-21 | **Detail Agunan Manual + Nama Pemilik + Likuidasi Otomatis** di bawah dropdown Jenis Agunan:
+    - menghapus lookup tetap nilai pasar/likuidasi; **Nilai Pasar** diisi manual oleh admin (format thousand-separator)
+    - **Nilai Likuidasi Agunan dihitung otomatis** (bukan diisi manual lagi): Pendiri/Simpanan = 100% dari nilai pasar; Kendaraan BPKB = 70%; Tanah/Bangunan (Akta/SHM) = 80%
+    - label Nilai Likuidasi menampilkan persentase relevan (e.g. "80% dari Nilai Pasar"), field read-only + bg-gray-50
+    - **Nama Pemilik Agunan** ditambahkan di 5 agunan detail section (BPKB, Akta/SHM, Simpanan, Sisujang, Pendiri) full-width sebelum grid detail
+    - kecukupan agunan (ACC/DITOLAK) tetap menggunakan nilaiPasarAgunan (bukan likuidasi)
+    - Pinjaman interface + handleSubmit + resetForm ter-update dengan `pemilikAgunan` field

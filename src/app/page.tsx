@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Users, Wallet, FileText, BarChart3,
@@ -232,6 +232,10 @@ const EmptyPulse = () => (
 
 // ═══════════════════════════════════════════════════════════════════
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration fix: need to set mounted state after client mount
+  useEffect(() => { setIsMounted(true); }, []);
+
   // ── Format helper ────────────────────────────────────────────────
   const fmt = (n: number) =>
     n.toLocaleString("id-ID", { minimumFractionDigits: 0 });
@@ -364,12 +368,10 @@ export default function Home() {
           <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-sm font-bold text-gray-900">Tren Simpanan vs Pinjaman</h2>
-<p className="text-xs text-gray-500">
-                   {Array.isArray(simpananRows) && simpananRows.length === 0 && Array.isArray(pinjamanRows) && pinjamanRows.length === 0
-                     ? "Belum ada data transaksi — grafik akan terisi otomatis setelah transaksi diinput"
-                     : `${Array.isArray(simpananRows) ? simpananRows.length : 0} transaksi simpanan · ${Array.isArray(pinjamanRows) ? pinjamanRows.length : 0} pinjaman`}
-                 </p>
+<h2 className="text-sm font-bold text-gray-900">Tren Simpanan vs Pinjaman</h2>
+                <p className="text-xs text-gray-500">
+                  {!isMounted ? "Memuat data..." : (Array.isArray(simpananRows) && simpananRows.length === 0 && Array.isArray(pinjamanRows) && pinjamanRows.length === 0) ? "Belum ada data transaksi — grafik akan terisi otomatis setelah transaksi diinput" : `${simpananRows?.length || 0} transaksi simpanan · ${pinjamanRows?.length || 0} pinjaman`}
+                </p>
               </div>
               <div className="flex items-center gap-1.5 text-[11px]">
                 <span className="flex items-center gap-1 text-emerald-600">

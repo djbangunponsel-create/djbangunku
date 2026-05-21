@@ -731,58 +731,44 @@ const errors: string[] = [];
              <h2 className="text-xl font-bold text-gray-900 mb-4">Tambah Pinjaman Baru</h2>
              <form onSubmit={handleSubmit} className="space-y-4">
                {/* Nama Anggota - Auto Complete */}
-               <div className="relative" ref={memberSearchRef}>
+               <div className="relative">
                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Anggota *</label>
                  <Input
                    type="text"
-                   placeholder="Ketik nama atau nomor anggota..."
+                   placeholder="Ketik nama anggota..."
                    value={formData.anggota}
                    onChange={(e) => {
-                     const val = e.target.value;
-                     setFormData({ ...formData, anggota: val });
-                     setMemberSearch(val);
-                   }}
-                   onFocus={() => {
+                     setFormData({...formData, anggota: e.target.value});
+                     setMemberSearch(e.target.value);
                      setShowMemberDropdown(true);
-                     setMemberSearch(formData.anggota);
                    }}
+                   onFocus={() => setShowMemberDropdown(true)}
                    required
                  />
                  {showMemberDropdown && (
-                   <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                     {(() => {
-                       const members = readAllAnggota();
-                       const q = memberSearch.toLowerCase().trim();
-                       const filtered = members.filter(
-                         (a) => a.nama.toLowerCase().includes(q) || a.no.toLowerCase().includes(q)
-                       );
-                       if (filtered.length === 0) {
-                         return <div className="px-3 py-2 text-gray-500 text-sm">Tidak ada data</div>;
-                       }
-                       return (
-                         <>
-                           {filtered.slice(0, 10).map((a) => (
-                             <button
-                               key={a.no}
-                               type="button"
-                               className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm"
-                               onClick={() => {
-                                 setFormData({ ...formData, anggota: `${a.no} - ${a.nama}`, anggotaNo: a.no });
-                                 setShowMemberDropdown(false);
-                                 setMemberSearch("");
-                               }}
-                             >
-                               <span className="font-medium">{a.nama}</span>
-                               <span className="text-gray-400 ml-2">No. {a.no}</span>
-                             </button>
-                           ))}
-                         </>
-                       );
-                     })()}
+                   <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                     {readAllAnggota()
+                       .filter((a) => a.nama.toLowerCase().includes(memberSearch.toLowerCase()) || a.no.toLowerCase().includes(memberSearch.toLowerCase()))
+                       .slice(0, 10)
+                       .map((a) => (
+                         <button
+                           key={a.no}
+                           type="button"
+                           className="w-full text-left px-3 py-2 hover:bg-gray-100"
+                           onClick={() => {
+                             setFormData({...formData, anggota: `${a.no} - ${a.nama}`, anggotaNo: a.no});
+                             setShowMemberDropdown(false);
+                           }}
+                         >
+                           {a.no} - {a.nama}
+                         </button>
+                       ))}
+                     {readAllAnggota().filter((a) => a.nama.toLowerCase().includes(memberSearch.toLowerCase()) || a.no.toLowerCase().includes(memberSearch.toLowerCase())).length === 0 && (
+                       <div className="px-3 py-2 text-gray-500">Tidak ada data</div>
+                     )}
                    </div>
                  )}
                </div>
-
 
                {/* Jumlah Pinjaman dengan Separator Ribuan */}
                <div>

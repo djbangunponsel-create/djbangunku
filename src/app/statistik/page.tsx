@@ -269,7 +269,7 @@ export default function StatistikPage() {
               <CardDescription>Persentase tipe simpanan</CardDescription>
             </CardHeader>
             <CardContent>
-              {savedComposition.length > 0 ? (
+              {savingsComposition.length > 0 ? (
                 <PieChart data={savingsComposition} />
               ) : (
                 <div className="h-48 flex items-center justify-center text-gray-400">

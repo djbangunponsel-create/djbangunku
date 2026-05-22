@@ -85,6 +85,9 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | File/Directory | Purpose |
 |----------------|---------|
 | `src/app/page.tsx` | Dashboard utama |
+| `src/components/Sidebar.tsx` | Komponen navigasi sidebar vertikal — bg-[#1E3A5F] navy, gunakan usePathname untuk highlight halaman aktif |
+| `src/components/AppLayout.tsx` | Wrapper layout — posisikan Sidebar fixed kiri (w-[220px]), offset konten dengan ml-[220px], title bar sticky opsional |
+| `src/app/layout.tsx` | Root layout — bungkus AppLayout, set body bg-[#F8FAFC] |
 | `src/app/anggota/page.tsx` | Data anggota dengan form 19 kolom |
 | `src/app/anggota/summary/page.tsx` | Tabel summary semua anggota (19 kolom) |
 | `src/app/anggota/register/page.tsx` | Halaman registrasi (menggunakan RegisterAnggotaForm) |
@@ -95,9 +98,10 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | `src/components/ui/textarea.tsx` | Komponen Textarea baru |
 | `src/components/AnggotaClientContent.tsx` | Komponen utama data anggota |
 | `src/components/SimpananClientContent.tsx` | Komponen utama data simpanan (CRUD + Excel import) |
- | `src/components/PinjamanClientContent.tsx` | Komponen utama data pinjaman (CRUD + Excel import) |
- | `src/app/laporan/neraca/page.tsx`   | Neraca — 3 kolom perbandingan TAHUN INI / TAHUN SEBELUMNYA, yearConfig dari system date, akumulator per tahun
-| `src/lib/database/db.ts`              | Database connection (drizzle-orm/libsql + @libsql/client) |
+| `src/components/PinjamanClientContent.tsx` | Komponen utama data pinjaman (CRUD + Excel import) |
+| `src/app/laporan/page.tsx` | Halaman indeks Laporan Keuangan — kartu sub-laporan (Neraca, PHU, Perubahan Ekuitas, Arus Kas, Promosi Ekonomi, Catatan) |
+| `src/app/laporan/neraca/page.tsx` | Neraca — 3 kolom perbandingan TAHUN INI / TAHUN SEBELUMNYA, yearConfig dari system date, akumulator per tahun |
+| `src/lib/database/db.ts`              | Database connection (drizzle-orm/libsql + @libsql/client) — migrasi auto-run saat import modul |
 | `src/lib/database/schema.ts`         | Drizzle ORM schema — simpanan table |
 | `drizzle/0001_create_simpanan.sql`  | D1 raw SQL migration — simpanan table DDL |
 | `src/app/api/anggota/route.ts`         | GET all / POST single anggota row |
@@ -186,4 +190,14 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | - [x] **Fix `handleImportConfirm`**: ganti 1-by-1 POST menjadi SATU bulk request ke `POST /api/anggota/bulk`, pakai `await res.json()` + `res.ok` untuk validasi, `toast.success` / `toast.warning` / `toast.error` untuk feedback pengguna, update `anggotaData` hanya untuk baris yang benar-benar baru.
 |  | - [x] **Fix `handleSubmit` (Tambah Anggota Baru manual)**: ganti fire-and-forget menjadi `POST /api/anggota` dengan `await res.ok`; `toast.success` jika berhasil, `toast.error` jika gagal.
 |  | - [x] **Endpoint baru** `POST /api/anggota/bulk` — INSERT semua rows, return `{ success, failed, total }`, menangani field yang ada di Excel (uppercase) maupun API API (camelCase).
+|  |
+|  | 2026-05-22 | **Sidebar Navigation Layout Restrukturisasi**:
+|  | - [x] **Sidebar baru** `src/components/Sidebar.tsx`: nav vertikal fixed kiri (w-[220px], bg-[#1E3A5F] navy), 7 menu dengan ikon (Dashboard/PiggyBank, Anggota/Users, Simpanan/Wallet, Pinjaman/CreditCard, Laporan/FileText, Statistik/BarChart3, Pengaturan/Settings), active state otomatis via `usePathname()` (matching exact path atau path prefix)
+|  | - [x] **AppLayout baru** `src/components/AppLayout.tsx`: wrapper flex dengan Sidebar fixed kiri + area konten `ml-[220px]`, title page bar opsional
+|  | - [x] **Root layout** `src/app/layout.tsx`: bungkus semua children dengan `<AppLayout>`, ubah body bg dari `bg-gray-50` jadi `bg-[#F8FAFC]`
+|  | - [x] **Hapus brand bar + horizontal nav** dari `src/app/page.tsx` (Dashboard): stripped header kiri+nav kanan, dan COMPLETELY removed 7 shortcut box menu bulanan (`navItems` array + `<nav>` render section)
+|  | - [x] **Hapus `<header>` + `<nav>`** dari `src/components/AnggotaClientContent.tsx`: tersisa title + search + action buttons + tabel, tanpa floating nav bar
+|  | - [x] **Hapus `<header>` + `<nav>`** dari `src/components/SimpananClientContent.tsx`: kembali ke `<main>` langsung, stat cards + tabel
+|  | - [x] **Hapus `<header>` + `<nav>`** dari `src/components/PinjamanClientContent.tsx` & `src/app/statistik/page.tsx` & `src/app/laporan/page.tsx` & semua sub-laporan (neraca, phu, perubahan-ekuitas, arus-kas, promosi-ekonomi, catatan)
+|  | - [x] typecheck + lint pass clean (0 new errors introduced)
 |  |

@@ -1,8 +1,5 @@
 import { Metadata } from "next"
-import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
   title: "Perubahan Ekuitas - KSP Mulia Dana Sejahtera",
@@ -11,24 +8,9 @@ export const metadata: Metadata = {
 export default function PerubahanEkuitasPage() {
   return (
     <div className="min-h-screen">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Laporan Perubahan Ekuitas (Modal)</h1>
-              <p className="text-sm text-gray-600">KSP Mulia Dana Sejahtera - Periode 1 Januari - 31 Desember 2025</p>
-            </div>
-            <Link href="/laporan">
-              <Button variant="ghost">
-                <FileText className="mr-2 h-4 w-4" />
-                Kembali ke Laporan
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Laporan Perubahan Ekuitas (Modal)</h1>
+        <p className="text-sm text-gray-600 mb-6">KSP Mulia Dana Sejahtera - Periode 1 Januari - 31 Desember 2025</p>
         <Card>
           <CardHeader>
             <CardTitle>Laporan Perubahan Ekuitas (Modal)</CardTitle>

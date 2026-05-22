@@ -419,53 +419,30 @@ setFormData({
 
   return (
     <div className="min-h-screen">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Kelola Data Anggota KSP
-              </h1>
-              <p className="text-sm text-gray-600">
-                Total {anggotaData.length} anggota terdaftar
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Input
-                type="text"
-                placeholder="Cari anggota..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-[200px] md:w-[250px]"
-              />
-              <Button variant="outline" onClick={() => setShowImport(true)}>
-                <Upload className="mr-2 h-4 w-4" />
-                Import Excel
-              </Button>
-              <Button variant="default" onClick={openAddForm}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Tambah Anggota Baru
-              </Button>
-            </div>
-          </div>
+      <main className="max-w-7xl mx-auto px-6 py-6">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Kelola Data Anggota KSP</h1>
+          <p className="text-sm text-gray-600">Total {anggotaData.length} anggota terdaftar</p>
         </div>
-      </header>
 
-      <nav className="bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex space-x-1 overflow-x-auto py-2">
-            <Button variant="ghost" asChild><Link href="/">Dashboard</Link></Button>
-            <Button variant="default" asChild><Link href="/anggota">Data Anggota</Link></Button>
-            <Button variant="ghost" asChild><Link href="/simpanan">Simpanan</Link></Button>
-            <Button variant="ghost" asChild><Link href="/pinjaman">Pinjaman</Link></Button>
-            <Button variant="ghost" asChild><Link href="/laporan">Laporan</Link></Button>
-            <Button variant="ghost" asChild><Link href="/statistik">Statistik</Link></Button>
-            <Button variant="ghost" asChild><Link href="/anggota/summary">Summary</Link></Button>
-          </div>
+        <div className="flex items-center gap-3 mb-6">
+          <Input
+            type="text"
+            placeholder="Cari anggota..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-[200px] md:w-[250px]"
+          />
+          <Button variant="outline" onClick={() => setShowImport(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import Excel
+          </Button>
+          <Button variant="default" onClick={openAddForm}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Tambah Anggota Baru
+          </Button>
         </div>
-      </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
         <Card>
           <CardHeader>
             <CardTitle>Daftar Anggota (19 Kolom)</CardTitle>

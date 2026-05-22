@@ -308,24 +308,9 @@ export default function NeracaPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Neraca</h1>
-              <p className="text-sm text-gray-600">Laporan Posisi Keuangan KSP Mulia Dana Sejahtera</p>
-            </div>
-            <Link href="/laporan">
-              <Button variant="ghost">
-                <FileText className="mr-2 h-4 w-4" />
-                Kembali ke Laporan
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Neraca</h1>
+        <p className="text-sm text-gray-600 mb-6">Laporan Posisi Keuangan KSP Mulia Dana Sejahtera</p>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between flex-wrap gap-4">

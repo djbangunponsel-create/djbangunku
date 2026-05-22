@@ -426,40 +426,7 @@ export default function SimpananClientContent() {
   // ══════════════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen">
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Data Simpanan</h1>
-              <p className="text-sm text-gray-600">Kelola simpanan anggota KSP</p>
-            </div>
-            <Link href="/">
-              <Button variant="ghost">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6" />
-                </svg>
-                Kembali ke Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <nav className="bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex space-x-1 overflow-x-auto py-2">
-            <Button variant="ghost" asChild><Link href="/">Dashboard</Link></Button>
-            <Button variant="ghost" asChild><Link href="/anggota">Data Anggota</Link></Button>
-            <Button variant="default" asChild><Link href="/simpanan">Simpanan</Link></Button>
-            <Button variant="ghost" asChild><Link href="/pinjaman">Pinjaman</Link></Button>
-            <Button variant="ghost" asChild><Link href="/laporan">Laporan</Link></Button>
-            <Button variant="ghost" asChild><Link href="/statistik">Statistik</Link></Button>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-6">
 
         {/* ── Loading / Error ─────────────────────────────────────────── */}
         {loading && (

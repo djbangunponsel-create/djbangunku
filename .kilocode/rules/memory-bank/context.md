@@ -100,8 +100,10 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 | `src/lib/database/db.ts`              | Database connection (drizzle-orm/libsql + @libsql/client) |
 | `src/lib/database/schema.ts`         | Drizzle ORM schema — simpanan table |
 | `drizzle/0001_create_simpanan.sql`  | D1 raw SQL migration — simpanan table DDL |
-| `src/app/api/simpanan/route.ts`      | GET all / POST single simpanan row |
-| `src/app/api/simpanan/bulk/route.ts` | POST bulk import — loof every row, per-row upsert, returns success/failed/total |
+| `src/app/api/anggota/route.ts`         | GET all / POST single anggota row |
+| `src/app/api/anggota/bulk/route.ts`   | POST bulk import anggota — INSERT semua rows, return { success, failed, total } |
+| `src/app/api/simpanan/route.ts`       | GET all / POST single simpanan row |
+| `src/app/api/simpanan/bulk/route.ts`  | POST bulk import simpanan — per-row upsert, returns success/failed/total |
 
 ## Session History
 
@@ -168,7 +170,7 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - kecukupan agunan (ACC/DITOLAK) tetap menggunakan nilaiPasarAgunan (bukan likuidasi)
     - Pinjaman interface + handleSubmit + resetForm ter-update dengan `pemilikAgunan` field
 |  | 2026-05-21 | **Fix Insentif Penanggung Jawab (1%) conditional on agunan sufficiency** (`src/components/PinjamanClientContent.tsx:219-236`): pindahkan `nilaiAgunan`/`agunanMencukupi` block (jumlahNum, nilaiPasarAgunan, AGUNAN_PCT_LIKUIDASI, nilaiLikuidasiAgunan, agunanMencukupi) SEBELUM potongan/insentifPJ block agar tidak ada hoisting violation TS2448; hapus duplicate `jumlahNum` di potongan block (sekarang hanya 1 declaration); `insentifPJ` logic baru: `!agunanMencukupi ? Math.round(jumlahNum * 0.01) : 0` — otomatis jadi Rp 0 jika agunan CUKUP (tidak ada flag/tidak ada notifikasi), otomatis tampil 1% jika agunan TIDAK CUKUP (ada flag peringatan merah); struktur sekarang: jumlahNum → Nilai Agunan → agunanMencukupi → Hitung potongan (insentifPJ conditional) → Netto; typecheck + lint PASS clean
-|  | 2026-05-21 | **Fix Pencarian Nama Anggota di form Tambah Pinjaman Baru** (`src/components/PinjamanClientContent.tsx:733-784`): total refactor JSX dropdown autocomplete pencarian anggota:
+  |  | 2026-05-21 | **Fix Pencarian Nama Anggota di form Tambah Pinjaman Baru** (`src/components/PinjamanClientContent.tsx:733-784`): total refactor JSX dropdown autocomplete pencarian anggota:
     - Tambah `memberSearchRef = useRef<HTMLDivElement>(null)` + `useEffect` click-outside handler (mousedown on document, hapus listener saat unmount)
     - Refactor JSX dari chained `.filter().map()` menjadi **IIFE `(() => { ... })()`** sehingga `readAllAnggota()` hanya dipanggil SEKALI per render (bukan 2x di baris 738 dan 754)
     - Filter sekarang pakai `const q = memberSearch.toLowerCase().trim()` (tambahan `.trim()`)
@@ -177,3 +179,11 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
     - Dropdown z-index dinaikkan dari `z-10` menjadi `z-50` dan `max-h-48` menjadi `max-h-60` agar tidak tertutup oleh elemen lain
     - Display hasil pencarian sekarang menampilkan `<b>Nama Anggota</b>` dengan tebal dan `No. XXX` berwarna abu-abu di sebelahnya agar jelas field mana yang cocok
     - typecheck + lint pass clean
+|  | 2026-05-22 | **Fix Import Anggota dan Database Persistence — 3 koreksi krusial**:
+|  | - [x] **Root cause 1 — Migrasi tidak pernah dijalankan**: `runMigrations()` di `db.ts` hanya didefinisikan tapi tidak pernah dipanggil sepanjang proyek. Tabel `Master_Anggota_KSP` tidak dibuat, INSERT silent gagal, dan semua operasi database tidak masuk ke DB sama sekali.
+|  | - [x] **Fix `db.ts`**: tambah `runMigrations().catch(() => {})` di akhir file sehingga migrasi otomatis berjalan saat modul pertama kali di-import oleh API route. `runMigrations()` sekarang memiliki guard `_migrationsDone` (idempoten).
+|  | - [x] **Root cause 2 — Import tidak menunggu konfirmasi server + POST 1-by-1 lambat**: `handleImportConfirm` tidak memeriksa `res.ok`, tidak mengumpulkan baris yang gagal, dan tidak menampilkan notifikasi error.
+|  | - [x] **Fix `handleImportConfirm`**: ganti 1-by-1 POST menjadi SATU bulk request ke `POST /api/anggota/bulk`, pakai `await res.json()` + `res.ok` untuk validasi, `toast.success` / `toast.warning` / `toast.error` untuk feedback pengguna, update `anggotaData` hanya untuk baris yang benar-benar baru.
+|  | - [x] **Fix `handleSubmit` (Tambah Anggota Baru manual)**: ganti fire-and-forget menjadi `POST /api/anggota` dengan `await res.ok`; `toast.success` jika berhasil, `toast.error` jika gagal.
+|  | - [x] **Endpoint baru** `POST /api/anggota/bulk` — INSERT semua rows, return `{ success, failed, total }`, menangani field yang ada di Excel (uppercase) maupun API API (camelCase).
+|  |

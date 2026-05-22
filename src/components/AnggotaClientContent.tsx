@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Upload, FileSpreadsheet, X, AlertCircle, CheckCircle, Eye, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { readStored, writeStored, KEYS } from '@/lib/storage';
 
 // ── Date helpers ─────────────────────────────────────────────────
@@ -194,9 +195,47 @@ export default function AnggotaClientContent() {
   // Reset to page 1 when search or data changes
   useEffect(() => { setCurrentPage(1); }, [search]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newAnggota: Anggota = { ...formData };
+
+    try {
+      const res = await fetch('/api/anggota', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          noAnggota: newAnggota.No_Anggota,
+          namaAnggota: newAnggota.NAMA,
+          jenisKelamin: newAnggota.Jenis_Kelamin,
+          agama: newAnggota.Agama,
+          nik: newAnggota.NIK,
+          tempatLahir: newAnggota.Tempat_Lahir,
+          tanggalLahir: newAnggota.Tanggal_Lahir,
+          telepon: newAnggota.TELEPON,
+          alamat: newAnggota.Alamat,
+          tanggalMasuk: newAnggota.Tanggal_Masuk,
+          statusPerkawinan: newAnggota.Status_Perkawinan,
+          namaPasangan: newAnggota.Nama_Pasangan,
+          jumlahAnak: newAnggota.Jumlah_Anak,
+          namaIbuKandung: newAnggota.Nama_Ibu_Kandung,
+          namaSaudara: newAnggota.Nama_Saudara,
+          noHpSaudara: newAnggota.No_HP_Saudara,
+          hubunganSaudara: newAnggota.Hubungan_Saudara,
+          pekerjaan: newAnggota.Pekerjaan,
+          penghasilanPerBulan: newAnggota.PENGHASILAN_per_Bulan,
+        }),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        toast.error(errBody.error || 'Gagal menyimpan data anggota ke server.');
+      } else {
+        toast.success(`Anggota ${newAnggota.No_Anggota} berhasil disimpan ke database.`);
+      }
+    } catch {
+      toast.error('Gagal terhubung ke server. Data disimpan hanya di memori lokal.');
+    }
+
     setAnggotaData([...anggotaData, newAnggota]);
     setShowForm(false);
     resetForm();
@@ -257,42 +296,40 @@ setFormData({
 
   const handleImportConfirm = async () => {
     if (importPreview.length === 0) return;
-    const newRows = importPreview.map((r) => r as unknown as Anggota);
-    
-    // Save to server database via API
-    try {
-      for (const row of newRows) {
-        await fetch('/api/anggota', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            noAnggota: row.No_Anggota,
-            namaAnggota: row.NAMA,
-            jenisKelamin: row.Jenis_Kelamin,
-            agama: row.Agama,
-            nik: row.NIK,
-            tempatLahir: row.Tempat_Lahir,
-            tanggalLahir: row.Tanggal_Lahir,
-            telepon: row.TELEPON,
-            alamat: row.Alamat,
-            tanggalMasuk: row.Tanggal_Masuk,
-            statusPerkawinan: row.Status_Perkawinan,
-            namaPasangan: row.Nama_Pasangan,
-            jumlahAnak: row.Jumlah_Anak,
-            namaIbuKandung: row.Nama_Ibu_Kandung,
-            namaSaudara: row.Nama_Saudara,
-            noHpSaudara: row.No_HP_Saudara,
-            hubunganSaudara: row.Hubungan_Saudara,
-            pekerjaan: row.Pekerjaan,
-            penghasilanPerBulan: row.PENGHASILAN_per_Bulan
-          })
-        });
-      }
-    } catch (err) {
-      console.error('Import to server failed:', err);
+
+    const rows = importPreview.map((r) => r as unknown as Anggota);
+
+    // Send all rows to the server in a single bulk request
+    const res = await fetch('/api/anggota/bulk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      toast.error(errBody.error || 'Gagal menyimpan data ke server.', { duration: 5000 });
+      return;
     }
-    
-    setAnggotaData((prev) => [...prev, ...newRows]);
+
+    const result = await res.json();
+
+    if (result && typeof result === 'object' && result.success < result.total) {
+      toast.warning(
+        `${result.success} dari ${result.total} berhasil disimpan. ${result.failed} gagal.`,
+        { duration: 5000 }
+      );
+    } else {
+      toast.success(`${result.success} anggota berhasil di-import ke database.`, { duration: 5000 });
+    }
+
+    // Update local state with newly imported rows
+    setAnggotaData((prev) => {
+      const existingNos = new Set(prev.map((a) => a.No_Anggota));
+      const trulyNew = rows.filter((r) => !existingNos.has(r.No_Anggota));
+      return [...prev, ...trulyNew];
+    });
+
     setShowImport(false);
     setImportFile(null);
     setImportPreview([]);

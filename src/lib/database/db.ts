@@ -24,10 +24,16 @@ const libsql      = createClient(connConfig);   // raw @libsql/client instance
 export const db         = drizzle(libsql, { schema });
 export const libsqlDb   = libsql;   // raw @libsql/client instance — used by API route raw-SQL handlers
 
-// ── Run migrations on startup (idempotent) ─────────────────────────
+// ── Run migrations once at startup (idempotent) ─────────────────────
+let _migrationsDone = false;
+
 export async function runMigrations() {
+  if (_migrationsDone) return;
+  _migrationsDone = true;
   const migrationsDir = path.join(process.cwd(), 'drizzle');
   if (fs.existsSync(migrationsDir)) {
     await migrate(db, { migrationsFolder: migrationsDir });
   }
 }
+
+runMigrations().catch(() => {});

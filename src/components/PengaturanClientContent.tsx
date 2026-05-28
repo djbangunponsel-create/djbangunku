@@ -43,7 +43,8 @@ interface KspSettings {
 
 // ── Anggota dropdown helper ──────────────────────────────────────
 function getAllAnggotaNames(): string[] {
-  const rows = readAllAnggota();
+  const raw = readStored<unknown[]>(KEYS.ANGGOTA, []);
+  const rows = Array.isArray(raw) ? raw : [];
   const names = new Set<string>();
   for (const r of rows) {
     const n = String((r as any).NAMA_ANGGOTA ?? (r as any).nama ?? '').trim();

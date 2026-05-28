@@ -12,7 +12,7 @@ function toRow(raw: any): Record<string, unknown> {
 export async function GET() {
   try {
     const result = await libsqlDb.execute(
-      'SELECT id, logo, namaKsp, alamat, telepon, ketuaKoperasi, sekretaris, bendahara, managerOperasional, kasir, admin, penjamin FROM Pengaturan_KSP WHERE id = \'main\''
+      'SELECT id, logo, namaKsp, alamat, badanHukum, telepon, email, ketuaKoperasi, sekretaris, bendahara, managerOperasional, kasir, admin, penjamin FROM Pengaturan_KSP WHERE id = \'main\''
     );
     const rows = (result as any).rows ?? [];
     if (rows.length === 0) {
@@ -21,6 +21,8 @@ export async function GET() {
         logo: '',
         namaKsp: 'KSP Mulia Dana Sejahtera',
         alamat: 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala',
+        badanHukum: '',
+        email: '',
         telepon: '',
         ketuaKoperasi: '',
         sekretaris: '',
@@ -40,6 +42,8 @@ export async function GET() {
         logo: '',
         namaKsp: 'KSP Mulia Dana Sejahtera',
         alamat: 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala',
+        badanHukum: '',
+        email: '',
         telepon: '',
         ketuaKoperasi: '',
         sekretaris: '',
@@ -61,19 +65,21 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const {
-      logo, namaKsp, alamat, telepon, ketuaKoperasi, sekretaris,
+      logo, namaKsp, alamat, badanHukum, telepon, email, ketuaKoperasi, sekretaris,
       bendahara, managerOperasional, kasir, admin, penjamin
     } = body;
 
     await libsqlDb.execute(
       `INSERT INTO Pengaturan_KSP
-         (id, logo, namaKsp, alamat, telepon, ketuaKoperasi, sekretaris, bendahara, managerOperasional, kasir, admin, penjamin)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         (id, logo, namaKsp, alamat, badanHukum, telepon, email, ketuaKoperasi, sekretaris, bendahara, managerOperasional, kasir, admin, penjamin)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
          logo     = excluded.logo,
          namaKsp  = excluded.namaKsp,
          alamat   = excluded.alamat,
+         badanHukum = excluded.badanHukum,
          telepon  = excluded.telepon,
+         email    = excluded.email,
          ketuaKoperasi = excluded.ketuaKoperasi,
          sekretaris  = excluded.sekretaris,
          bendahara   = excluded.bendahara,
@@ -83,7 +89,8 @@ export async function POST(req: Request) {
          penjamin = excluded.penjamin`,
       [
         'main', String(logo ?? ''), String(namaKsp ?? ''), String(alamat ?? ''),
-        String(telepon ?? ''), String(ketuaKoperasi ?? ''), String(sekretaris ?? ''),
+        String(badanHukum ?? ''), String(telepon ?? ''), String(email ?? ''),
+        String(ketuaKoperasi ?? ''), String(sekretaris ?? ''),
         String(bendahara ?? ''), String(managerOperasional ?? ''), String(kasir ?? ''),
         String(admin ?? ''), JSON.stringify(penjamin ?? [])
       ]

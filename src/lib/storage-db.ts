@@ -1,12 +1,3 @@
-/**
- * ─────────────────────────────────────────────────────────────────────
- *  KSP Server Database Storage Layer
- * ─────────────────────────────────────────────────────────────────────
- *  This module provides server-side database operations for KSP data.
- *  All data is persisted in SQLite/Turso database and survives rebuilds.
- * ─────────────────────────────────────────────────────────────────────
- */
-
 const API_BASE = '/api';
 
 async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -57,7 +48,7 @@ export async function upsertPinjaman(data: any) {
   });
 }
 
-// ── Pengaturan ───────────────────────────────────────────────────────
+// ── Pengaturan (client-side, for client components) ─────────────────────
 export async function getPengaturan() {
   return fetchAPI<any>('/pengaturan');
 }

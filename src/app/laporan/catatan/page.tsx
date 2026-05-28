@@ -1,16 +1,21 @@
-import { Metadata } from "next"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Metadata } from "next";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getPengaturanServer } from "@/lib/server-pengaturan";
 
 export const metadata: Metadata = {
-  title: "Catatan Atas Laporan Keuangan - KSP Mulia Dana Sejahtera",
-}
+  title: "Catatan Atas Laporan Keuangan - KSP",
+};
 
-export default function CatatanLaporanPage() {
+export default async function CatatanLaporanPage() {
+  const settings = await getPengaturanServer();
+  const namaKsp = settings?.namaKsp || 'KSP Mulia Dana Sejahtera';
+  const alamat = settings?.alamat || 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala';
+
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-6 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Catatan Atas Laporan Keuangan</h1>
-        <p className="text-sm text-gray-600 mb-6">KSP Mulia Dana Sejahtera - Periode 1 Januari - 31 Desember 2025</p>
+        <p className="text-sm text-gray-600 mb-6">{namaKsp} — {alamat}</p>
 
         <Card>
           <CardHeader>
@@ -21,7 +26,7 @@ export default function CatatanLaporanPage() {
             <div className="space-y-6">
               <div className="prose">
                 <p><strong>1. PENJELASAN UMUM</strong></p>
-                <p>Koperasi Simpan Pinjam (KSP) Mulia Dana Sejahtera adalah koperasi yang berdiri berdasarkan Undang-Undang Nomor 25 Tahun 1992 tentang Koperasi, dengan fokus utama pada layanan simpanan dan pinjaman bagi anggotanya. KSP Mulia Dana Sejahtera telah beroperasi sejak tahun 2020 dan memiliki kantor pusat di [alamat kantor].</p>
+                <p>Koperasi Simpan Pinjam ({namaKsp}) adalah koperasi yang berdiri berdasarkan Undang-Undang Nomor 25 Tahun 1992 tentang Koperasi, dengan fokus utama pada layanan simpanan dan pinjaman bagi anggotanya. KSP telah beroperasi sejak tahun 2020 dan memiliki kantor pusat di {alamat}.</p>
                 
                 <p><strong>2. SUMBER SUMBER KEBIJAKAN AKUNTANSI</strong></p>
                 <p>Laporan keuangan disusun sesuai dengan:</p>
@@ -105,13 +110,13 @@ export default function CatatanLaporanPage() {
                 </ul>
                 
                 <p><strong>6. PERINGATAN TERHADAP KONTINUITAS USAHA</strong></p>
-                <p>Berdasarkan evaluasi manajemen, tidak terdapat indikasi bahwa KSP Mulia Dana Sejahtera akan mengalami kesulitan signifikan dalam menjalankan operasinya di masa depan yang dapat dipertimbangkan sebagai lanjutan usaha (going concern).</p>
+                <p>Berdasarkan evaluasi manajemen, tidak terdapat indikasi bahwa KSP akan mengalami kesulitan signifikan dalam menjalankan operasinya di masa depan yang dapat dipertimbangkan sebagai lanjutan usaha (going concern).</p>
                 
                 <p><strong>7. PERISTIWA TERJADI SETELAH TANGKAL LAPORAN</strong></p>
                 <p>Tidak terdapat peristiwa penting yang terjadi setelah tanggal laporan yang perlu divulkanisasi dalam catatan atas laporan keuangan ini.</p>
                 
                 <p><strong>8. PENGUNGKAPAN TERKAIT PENCARIAN</strong></p>
-                <p>Tidak terdapat perkara pencarian yang sedang atau telah selesai yang berpotensi mengakibatkan kerugian finansial yang signifikan bagi KSP Mulia Dana Sejahtera.</p>
+                <p>Tidak terdapat perkara pencarian yang sedang atau telah selesai yang berpotensi mengakibatkan kerugian finansial yang signifikan bagi KSP.</p>
                 
                 <p><strong>9. PARTI BERKAITAN</strong></p>
                 <p>Transaksi dengan pihak berkaidang meliputi:</p>
@@ -121,7 +126,7 @@ export default function CatatanLaporanPage() {
                 </ul>
                 
                 <p><strong>10. KEPATUHAN TERHADAP PERATURAN PERKOPERASIAN</strong></p>
-                <p>KSP Mulia Dana Sejahtera telah mematuhi:</p>
+                <p>KSP telah mematuhi:</p>
                 <ul className="list-disc list-inside mt-2">
                   <li>Persyaratan penyimpanan cadangan minimal sesuai dengan peraturan koperasi</li>
                   <li>Kewajiban penyusutan laporan keuangan tahunan</li>

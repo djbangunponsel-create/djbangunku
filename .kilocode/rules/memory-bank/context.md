@@ -208,3 +208,9 @@ Aplikasi KSP (Koperasi Simpan Pinjam) Mulia Dana Sejahtera telah dibuat dengan f
 |  | - [x] **User persists seeing error**: in this headless CLI sandbox, browser-side JS console errors cannot be captured. All server-side signals (typecheck, production build, HTTP 200 from curl) pass. If an error persists, it must be a client-only runtime exception (e.g. stale dev server cache, Turbopack chunk loading race, or React hydration mismatch) that requires reproduction in a real browser with developer-tools console open.
 |  |
 |  | 2026-05-28 | **Anggota form UX improvement**: modified `handleSubmit` in `src/components/AnggotaClientContent.tsx` to keep the tambah anggota modal open after a successful (or failed) save, automatically resetting the form with the next available No_Anggota, enabling rapid entry of multiple members without re‑opening the modal each time.
+|  | 2026-05-28 | **Identitas KSP di Pengaturan - Database Persistence**: 
+|  | - [x] Database schema: added `badanHukum` and `email` fields to `Pengaturan_KSP` table in `drizzle/0002_create_all_tables.sql` and `src/lib/database/schema.ts`
+|  | - [x] API route `src/app/api/pengaturan/route.ts`: updated GET/POST to handle new fields
+|  | - [x] PengaturanClientContent: handleSave now calls `upsertPengaturan()` to save to database, dispatches custom event `ksp-settings-updated` for cross-tab notification
+|  | - [x] All 6 laporan pages (neraca, phu, perubahan-ekuitas, arus-kas, promosi-ekonomi, catatan) updated to fetch KSP identity via `getPengaturan()` async and display in header
+|  | - [x] Header shows: namaKsp, alamat, badanHukum, telepon, email - auto-updated when Pengaturan data changes

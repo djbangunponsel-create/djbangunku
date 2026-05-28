@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Settings, Upload, Trash2, Plus, Save, Eye, User } from 'lucide-react';
 import { readStored, writeStored, KEYS, readAllAnggota } from '@/lib/storage';
+import { getPengaturan, upsertPengaturan } from '@/lib/storage-db';
 
 // ── Default empty shape ──────────────────────────────────────────
 const EMPTY_SETTINGS: KspSettings = {
@@ -136,9 +137,21 @@ export default function PengaturanClientContent() {
     setSaved(false);
   };
 
-  // ── Save ─────────────────────────────────────────────────────
-  const handleSave = () => {
+  // ── Save to database ───────────────────────────────────────────────
+  const handleSave = async () => {
     const ok = writeStored(KEYS.SETTINGS, settings);
+    
+    try {
+      await upsertPengaturan({
+        ...settings,
+        penjamin: settings.penjamin ?? [],
+      });
+    } catch (err) {
+      console.error('Failed to save to database:', err);
+    }
+    
+    // Notify other tabs/components about settings update
+    window.dispatchEvent(new CustomEvent('ksp-settings-updated', { detail: settings }));
     setSaved(ok);
   };
 

@@ -1,17 +1,22 @@
-import { Metadata } from "next"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText } from "lucide-react"
+import { Metadata } from "next";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText } from "lucide-react";
+import { getPengaturanServer } from "@/lib/server-pengaturan";
 
 export const metadata: Metadata = {
-  title: "PHU - KSP Mulia Dana Sejahtera",
-}
+  title: "PHU - KSP",
+};
 
-export default function PhuPage() {
+export default async function PhuPage() {
+  const settings = await getPengaturanServer();
+  const namaKsp = settings?.namaKsp || 'KSP Mulia Dana Sejahtera';
+  const alamat = settings?.alamat || 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala';
+
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-6 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Laporan Perhitungan Hasil Usaha (PHU)</h1>
-        <p className="text-sm text-gray-600 mb-6">KSP Mulia Dana Sejahtera - Periode 1 Januari - 31 Desember 2025</p>
+        <p className="text-sm text-gray-600 mb-6">{namaKsp} — {alamat}</p>
         <Card>
           <CardHeader>
             <CardTitle>Laporan Perhitungan Hasil Usaha (PHU)</CardTitle>

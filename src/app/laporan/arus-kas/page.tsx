@@ -1,16 +1,21 @@
-import { Metadata } from "next"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Metadata } from "next";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getPengaturanServer } from "@/lib/server-pengaturan";
 
 export const metadata: Metadata = {
-  title: "Arus Kas - KSP Mulia Dana Sejahtera",
-}
+  title: "Arus Kas - KSP",
+};
 
-export default function ArusKasPage() {
+export default async function ArusKasPage() {
+  const settings = await getPengaturanServer();
+  const namaKsp = settings?.namaKsp || 'KSP Mulia Dana Sejahtera';
+  const alamat = settings?.alamat || 'Desa Sungai Bundung, Kecamatan Marabahan, Kabupaten Barito Kuala';
+
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-6 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Laporan Arus Kas</h1>
-        <p className="text-sm text-gray-600 mb-6">KSP Mulia Dana Sejahtera - Periode 1 Januari - 31 Desember 2025</p>
+        <p className="text-sm text-gray-600 mb-6">{namaKsp} — {alamat}</p>
 
         <Card>
           <CardHeader>

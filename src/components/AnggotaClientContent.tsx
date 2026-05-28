@@ -195,75 +195,83 @@ export default function AnggotaClientContent() {
   // Reset to page 1 when search or data changes
   useEffect(() => { setCurrentPage(1); }, [search]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const newAnggota: Anggota = { ...formData };
+   const handleSubmit = async (e: React.FormEvent) => {
+     e.preventDefault();
+     const newAnggota: Anggota = { ...formData };
 
-    try {
-      const res = await fetch('/api/anggota', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          noAnggota: newAnggota.No_Anggota,
-          namaAnggota: newAnggota.NAMA,
-          jenisKelamin: newAnggota.Jenis_Kelamin,
-          agama: newAnggota.Agama,
-          nik: newAnggota.NIK,
-          tempatLahir: newAnggota.Tempat_Lahir,
-          tanggalLahir: newAnggota.Tanggal_Lahir,
-          telepon: newAnggota.TELEPON,
-          alamat: newAnggota.Alamat,
-          tanggalMasuk: newAnggota.Tanggal_Masuk,
-          statusPerkawinan: newAnggota.Status_Perkawinan,
-          namaPasangan: newAnggota.Nama_Pasangan,
-          jumlahAnak: newAnggota.Jumlah_Anak,
-          namaIbuKandung: newAnggota.Nama_Ibu_Kandung,
-          namaSaudara: newAnggota.Nama_Saudara,
-          noHpSaudara: newAnggota.No_HP_Saudara,
-          hubunganSaudara: newAnggota.Hubungan_Saudara,
-          pekerjaan: newAnggota.Pekerjaan,
-          penghasilanPerBulan: newAnggota.PENGHASILAN_per_Bulan,
-        }),
-      });
+     try {
+       const res = await fetch('/api/anggota', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+           noAnggota: newAnggota.No_Anggota,
+           namaAnggota: newAnggota.NAMA,
+           jenisKelamin: newAnggota.Jenis_Kelamin,
+           agama: newAnggota.Agama,
+           nik: newAnggota.NIK,
+           tempatLahir: newAnggota.Tempat_Lahir,
+           tanggalLahir: newAnggota.Tanggal_Lahir,
+           telepon: newAnggota.TELEPON,
+           alamat: newAnggota.Alamat,
+           tanggalMasuk: newAnggota.Tanggal_Masuk,
+           statusPerkawinan: newAnggota.Status_Perkawinan,
+           namaPasangan: newAnggota.Nama_Pasangan,
+           jumlahAnak: newAnggota.Jumlah_Anak,
+           namaIbuKandung: newAnggota.Nama_Ibu_Kandung,
+           namaSaudara: newAnggota.Nama_Saudara,
+           noHpSaudara: newAnggota.No_HP_Saudara,
+           hubunganSaudara: newAnggota.Hubungan_Saudara,
+           pekerjaan: newAnggota.Pekerjaan,
+           penghasilanPerBulan: newAnggota.PENGHASILAN_per_Bulan,
+         }),
+       });
 
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        toast.error(errBody.error || 'Gagal menyimpan data anggota ke server.');
-      } else {
-        toast.success(`Anggota ${newAnggota.No_Anggota} berhasil disimpan ke database.`);
-      }
-    } catch {
-      toast.error('Gagal terhubung ke server. Data disimpan hanya di memori lokal.');
-    }
+       if (!res.ok) {
+         const errBody = await res.json().catch(() => ({}));
+         toast.error(errBody.error || 'Gagal menyimpan data anggota ke server.');
+       } else {
+         toast.success(`Anggota ${newAnggota.No_Anggota} berhasil disimpan ke database.`);
+       }
+     } catch {
+       toast.error('Gagal terhubung ke server. Data disimpan hanya di memori lokal.');
+     }
 
-    setAnggotaData([...anggotaData, newAnggota]);
-    setShowForm(false);
-    resetForm();
-  };
-
-  const resetForm = () => {
-setFormData({
-       No_Anggota: '',
+     setAnggotaData([...anggotaData, newAnggota]);
+     // Keep form open for next entry, reset fields with next number
+     const nextNo = (() => {
+       const updatedData = [...anggotaData, newAnggota];
+       if (updatedData.length === 0) return "1";
+       const maxN = updatedData.reduce((maxVal, a) => {
+         const nVal = parseInt((a.No_Anggota || "").replace(/\D/g, ""), 10) || 0;
+         return nVal > maxVal ? nVal : maxVal;
+       }, 0);
+       return String(maxN + 1);
+     })();
+     setFormData({
+       No_Anggota: nextNo,
        NAMA: '',
        Jenis_Kelamin: 'Laki-laki',
-      Agama: '',
-      NIK: '',
-      Tempat_Lahir: '',
-      Tanggal_Lahir: '',
-      TELEPON: '',
-      Alamat: '',
-      Tanggal_Masuk: '',
-      Status_Perkawinan: 'Belum Kawin',
-      Nama_Pasangan: '',
-      Jumlah_Anak: 0,
-      Nama_Ibu_Kandung: '',
-      Nama_Saudara: '',
-      No_HP_Saudara: '',
-      Hubungan_Saudara: '',
-      Pekerjaan: '',
-      PENGHASILAN_per_Bulan: 0,
-    });
-  };
+       Agama: '',
+       NIK: '',
+       Tempat_Lahir: '',
+       Tanggal_Lahir: '',
+       TELEPON: '',
+       Alamat: '',
+       Tanggal_Masuk: new Date().toISOString().slice(0, 10),
+       Status_Perkawinan: 'Belum Kawin',
+       Nama_Pasangan: '',
+       Jumlah_Anak: 0,
+       Nama_Ibu_Kandung: '',
+       Nama_Saudara: '',
+       No_HP_Saudara: '',
+       Hubungan_Saudara: '',
+       Pekerjaan: '',
+       PENGHASILAN_per_Bulan: 0,
+     });
+     // Do not close the form; user can close manually or add another
+   };
+
+
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
